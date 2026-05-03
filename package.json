@@ -2,6 +2,8 @@
   "name": "gymmaster",
   "version": "1.0.0",
   "private": true,
+  "license": "UNLICENSED",
+  "author": "zakaratcha",
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/server/dev.ts",
