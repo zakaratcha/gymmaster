@@ -12,6 +12,7 @@
 | [03-functional-requirements.md](./03-functional-requirements.md) | Функциональные требования (MoSCoW) |
 | [04-non-functional-requirements.md](./04-non-functional-requirements.md) | Нефункциональные требования |
 | [05-tech-and-data.md](./05-tech-and-data.md) | Веб-стек, данные, сущности |
+| [ui/](./ui/README.md) | Черновик интерфейса: оболочка, экраны тренера, вход и админка |
 
 ## Как пользоваться
 
