@@ -6,7 +6,13 @@
   "scripts": {
     "dev": "tsx watch src/server/dev.ts",
     "build": "vite build && tsc -p tsconfig.server.json",
-    "start": "node dist/server/index.js"
+    "start": "node dist/server/index.js",
+    "playwright:install": "playwright install chromium",
+    "typecheck": "npm run typecheck:client && npm run typecheck:server && npm run typecheck:e2e",
+    "typecheck:client": "tsc --noEmit -p tsconfig.json",
+    "typecheck:server": "tsc --noEmit -p tsconfig.server.json",
+    "typecheck:e2e": "tsc --noEmit -p tests/tsconfig.json",
+    "test:e2e": "NODE_OPTIONS='--import tsx/esm' cucumber-js --config tests/_harness/config/cucumber.yml"
   },
   "dependencies": {
     "@bem-react/classname": "1.8.0",
@@ -15,11 +21,14 @@
     "react-dom": "19.2.5"
   },
   "devDependencies": {
+    "@cucumber/cucumber": "12.8.2",
+    "@playwright/test": "1.59.1",
     "@types/express": "5.0.6",
     "@types/node": "25.6.0",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "6.0.1",
+    "playwright": "1.59.1",
     "tsx": "4.21.0",
     "typescript": "6.0.3",
     "vite": "8.0.10"
