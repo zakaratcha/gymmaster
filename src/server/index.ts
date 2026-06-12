@@ -1,13 +1,19 @@
 import express from "express";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { apiRouter } from "./routes.js";
+import cookieParser from "cookie-parser";
+import { migrate } from "./db/migrate.ts";
+import { apiRouter } from "./routes.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const clientDir = path.join(__dirname, "../client");
 
+await migrate();
+
 const app = express();
 app.disable("x-powered-by");
+app.use(express.json());
+app.use(cookieParser());
 app.use("/api", apiRouter);
 app.use(express.static(clientDir, { index: false }));
 app.use((_req, res) => {

@@ -2,14 +2,20 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import express from "express";
+import cookieParser from "cookie-parser";
 import { createServer as createViteServer } from "vite";
-import { apiRouter } from "./routes.js";
+import { migrate } from "./db/migrate.ts";
+import { apiRouter } from "./routes.ts";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
+
+await migrate();
 
 async function main(): Promise<void> {
   const app = express();
   app.disable("x-powered-by");
+  app.use(express.json());
+  app.use(cookieParser());
   app.use("/api", apiRouter);
 
   const vite = await createViteServer({

@@ -1,0 +1,26 @@
+meta {
+  name: login
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/login
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "email": "first-admin@local",
+    "password": "changeme"
+  }
+}
+
+docs {
+  Dev-only учётка (ADMIN-BOOT-001). Cookie gm_session сохраняется Bruno автоматически.
+}

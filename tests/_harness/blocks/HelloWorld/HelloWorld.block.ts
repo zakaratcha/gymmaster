@@ -3,14 +3,12 @@ import type { Page as PlaywrightPage } from "playwright";
 
 import { Block } from "../../classes/Block";
 
-const HELLO_SELECTORS = {
-  root: ".HelloWorld",
-  title: ".HelloWorld-Title",
-  apiLine: ".HelloWorld-ApiLine",
-} as const;
-
-export class HelloWorldBlock extends Block<typeof HELLO_SELECTORS> {
-  readonly selectors = HELLO_SELECTORS;
+export class HelloWorldBlock extends Block {
+  readonly selectors = {
+    root: ".HelloWorld",
+    title: ".HelloWorld-Title",
+    apiLine: ".HelloWorld-ApiLine",
+  };
 
   constructor(page: PlaywrightPage) {
     super(page, null);
