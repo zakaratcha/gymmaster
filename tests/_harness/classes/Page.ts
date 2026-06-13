@@ -1,8 +1,8 @@
-import { expect } from "@playwright/test";
-import type { Page as PlaywrightPage } from "playwright";
+import { expect } from '@playwright/test';
+import type { Page as PlaywrightPage } from 'playwright';
 
-import { Block, type BlockSelectors } from "./Block";
-import { getBaseUrl } from "../config/env";
+import { getBaseUrl } from '../config/env';
+import { Block, type BlockSelectors } from './Block';
 
 export abstract class Page<S extends BlockSelectors = BlockSelectors> extends Block<S> {
   abstract readonly url: string;
@@ -12,9 +12,9 @@ export abstract class Page<S extends BlockSelectors = BlockSelectors> extends Bl
     super(page, null);
   }
 
-  async open(urlExtras = ""): Promise<void> {
+  async open(urlExtras = ''): Promise<void> {
     const base = getBaseUrl();
-    const path = this.url === "/" ? "/" : this.url;
+    const path = this.url === '/' ? '/' : this.url;
     const url = new URL(path + urlExtras, `${base}/`).href;
     await this.page.goto(url);
     await this.waitForVisible();
@@ -22,7 +22,7 @@ export abstract class Page<S extends BlockSelectors = BlockSelectors> extends Bl
 
   async testUrl(): Promise<void> {
     const base = getBaseUrl();
-    const expected = new URL(this.url === "/" ? "/" : this.url, `${base}/`).href;
+    const expected = new URL(this.url === '/' ? '/' : this.url, `${base}/`).href;
     await expect(this.page).toHaveURL(expected);
   }
 }

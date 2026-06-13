@@ -1,22 +1,23 @@
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import { randomUUID } from "node:crypto";
-import { eq } from "drizzle-orm";
-import { hashPassword } from "../auth/password.ts";
-import { getDb, getSqlite } from "./client.ts";
-import { trainers } from "./schema.ts";
+import { randomUUID } from 'node:crypto';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { eq } from 'drizzle-orm';
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
+import { hashPassword } from '../auth/password.ts';
+import { getDb, getSqlite } from './client.ts';
+import { trainers } from './schema.ts';
 
-const migrationsDir = path.join(root, "src/server/db/migrations");
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 
-const BOOTSTRAP_EMAIL = "first-admin@local";
+const migrationsDir = path.join(root, 'src/server/db/migrations');
+
+const BOOTSTRAP_EMAIL = 'first-admin@local';
 /** Dev-only пароль первого админа (ADMIN-BOOT-001). */
-const BOOTSTRAP_PASSWORD = "changeme";
+const BOOTSTRAP_PASSWORD = 'changeme';
 
 function runSqlMigration(filename: string): void {
-  const sql = fs.readFileSync(path.join(migrationsDir, filename), "utf-8");
+  const sql = fs.readFileSync(path.join(migrationsDir, filename), 'utf8');
   getSqlite().exec(sql);
 }
 
@@ -33,19 +34,20 @@ async function seedBootstrapAdmin(): Promise<void> {
   }
 
   const now = new Date().toISOString();
+  // eslint-disable-next-line unicorn/no-unused-array-method-return -- Drizzle insert builder, not Map.values()
   await db.insert(trainers).values({
     id: randomUUID(),
     email: BOOTSTRAP_EMAIL,
     password: await hashPassword(BOOTSTRAP_PASSWORD),
-    status: "active",
+    status: 'active',
     admin: 1,
     createdAt: now,
-    updatedAt: now,
+    updatedAt: now
   });
 }
 
 export async function migrate(): Promise<void> {
-  runSqlMigration("0001_init.sql");
+  runSqlMigration('0001_init.sql');
   await seedBootstrapAdmin();
 }
 
@@ -55,13 +57,11 @@ async function main(): Promise<void> {
 }
 
 const isDirectRun =
-  process.argv[1] !== undefined &&
-  path.resolve(process.argv[1]) ===
-    path.resolve(fileURLToPath(import.meta.url));
+  process.argv[1] !== undefined && path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url));
 
 if (isDirectRun) {
-  void main().catch((err: unknown) => {
-    console.error(err);
+  void main().catch((error: unknown) => {
+    console.error(error);
     process.exit(1);
   });
 }

@@ -1,8 +1,8 @@
-import { After, Before, setDefaultTimeout, setWorldConstructor } from "@cucumber/cucumber";
-import { chromium } from "playwright";
+import { After, Before, setDefaultTimeout, setWorldConstructor } from '@cucumber/cucumber';
+import { chromium } from 'playwright';
 
-import { getHeadless } from "./config/env";
-import { CustomWorld } from "./world";
+import { getHeadless } from './config/env';
+import { CustomWorld } from './world';
 
 setWorldConstructor(CustomWorld);
 setDefaultTimeout(30 * 1000);

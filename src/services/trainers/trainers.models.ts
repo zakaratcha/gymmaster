@@ -1,6 +1,6 @@
-export type TrainerStatus = "active" | "blocked";
+export type TrainerStatus = 'active' | 'blocked';
 
-export type TrainerRole = "trainer" | "platform_admin";
+export type TrainerRole = 'trainer' | 'platform_admin';
 
 export type Trainer = {
   readonly id: string;

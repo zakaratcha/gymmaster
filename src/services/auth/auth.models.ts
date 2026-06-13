@@ -1,4 +1,4 @@
-import type { Trainer } from "../trainers/trainers.models.ts";
+import type { Trainer } from '../trainers/trainers.models.ts';
 
 export type LoginRequest = {
   readonly email: string;
@@ -13,10 +13,7 @@ export type LoginResponse = {
   readonly trainer: Trainer;
 };
 
-export type AuthErrorCode =
-  | "invalid_credentials"
-  | "validation_error"
-  | "forbidden";
+export type AuthErrorCode = 'invalid_credentials' | 'validation_error' | 'forbidden';
 
 export type AuthErrorResponse = {
   readonly error: AuthErrorCode;

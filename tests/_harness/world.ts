@@ -1,5 +1,5 @@
-import { World, type IWorldOptions } from "@cucumber/cucumber";
-import type { Browser, BrowserContext, Page } from "playwright";
+import { type IWorldOptions, World } from '@cucumber/cucumber';
+import type { Browser, BrowserContext, Page } from 'playwright';
 
 export class CustomWorld extends World {
   browser!: Browser;

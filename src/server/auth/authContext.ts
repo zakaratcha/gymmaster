@@ -1,4 +1,4 @@
-import type { TrainerRole, TrainerStatus } from "../../services/trainers/trainers.models.ts";
+import type { TrainerRole, TrainerStatus } from '../../services/trainers/trainers.models.ts';
 
 export type AuthContext = {
   readonly trainerId: string;
@@ -11,8 +11,8 @@ declare global {
   namespace Express {
     interface Request {
       auth?: AuthContext;
+      cookies: Record<string, string>;
+      signedCookies: Record<string, string>;
     }
   }
 }
-
-export {};

@@ -4,25 +4,19 @@ export type HelloResponse = {
 };
 
 function parseHelloResponse(data: unknown): HelloResponse {
-  if (
-    typeof data === "object" &&
-    data !== null &&
-    "message" in data &&
-    typeof (data as { message: unknown }).message === "string"
-  ) {
-    return {
-      message: (data as { message: string }).message,
-    };
+  if (typeof data === 'object' && data !== null && 'message' in data) {
+    const message = Reflect.get(data, 'message');
+    if (typeof message === 'string') {
+      return { message };
+    }
   }
-  throw new Error("Invalid /api/hello JSON shape.");
+  throw new Error('Invalid /api/hello JSON shape.');
 }
 
 /** Загружает приветствие с API того же происхождения, что и страница. */
-export async function fetchHello(options?: {
-  readonly signal?: AbortSignal;
-}): Promise<HelloResponse> {
-  const res = await fetch("/api/hello", {
-    signal: options?.signal,
+export async function fetchHello(options?: { readonly signal?: AbortSignal }): Promise<HelloResponse> {
+  const res = await fetch('/api/hello', {
+    signal: options?.signal
   });
   if (!res.ok) {
     throw new Error(`GET /api/hello failed: HTTP ${String(res.status)}`);

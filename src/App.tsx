@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
+import type { FC } from 'react';
 
-import { HelloWorld } from "./blocks/HelloWorld/HelloWorld";
-import { fetchHello } from "./services/helloApi";
+import { HelloWorld } from './blocks/HelloWorld/HelloWorld';
+import { fetchHello } from './services/helloApi';
 
-export function App() {
-  const [fromApi, setFromApi] = useState<string | undefined>(undefined);
+export const App: FC = () => {
+  const [fromApi, setFromApi] = useState<string | undefined>();
 
   useEffect(() => {
     const ac = new AbortController();
@@ -13,12 +14,12 @@ export function App() {
       .then(({ message }) => {
         setFromApi(message);
       })
-      .catch((err: unknown) => {
-        if (err instanceof Error && err.name === "AbortError") {
+      .catch((error: unknown) => {
+        if (error instanceof Error && error.name === 'AbortError') {
           return;
         }
-        console.error(err);
-        setFromApi("(не удалось загрузить)");
+        console.error(error);
+        setFromApi('(не удалось загрузить)');
       });
 
     return () => {
@@ -27,4 +28,4 @@ export function App() {
   }, []);
 
   return <HelloWorld apiLine={fromApi} />;
-}
+};

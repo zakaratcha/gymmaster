@@ -1,20 +1,17 @@
-import { randomBytes } from "node:crypto";
-import type { Response } from "express";
-import { and, eq, gt, lt } from "drizzle-orm";
-import { getDb } from "../db/client.ts";
-import { sessions, trainers, type TrainerRow } from "../db/schema.ts";
-import {
-  isProduction,
-  SESSION_COOKIE,
-  sessionMaxAgeMs,
-} from "./constants.ts";
+import { randomBytes } from 'node:crypto';
+import { and, eq, gt, lt } from 'drizzle-orm';
+import type { Response } from 'express';
+
+import { getDb } from '../db/client.ts';
+import { sessions, type TrainerRow, trainers } from '../db/schema.ts';
+import { isProduction, SESSION_COOKIE, sessionMaxAgeMs } from './constants.ts';
 
 function nowIso(): string {
   return new Date().toISOString();
 }
 
 function newSessionToken(): string {
-  return randomBytes(32).toString("base64url");
+  return randomBytes(32).toString('base64url');
 }
 
 function sessionExpiresAt(): string {
@@ -24,19 +21,19 @@ function sessionExpiresAt(): string {
 export function setSessionCookie(res: Response, token: string): void {
   res.cookie(SESSION_COOKIE, token, {
     httpOnly: true,
-    sameSite: "lax",
+    sameSite: 'lax',
     secure: isProduction(),
     maxAge: sessionMaxAgeMs(),
-    path: "/",
+    path: '/'
   });
 }
 
 export function clearSessionCookie(res: Response): void {
   res.clearCookie(SESSION_COOKIE, {
     httpOnly: true,
-    sameSite: "lax",
+    sameSite: 'lax',
     secure: isProduction(),
-    path: "/",
+    path: '/'
   });
 }
 
@@ -50,10 +47,7 @@ export async function revokeSessionsForTrainer(trainerId: string): Promise<void>
   await db.delete(sessions).where(eq(sessions.trainerId, trainerId));
 }
 
-export async function createSession(
-  trainerId: string,
-  res: Response,
-): Promise<string> {
+export async function createSession(trainerId: string, res: Response): Promise<string> {
   const db = getDb();
   await revokeSessionsForTrainer(trainerId);
   await cleanupExpiredSessions();
@@ -61,11 +55,12 @@ export async function createSession(
   const token = newSessionToken();
   const createdAt = nowIso();
 
+  // eslint-disable-next-line unicorn/no-unused-array-method-return -- Drizzle insert builder, not Map.values()
   await db.insert(sessions).values({
     id: token,
     trainerId,
     expiresAt: sessionExpiresAt(),
-    createdAt,
+    createdAt
   });
 
   setSessionCookie(res, token);
@@ -77,9 +72,7 @@ export async function deleteSessionByToken(token: string): Promise<void> {
   await db.delete(sessions).where(eq(sessions.id, token));
 }
 
-export async function findTrainerBySessionToken(
-  token: string,
-): Promise<TrainerRow | undefined> {
+export async function findTrainerBySessionToken(token: string): Promise<TrainerRow | undefined> {
   const db = getDb();
   const now = nowIso();
 
@@ -91,7 +84,7 @@ export async function findTrainerBySessionToken(
       status: trainers.status,
       admin: trainers.admin,
       createdAt: trainers.createdAt,
-      updatedAt: trainers.updatedAt,
+      updatedAt: trainers.updatedAt
     })
     .from(sessions)
     .innerJoin(trainers, eq(sessions.trainerId, trainers.id))
@@ -103,7 +96,7 @@ export async function findTrainerBySessionToken(
     return undefined;
   }
 
-  if (row.status !== "active") {
+  if (row.status !== 'active') {
     await deleteSessionByToken(token);
     return undefined;
   }

@@ -1,17 +1,17 @@
 .HelloWorld {
-  font-family:
-    system-ui,
-    Segoe UI,
-    sans-serif;
   padding: 1.5rem;
+
+  font-family: system-ui, "Segoe UI", sans-serif;
 }
 
 .HelloWorld-Title {
   margin: 0 0 0.75rem;
+
   font-weight: 600;
 }
 
 .HelloWorld-ApiLine {
   margin: 0;
+
   color: #374151;
 }

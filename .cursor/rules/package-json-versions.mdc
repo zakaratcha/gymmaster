@@ -1,0 +1,10 @@
+---
+description: Точные версии зависимостей в package.json без диапазонов
+globs: package.json
+alwaysApply: false
+---
+
+# Версии в package.json
+
+- Указывай **точные** версии: `"3.3.0"`, не `"^3.3.0"` и не `"~3.3.0"`.
+- При добавлении пакетов используй `npm install --save-exact` (в проекте включён `save-exact=true` в `.npmrc`).
