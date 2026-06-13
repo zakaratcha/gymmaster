@@ -3,8 +3,10 @@ import { observer, useLocalObservable } from 'mobx-react-lite';
 import { cn } from '@bem-react/classname';
 import type { ChangeEvent, FC, SyntheticEvent } from 'react';
 
+import { authenticate } from '../../services/auth/auth.service';
 import { Button } from '../Button/Button';
 import { Input } from '../Input/Input';
+import { Loading } from '../Loading/Loading';
 
 import './LoginForm.css';
 
@@ -13,29 +15,55 @@ const cnLoginForm = cn('LoginForm');
 type LoginFormState = {
   login: string;
   password: string;
+  submitting: boolean;
+  error?: string;
   setLogin(value: string): void;
   setPassword(value: string): void;
+  setSubmitting(value: boolean): void;
+  setError(value: string | undefined): void;
 };
 
 export const LoginForm: FC = observer(() => {
-  const { login, password, setLogin, setPassword } = useLocalObservable<LoginFormState>(() => {
-    const store: LoginFormState = {
-      login: '',
-      password: '',
-      setLogin(value) {
-        store.login = value;
-      },
-      setPassword(value) {
-        store.password = value;
+  const { login, password, submitting, error, setLogin, setPassword, setSubmitting, setError } =
+    useLocalObservable<LoginFormState>(() => {
+      const store: LoginFormState = {
+        login: '',
+        password: '',
+        submitting: false,
+        setLogin(value) {
+          store.login = value;
+        },
+        setPassword(value) {
+          store.password = value;
+        },
+        setSubmitting(value) {
+          store.submitting = value;
+        },
+        setError(value) {
+          store.error = value;
+        }
+      };
+
+      return store;
+    });
+
+  const handleSubmit = useCallback(
+    async (event: SyntheticEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      setError(undefined);
+      setSubmitting(true);
+
+      try {
+        const result = await authenticate({ email: login.trim(), password });
+        if (!result.ok) {
+          setError(result.error);
+        }
+      } finally {
+        setSubmitting(false);
       }
-    };
-
-    return store;
-  });
-
-  const handleSubmit = useCallback((event: SyntheticEvent<HTMLFormElement>) => {
-    event.preventDefault();
-  }, []);
+    },
+    [login, password, setError, setSubmitting]
+  );
 
   const handleLoginChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -57,6 +85,7 @@ export const LoginForm: FC = observer(() => {
         <h1 className={cnLoginForm('Title')}>GymMaster</h1>
         <p className={cnLoginForm('Subtitle')}>Кабинет тренера</p>
         <form className={cnLoginForm('Form')} onSubmit={handleSubmit}>
+          <Loading visible={submitting} />
           <Input id='login' label='Логин' onChange={handleLoginChange} placeholder='Введите логин' value={login} />
           <Input
             id='password'
@@ -66,7 +95,12 @@ export const LoginForm: FC = observer(() => {
             type='password'
             value={password}
           />
-          <Button color='primary' type='submit'>
+          {error === undefined ? null : (
+            <p className={cnLoginForm('Error')} role='alert'>
+              {error}
+            </p>
+          )}
+          <Button color='primary' disabled={submitting} type='submit'>
             Войти
           </Button>
         </form>

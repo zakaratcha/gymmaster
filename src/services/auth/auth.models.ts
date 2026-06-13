@@ -5,16 +5,10 @@ export type LoginRequest = {
   readonly password: string;
 };
 
+export type AuthResult =
+  | { readonly ok: true; readonly trainer: Trainer }
+  | { readonly ok: false; readonly error: string };
+
 export type CurrentTrainerResponse = {
   readonly trainer: Trainer;
-};
-
-export type LoginResponse = {
-  readonly trainer: Trainer;
-};
-
-export type AuthErrorCode = 'invalid_credentials' | 'validation_error' | 'forbidden';
-
-export type AuthErrorResponse = {
-  readonly error: AuthErrorCode;
 };

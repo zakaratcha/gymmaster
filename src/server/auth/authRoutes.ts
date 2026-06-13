@@ -1,5 +1,6 @@
 import express, { type Router } from 'express';
 
+import type { AuthResult } from '../../services/auth/auth.models.ts';
 import { requireAuth } from '../middleware/requireAuth.ts';
 import { getCurrentTrainer, login, logout, readSessionToken } from './authService.ts';
 
@@ -11,18 +12,13 @@ authRouter.post('/login', async (req, res) => {
   const body = req.body as { email?: unknown; password?: unknown };
 
   if (typeof body.email !== 'string' || typeof body.password !== 'string') {
-    res.status(400).json({ error: 'validation_error' });
+    const result: AuthResult = { ok: false, error: 'Проверьте введённые данные' };
+    res.json(result);
     return;
   }
 
   const result = await login(body.email, body.password, res);
-  if (!result.ok) {
-    const status = result.error === 'validation_error' ? 400 : 401;
-    res.status(status).json({ error: result.error });
-    return;
-  }
-
-  res.json({ trainer: result.trainer });
+  res.json(result);
 });
 
 authRouter.post('/logout', async (req, res) => {

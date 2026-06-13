@@ -1,8 +1,7 @@
 import { eq } from 'drizzle-orm';
 import type { Request, Response } from 'express';
 
-import type { CurrentTrainerResponse } from '../../services/auth/auth.models.ts';
-import type { Trainer } from '../../services/trainers/trainers.models.ts';
+import type { AuthResult, CurrentTrainerResponse } from '../../services/auth/auth.models.ts';
 import { getDb } from '../db/client.ts';
 import { type TrainerRow, trainers } from '../db/schema.ts';
 import { isValidEmail, normalizeEmail, toPublicTrainer, trainerRoles } from '../trainers/trainerMapper.ts';
@@ -13,15 +12,11 @@ import { cleanupExpiredSessions, clearSessionCookie, createSession, deleteSessio
 
 import './authContext.ts';
 
-export type LoginResult =
-  | { readonly ok: true; readonly trainer: Trainer }
-  | { readonly ok: false; readonly error: 'invalid_credentials' | 'validation_error' };
-
-export async function login(emailRaw: string, password: string, res: Response): Promise<LoginResult> {
+export async function login(emailRaw: string, password: string, res: Response): Promise<AuthResult> {
   const email = normalizeEmail(emailRaw);
 
   if (!isValidEmail(email) || password.length === 0) {
-    return { ok: false, error: 'validation_error' };
+    return { ok: false, error: 'Проверьте введённые данные' };
   }
 
   await cleanupExpiredSessions();
@@ -31,12 +26,12 @@ export async function login(emailRaw: string, password: string, res: Response): 
 
   const row = rows[0];
   if (row === undefined || row.status !== 'active') {
-    return { ok: false, error: 'invalid_credentials' };
+    return { ok: false, error: 'Неверный логин или пароль' };
   }
 
   const passwordOk = await verifyPassword(password, row.password);
   if (!passwordOk) {
-    return { ok: false, error: 'invalid_credentials' };
+    return { ok: false, error: 'Неверный логин или пароль' };
   }
 
   await createSession(row.id, res);
