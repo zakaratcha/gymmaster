@@ -1,19 +1,4 @@
 {
-  "extends": "./tsconfig.base.json",
-  "compilerOptions": {
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "jsx": "react-jsx",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "noEmit": true
-  },
-  "include": [
-    "src/blocks/**/*",
-    "src/services/**/*",
-    "src/App.tsx",
-    "src/main.tsx",
-    "src/vite-env.d.ts",
-    "vite.config.ts"
-  ],
-  "exclude": ["src/server/**"]
+  "files": [],
+  "references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.storybook.json" }]
 }

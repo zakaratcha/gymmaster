@@ -2,3 +2,8 @@
 /dist/
 /data/
 .vscode/
+storybook-static/
+debug-storybook.log
+
+*storybook.log
+storybook-static

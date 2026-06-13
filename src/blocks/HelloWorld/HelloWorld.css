@@ -13,5 +13,5 @@
 .HelloWorld-ApiLine {
   margin: 0;
 
-  color: #374151;
+  color: var(--color-text-muted);
 }

@@ -1,31 +1,38 @@
-import { useEffect, useState } from 'react';
-import type { FC } from 'react';
+import { useCallback, useState } from 'react';
+import { cn } from '@bem-react/classname';
+import type { ChangeEvent, FC, SyntheticEvent } from 'react';
 
-import { HelloWorld } from './blocks/HelloWorld/HelloWorld';
-import { fetchHello } from './services/helloApi';
+import { Button } from './blocks/Button/Button';
+import { Input } from './blocks/Input/Input';
+
+import './App.css';
+
+const classname = cn('App');
 
 export const App: FC = () => {
-  const [fromApi, setFromApi] = useState<string | undefined>();
+  const [login, setLogin] = useState('');
 
-  useEffect(() => {
-    const ac = new AbortController();
-
-    fetchHello({ signal: ac.signal })
-      .then(({ message }) => {
-        setFromApi(message);
-      })
-      .catch((error: unknown) => {
-        if (error instanceof Error && error.name === 'AbortError') {
-          return;
-        }
-        console.error(error);
-        setFromApi('(не удалось загрузить)');
-      });
-
-    return () => {
-      ac.abort();
-    };
+  const handleSubmit = useCallback((event: SyntheticEvent<HTMLFormElement>) => {
+    event.preventDefault();
   }, []);
 
-  return <HelloWorld apiLine={fromApi} />;
+  const handleLoginChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    setLogin(event.target.value);
+  }, []);
+
+  return (
+    <div className={classname()}>
+      <main className={classname('Main')}>
+        <h1 className={classname('Title')}>GymMaster</h1>
+        <p className={classname('Subtitle')}>Кабинет тренера</p>
+        <form className={classname('Form')} onSubmit={handleSubmit}>
+          <Input id='login' label='Логин' onChange={handleLoginChange} placeholder='Введите логин' value={login} />
+          <Input id='password' label='Пароль' placeholder='Введите пароль' type='password' />
+          <Button color='primary' type='submit'>
+            Войти
+          </Button>
+        </form>
+      </main>
+    </div>
+  );
 };
