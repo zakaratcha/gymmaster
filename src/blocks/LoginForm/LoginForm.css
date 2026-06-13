@@ -1,4 +1,4 @@
-.App {
+.LoginForm {
   display: flex;
   flex-direction: column;
 
@@ -7,7 +7,7 @@
   background-color: var(--color-bg);
 }
 
-.App-Main {
+.LoginForm-Main {
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -19,7 +19,7 @@
   padding: var(--space-xl);
 }
 
-.App-Title {
+.LoginForm-Title {
   margin: 0 0 var(--space-xs);
 
   color: var(--color-text);
@@ -28,7 +28,7 @@
   font-weight: 700;
 }
 
-.App-Subtitle {
+.LoginForm-Subtitle {
   margin: 0 0 var(--space-xl);
 
   color: var(--color-text-muted);
@@ -36,7 +36,7 @@
   font-size: var(--font-size-sm);
 }
 
-.App-Form {
+.LoginForm-Form {
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
