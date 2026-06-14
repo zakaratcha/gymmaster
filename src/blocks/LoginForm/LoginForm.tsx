@@ -82,8 +82,16 @@ export const LoginForm: FC = observer(() => {
         <p className={cnLoginForm('Subtitle')}>Кабинет тренера</p>
         <form className={cnLoginForm('Form')} onSubmit={handleSubmit}>
           <Loading visible={submitting} />
-          <Input id='login' label='Логин' onChange={handleLoginChange} placeholder='Введите логин' value={login} />
           <Input
+            className={cnLoginForm('LoginField')}
+            id='login'
+            label='Логин'
+            onChange={handleLoginChange}
+            placeholder='Введите логин'
+            value={login}
+          />
+          <Input
+            className={cnLoginForm('PasswordField')}
             id='password'
             label='Пароль'
             onChange={handlePasswordChange}
@@ -96,7 +104,7 @@ export const LoginForm: FC = observer(() => {
               {error}
             </p>
           )}
-          <Button color='primary' disabled={submitting} type='submit'>
+          <Button className={cnLoginForm('Submit')} color='primary' disabled={submitting} type='submit'>
             Войти
           </Button>
         </form>

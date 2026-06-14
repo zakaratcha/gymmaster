@@ -8,6 +8,7 @@ const cnInput = cn('Input');
 
 export type InputProps = {
   readonly id: string;
+  readonly className?: string;
   readonly label?: string;
   readonly error?: string;
 } & Pick<
@@ -17,6 +18,7 @@ export type InputProps = {
 
 export const Input: FC<InputProps> = ({
   id,
+  className,
   label,
   error,
   value,
@@ -30,7 +32,7 @@ export const Input: FC<InputProps> = ({
   const hasError = error !== undefined && error.length > 0;
 
   return (
-    <div className={cnInput({ error: hasError })}>
+    <div className={cnInput({ error: hasError }, [className])}>
       {label === undefined ? null : (
         <Label.Root className={cnInput('Label')} htmlFor={id}>
           {label}

@@ -3,9 +3,8 @@ import type { Page as PlaywrightPage } from 'playwright';
 import { Page } from '../../classes/Page';
 
 const MAIN_SELECTORS = {
-  root: '.HelloWorld',
-  title: '.HelloWorld-Title',
-  apiLine: '.HelloWorld-ApiLine'
+  root: '.LoginForm',
+  title: '.LoginForm-Title'
 } as const;
 
 export class MainPage extends Page<typeof MAIN_SELECTORS> {

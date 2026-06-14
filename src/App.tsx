@@ -3,9 +3,9 @@ import { observer } from 'mobx-react-lite';
 import { cn } from '@bem-react/classname';
 import type { FC } from 'react';
 
-import { HelloWorld } from './blocks/HelloWorld/HelloWorld';
 import { Loading } from './blocks/Loading/Loading';
 import { LoginForm } from './blocks/LoginForm/LoginForm';
+import { Profile } from './blocks/Profile/Profile';
 import { checkAuth } from './services/auth/auth.service';
 import { currentUserStore } from './stores/currentUser.store';
 
@@ -26,5 +26,5 @@ export const App: FC = observer(() => {
     );
   }
 
-  return <div className={cnApp()}>{currentUserStore.id === undefined ? <LoginForm /> : <HelloWorld />}</div>;
+  return <div className={cnApp()}>{currentUserStore.id === undefined ? <LoginForm /> : <Profile />}</div>;
 });

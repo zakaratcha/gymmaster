@@ -4,23 +4,23 @@
 
 ## Структура `src/`
 
-| Каталог      | Роль                                                                |
-|-------------|----------------------------------------------------------------------|
-| `blocks/`    | Компоненты по **БЭМ** и в **React-договорённости имён**: папка **PascalCase** = файл **Block.tsx** и CSS **Block.css**. |
-| `services/` | Клиентские обращения к API, адаптеры данных без разметки.              |
+| Каталог     | Роль                                                                                                                    |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `blocks/`   | Компоненты по **БЭМ** и в **React-договорённости имён**: папка **PascalCase** = файл **Block.tsx** и CSS **Block.css**. |
+| `services/` | Клиентские обращения к API, адаптеры данных без разметки.                                                               |
 
 ## Структура `tests/`
 
-| Каталог | Роль |
-|---------|------|
-| `e2e/` | Gherkin-файлы `*.feature` (сценарии), по фичам в подпапках. |
-| `_harness/config/` | [cucumber.yml](../../tests/_harness/config/cucumber.yml), [env.ts](../../tests/_harness/config/env.ts) — конфиг раннера и базовый URL/режим браузера. |
-| `_harness/` (корень) | [world.ts](../../tests/_harness/world.ts), [hooks.ts](../../tests/_harness/hooks.ts) — `CustomWorld`, запуск и закрытие Chromium. |
-| `_harness/classes/` | Базовые [Block](../../tests/_harness/classes/Block.ts) и [Page](../../tests/_harness/classes/Page.ts) (объекты страниц и блоков UI на Playwright). |
-| `_harness/pages/` | Page object на экран/маршрут; в каждой подпапке `*.page.ts` и при необходимости `*.steps.ts`. |
-| `_harness/blocks/` | Объекты виджетов (как на фронте); `*.block.ts` + при необходимости `*.steps.ts`. |
-| `_harness/commonSteps/` | Общие step definitions, не привязанные к конкретной странице или блоку (`*.steps.ts`). |
-| `_harness/commands/` | Зарезервировано под вспомогательные команды (данные, API и т.п.). |
+| Каталог                 | Роль                                                                                                                                                  |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `e2e/`                  | Gherkin-файлы `*.feature` (сценарии), по фичам в подпапках.                                                                                           |
+| `_harness/config/`      | [cucumber.yml](../../tests/_harness/config/cucumber.yml), [env.ts](../../tests/_harness/config/env.ts) — конфиг раннера и базовый URL/режим браузера. |
+| `_harness/` (корень)    | [world.ts](../../tests/_harness/world.ts), [hooks.ts](../../tests/_harness/hooks.ts) — `CustomWorld`, запуск и закрытие Chromium.                     |
+| `_harness/classes/`     | Базовые [Block](../../tests/_harness/classes/Block.ts) и [Page](../../tests/_harness/classes/Page.ts) (объекты страниц и блоков UI на Playwright).    |
+| `_harness/pages/`       | Page object на экран/маршрут; в каждой подпапке `*.page.ts` и при необходимости `*.steps.ts`.                                                         |
+| `_harness/blocks/`      | Объекты виджетов (как на фронте); `*.block.ts` + при необходимости `*.steps.ts`.                                                                      |
+| `_harness/commonSteps/` | Общие step definitions, не привязанные к конкретной странице или блоку (`*.steps.ts`).                                                                |
+| `_harness/commands/`    | Зарезервировано под вспомогательные команды (данные, API и т.п.).                                                                                     |
 
 Подключение шагов в Cucumber: сначала явно `world.ts` и `hooks.ts`, далее glob’ы `commonSteps/**/*.steps.ts`, `pages/**/*.steps.ts`, `blocks/**/*.steps.ts` (см. конфиг).
 
@@ -53,7 +53,7 @@
 
 Язык сценариев в фичах: русский (`# language: ru` в `*.feature`). Утверждения на стороне Playwright — **`expect`** из **`@playwright/test`** (web-first).
 
-**Пример.** Сценарий [helloWorld.feature](../../tests/e2e/helloWorld/helloWorld.feature): главная страница ([Main.page.ts](../../tests/_harness/pages/Main/Main.page.ts), шаги [Main.steps.ts](../../tests/_harness/pages/Main/Main.steps.ts)), блок приветствия ([HelloWorld.block.ts](../../tests/_harness/blocks/HelloWorld/HelloWorld.block.ts), [HelloWorld.steps.ts](../../tests/_harness/blocks/HelloWorld/HelloWorld.steps.ts)).
+**Пример.** Сценарий [auth.feature](../../tests/e2e/auth/auth.feature): главная страница ([Main.page.ts](../../tests/_harness/pages/Main/Main.page.ts), шаги [Main.steps.ts](../../tests/_harness/pages/Main/Main.steps.ts)), блоки формы входа и профиля ([LoginForm.block.ts](../../tests/_harness/blocks/LoginForm/LoginForm.block.ts), [Profile.block.ts](../../tests/_harness/blocks/Profile/Profile.block.ts) и соответствующие `*.steps.ts`).
 
 Зависимости в **`package.json`** задаются **точными** версиями без `^`/`~`; в репозитории хранится **`package-lock.json`**.
 
