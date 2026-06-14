@@ -421,6 +421,10 @@ export default defineConfig([globalIgnores([
       ...globals.browser,
       ...globals.node
     }
+  },
+
+  rules: {
+    'unicorn/no-this-outside-of-class': 'off'
   }
 }, {
   files: ['src/server/**/*.{ts,tsx}'],

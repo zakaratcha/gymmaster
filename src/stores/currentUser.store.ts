@@ -7,6 +7,7 @@ class CurrentUserStore implements Partial<Trainer> {
   @observable email?: Trainer['email'];
   @observable status?: Trainer['status'];
   @observable roles?: Trainer['roles'];
+  @observable inited = false;
 
   constructor() {
     makeObservable(this);
@@ -18,6 +19,11 @@ class CurrentUserStore implements Partial<Trainer> {
     this.email = trainer.email;
     this.status = trainer.status;
     this.roles = [...trainer.roles];
+  }
+
+  @action
+  setInited(inited: boolean): void {
+    this.inited = inited;
   }
 
   @action

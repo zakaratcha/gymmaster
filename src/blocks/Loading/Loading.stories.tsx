@@ -4,8 +4,7 @@ import { Loading } from './Loading';
 
 const meta = {
   title: 'Blocks/Loading',
-  component: Loading,
-  tags: ['autodocs']
+  component: Loading
 } satisfies Meta<typeof Loading>;
 
 export default meta;

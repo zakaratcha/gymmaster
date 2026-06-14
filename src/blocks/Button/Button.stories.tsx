@@ -6,7 +6,6 @@ import { Button } from './Button';
 const meta = {
   title: 'Blocks/Button',
   component: Button,
-  tags: ['autodocs'],
   args: {
     children: 'Кнопка'
   }

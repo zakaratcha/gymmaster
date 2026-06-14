@@ -13,7 +13,8 @@
   },
   "include": [
     "src/server/**/*.ts",
-    "src/services/trainers/**/*.ts",
-    "src/services/auth/**/*.ts"
+    "src/services/**/*.models.ts",
+    "src/services/**/*.utils.ts",
+    "src/services/**/*.typeguards.ts"
   ]
 }

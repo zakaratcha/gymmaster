@@ -22,8 +22,9 @@ function resolveOrigin(baseUrl: string): string {
     return baseUrl.replace(/\/$/, '');
   }
 
-  if (typeof window !== 'undefined') {
-    return window.location.origin;
+  const location = (globalThis as { location?: { origin: string } }).location;
+  if (location !== undefined) {
+    return location.origin;
   }
 
   return readNodeEnv('API_BASE_URL') ?? readNodeEnv('E2E_BASE_URL') ?? 'http://127.0.0.1:5173';

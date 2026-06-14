@@ -25,27 +25,23 @@ type LoginFormState = {
 
 export const LoginForm: FC = observer(() => {
   const { login, password, submitting, error, setLogin, setPassword, setSubmitting, setError } =
-    useLocalObservable<LoginFormState>(() => {
-      const store: LoginFormState = {
-        login: '',
-        password: '',
-        submitting: false,
-        setLogin(value) {
-          store.login = value;
-        },
-        setPassword(value) {
-          store.password = value;
-        },
-        setSubmitting(value) {
-          store.submitting = value;
-        },
-        setError(value) {
-          store.error = value;
-        }
-      };
-
-      return store;
-    });
+    useLocalObservable<LoginFormState>(() => ({
+      login: '',
+      password: '',
+      submitting: false,
+      setLogin(value) {
+        this.login = value;
+      },
+      setPassword(value) {
+        this.password = value;
+      },
+      setSubmitting(value) {
+        this.submitting = value;
+      },
+      setError(value) {
+        this.error = value;
+      }
+    }));
 
   const handleSubmit = useCallback(
     async (event: SyntheticEvent<HTMLFormElement>) => {

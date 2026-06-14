@@ -5,7 +5,6 @@ import { Input } from './Input';
 const meta = {
   title: 'Blocks/Input',
   component: Input,
-  tags: ['autodocs'],
   args: {
     id: 'demo-input',
     placeholder: 'Введите значение'
