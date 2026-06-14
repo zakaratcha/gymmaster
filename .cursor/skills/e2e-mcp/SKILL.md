@@ -32,7 +32,7 @@ npm run test:e2e
 **Один файл или сценарий** — путь к `.feature` и при необходимости теги/имя сценария через опции Cucumber (см. `cucumber-js --help`). Пример только одного файла:
 
 ```bash
-npm run test:e2e -- tests/e2e/helloWorld/helloWorld.feature
+npm run test:e2e -- tests/e2e/auth/auth.feature
 ```
 
 Для отладки с окном браузера в прогоне: **`E2E_HEADLESS=false npm run test:e2e`**.
