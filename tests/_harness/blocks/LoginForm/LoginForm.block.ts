@@ -1,3 +1,4 @@
+import { expect } from '@playwright/test';
 import type { Page as PlaywrightPage } from 'playwright';
 
 import { Block } from '../../classes/Block';
@@ -24,5 +25,11 @@ export class LoginFormBlock extends Block {
 
   async expectVisible(): Promise<void> {
     await this.waitForVisible();
+  }
+
+  async expectError(expected: string): Promise<void> {
+    const error = this.findBySelector('error');
+    await expect(error).toBeVisible();
+    await expect(error).toHaveText(expected);
   }
 }

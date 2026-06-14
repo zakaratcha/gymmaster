@@ -21,6 +21,11 @@ Given(
 When('я авторизуюсь в форме входа с email {string} и паролем {string}', fillLoginForm);
 
 Then('отображается форма входа', async function (this: CustomWorld) {
-  const block = new LoginFormBlock(this.page);
-  await block.expectVisible();
+  const loginForm = new LoginFormBlock(this.page);
+  await loginForm.expectVisible();
+});
+
+Then('на форме входа отображается ошибка {string}', async function (this: CustomWorld, text: string) {
+  const loginForm = new LoginFormBlock(this.page);
+  await loginForm.expectError(text);
 });
