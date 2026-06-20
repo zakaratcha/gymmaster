@@ -13,6 +13,7 @@
     "src/services/**/*",
     "src/stores/**/*",
     "src/App.tsx",
+    "src/routes/**/*",
     "src/main.tsx",
     "src/vite-env.d.ts"
   ],

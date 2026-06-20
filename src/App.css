@@ -3,3 +3,11 @@
 
   height: 100%;
 }
+
+.App-LoginOverlay {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+
+  background-color: var(--color-bg);
+}

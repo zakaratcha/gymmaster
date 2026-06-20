@@ -1,7 +1,7 @@
 import { Given, Then, When } from '@cucumber/cucumber';
 
 import type { CustomWorld } from '../../world';
-import { ProfileBlock } from '../Profile/Profile.block';
+import { WorkoutsBlock } from '../Workouts/Workouts.block';
 import { LoginFormBlock } from './LoginForm.block';
 
 async function fillLoginForm(this: CustomWorld, email: string, password: string): Promise<void> {
@@ -13,8 +13,8 @@ Given(
   'я авторизован с email {string} и паролем {string}',
   async function (this: CustomWorld, email: string, password: string) {
     await fillLoginForm.call(this, email, password);
-    const profile = new ProfileBlock(this.page);
-    await profile.waitForVisible();
+    const workouts = new WorkoutsBlock(this.page);
+    await workouts.waitForVisible();
   }
 );
 

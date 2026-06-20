@@ -10,5 +10,5 @@ Then('отображается экран профиля с email {string}', asy
 
 When('я выхожу из системы', async function (this: CustomWorld) {
   const block = new ProfileBlock(this.page);
-  await block.logout();
+  await block.logoutFromHome();
 });

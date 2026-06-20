@@ -2,12 +2,14 @@ import { useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 import { cn } from '@bem-react/classname';
 import type { FC } from 'react';
+import { Router } from 'react-router';
 
 import { Loading } from './blocks/Loading/Loading';
 import { LoginForm } from './blocks/LoginForm/LoginForm';
-import { Profile } from './blocks/Profile/Profile';
+import { AppRoutes } from './routes/AppRoutes';
 import { checkAuth } from './services/auth/auth.service';
 import { currentUserStore } from './stores/currentUser.store';
+import { history, routingStore } from './stores/routing.store';
 
 import './App.css';
 
@@ -26,5 +28,16 @@ export const App: FC = observer(() => {
     );
   }
 
-  return <div className={cnApp()}>{currentUserStore.id === undefined ? <LoginForm /> : <Profile />}</div>;
+  return (
+    <Router location={routingStore.location} navigator={history}>
+      <div className={cnApp()}>
+        <AppRoutes />
+        {currentUserStore.id === undefined && (
+          <div className={cnApp('LoginOverlay')}>
+            <LoginForm />
+          </div>
+        )}
+      </div>
+    </Router>
+  );
 });

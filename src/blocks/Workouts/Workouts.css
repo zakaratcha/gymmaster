@@ -1,0 +1,41 @@
+.Workouts {
+  display: flex;
+  flex-direction: column;
+
+  min-height: 100%;
+
+  background-color: var(--color-bg);
+}
+
+.Workouts-Main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+
+  width: 100%;
+  max-width: 24rem;
+  margin: 0 auto;
+  padding: var(--space-xl);
+}
+
+.Workouts-Title {
+  margin: 0 0 var(--space-xl);
+
+  color: var(--color-text);
+
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.Workouts-ProfileLink {
+  text-decoration: none;
+
+  color: var(--color-accent);
+
+  font-size: var(--font-size-sm);
+}
+
+.Workouts-ProfileLink:hover {
+  text-decoration: underline;
+}
