@@ -1,11 +1,11 @@
 import { boundClass } from 'autobind-decorator';
 
 import { api } from '../api/api.service';
-import { Client } from '../api/Client';
+import { ApiClient } from '../api/ApiClient';
 import type { AuthResult, CurrentTrainerResponse, LoginRequest } from './auth.models';
 
 @boundClass
-class AuthClient extends Client {
+class AuthClient extends ApiClient {
   private static _instance: AuthClient;
 
   static get instance(): AuthClient {

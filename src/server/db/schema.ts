@@ -1,4 +1,4 @@
-import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { index, integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 import type { TrainerStatus } from '../../services/trainers/trainers.models.ts';
 
@@ -25,5 +25,22 @@ export const sessions = sqliteTable(
   table => [index('idx_sessions_trainer_id').on(table.trainerId)]
 );
 
+export const clients = sqliteTable(
+  'clients',
+  {
+    id: text('id').primaryKey(),
+    trainerId: text('trainer_id')
+      .notNull()
+      .references(() => trainers.id, { onDelete: 'cascade' }),
+    name: text('name').notNull(),
+    notes: text('notes'),
+    bodyWeightKg: real('body_weight_kg'),
+    createdAt: text('created_at').notNull(),
+    updatedAt: text('updated_at').notNull()
+  },
+  table => [index('idx_clients_trainer_id').on(table.trainerId)]
+);
+
 export type TrainerRow = typeof trainers.$inferSelect;
 export type SessionRow = typeof sessions.$inferSelect;
+export type ClientRow = typeof clients.$inferSelect;

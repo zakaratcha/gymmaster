@@ -15,7 +15,7 @@ await migrate();
 async function main(): Promise<void> {
   const app = express();
   app.disable('x-powered-by');
-  app.use(express.json());
+  app.use(express.json({ type: ['application/json', 'application/merge-patch+json'] }));
   app.use(cookieParser());
   app.use('/api', apiRouter);
 

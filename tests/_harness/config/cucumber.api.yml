@@ -1,0 +1,8 @@
+default:
+  forceExit: true
+  import:
+    - tests/_harness/world.api.ts
+    - tests/_harness/hooks.api.ts
+    - tests/_harness/apiSteps/**/*.steps.ts
+  paths:
+    - tests/api/**/*.feature

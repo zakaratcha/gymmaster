@@ -1,0 +1,26 @@
+meta {
+  name: update
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/api/clients/{{clientId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/merge-patch+json
+}
+
+body:json {
+  {
+    "name": "Анна Иванова (обновлено)",
+    "bodyWeightKg": 63
+  }
+}
+
+docs {
+  Сначала login из auth-коллекции (cookie gm_session). Подставьте clientId из ответа create. Ожидается 200.
+}

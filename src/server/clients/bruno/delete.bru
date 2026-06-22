@@ -1,0 +1,15 @@
+meta {
+  name: delete
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/api/clients/{{clientId}}
+  body: none
+  auth: none
+}
+
+docs {
+  Сначала login из auth-коллекции (cookie gm_session). Подставьте clientId из ответа create. Ожидается 204; повторный get-by-id — 404.
+}

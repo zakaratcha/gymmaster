@@ -1,0 +1,27 @@
+meta {
+  name: create
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/clients
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Анна Иванова",
+    "notes": "Первый визит",
+    "bodyWeightKg": 62.5
+  }
+}
+
+docs {
+  Сначала login из auth-коллекции (cookie gm_session). Ожидается 201 и client с id.
+}

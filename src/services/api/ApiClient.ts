@@ -1,6 +1,6 @@
 import { api } from './api.service';
 
-export abstract class Client {
+export abstract class ApiClient {
   protected getBaseUrl(): string {
     return api.baseUrl;
   }

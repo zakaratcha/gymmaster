@@ -48,6 +48,7 @@ async function seedBootstrapAdmin(): Promise<void> {
 
 export async function migrate(): Promise<void> {
   runSqlMigration('0001_init.sql');
+  runSqlMigration('0002_clients.sql');
   await seedBootstrapAdmin();
 }
 

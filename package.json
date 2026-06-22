@@ -18,6 +18,7 @@
     "typecheck:server": "tsc --noEmit -p tsconfig.server.json",
     "typecheck:e2e": "tsc --noEmit -p tests/tsconfig.json",
     "test:e2e": "NODE_OPTIONS='--import tsx/esm' cucumber-js --config tests/_harness/config/cucumber.yml",
+    "test:api": "NODE_OPTIONS='--import tsx/esm' cucumber-js --config tests/_harness/config/cucumber.api.yml",
     "lint:es": "eslint ./src/ ./tests/ ./.storybook/ vite.config.ts --concurrency=4 --max-warnings=5",
     "lint:styles": "stylelint \"src/**/*.{css,scss}\"",
     "lint:gherkin": "gherkin-lint",

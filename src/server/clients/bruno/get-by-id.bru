@@ -1,0 +1,15 @@
+meta {
+  name: get-by-id
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/clients/{{clientId}}
+  body: none
+  auth: none
+}
+
+docs {
+  Сначала login из auth-коллекции (cookie gm_session). Подставьте clientId из ответа create. Ожидается 200.
+}
