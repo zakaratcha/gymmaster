@@ -2,7 +2,7 @@ import { expect } from '@playwright/test';
 import type { Page as PlaywrightPage } from 'playwright';
 
 import { Block } from '../../classes/Block';
-import { WorkoutsBlock } from '../Workouts/Workouts.block';
+import { ShellBlock } from '../Shell/Shell.block';
 
 export class ProfileBlock extends Block {
   readonly selectors = {
@@ -26,8 +26,8 @@ export class ProfileBlock extends Block {
   }
 
   async logoutFromHome(): Promise<void> {
-    const workouts = new WorkoutsBlock(this.page);
-    await workouts.openProfile();
+    const shell = new ShellBlock(this.page);
+    await shell.openAccountTab();
     await this.waitForVisible();
     await this.logout();
   }

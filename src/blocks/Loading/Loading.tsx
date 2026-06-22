@@ -1,7 +1,7 @@
 import { cn } from '@bem-react/classname';
 import type { CSSProperties, FC } from 'react';
 
-import './Loading.css';
+import './Loading.scss';
 
 const cnLoading = cn('Loading');
 

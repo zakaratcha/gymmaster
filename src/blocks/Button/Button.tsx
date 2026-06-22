@@ -2,7 +2,7 @@ import { cn } from '@bem-react/classname';
 import { Slot } from '@radix-ui/react-slot';
 import type { ButtonHTMLAttributes, FC, ReactNode } from 'react';
 
-import './Button.css';
+import './Button.scss';
 
 const cnButton = cn('Button');
 

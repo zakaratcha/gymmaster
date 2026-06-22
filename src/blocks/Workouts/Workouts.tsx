@@ -2,7 +2,7 @@ import { cn } from '@bem-react/classname';
 import type { FC } from 'react';
 import { Link } from 'react-router-dom';
 
-import './Workouts.css';
+import './Workouts.scss';
 
 const cnWorkouts = cn('Workouts');
 

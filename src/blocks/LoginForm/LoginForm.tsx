@@ -8,7 +8,7 @@ import { Button } from '../Button/Button';
 import { Input } from '../Input/Input';
 import { Loading } from '../Loading/Loading';
 
-import './LoginForm.css';
+import './LoginForm.scss';
 
 const cnLoginForm = cn('LoginForm');
 

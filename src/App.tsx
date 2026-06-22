@@ -11,7 +11,7 @@ import { checkAuth } from './services/auth/auth.service';
 import { currentUserStore } from './stores/currentUser.store';
 import { history, routingStore } from './stores/routing.store';
 
-import './App.css';
+import './App.scss';
 
 const cnApp = cn('App');
 

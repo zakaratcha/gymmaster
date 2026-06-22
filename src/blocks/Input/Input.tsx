@@ -2,7 +2,7 @@ import { cn } from '@bem-react/classname';
 import * as Label from '@radix-ui/react-label';
 import type { FC, InputHTMLAttributes } from 'react';
 
-import './Input.css';
+import './Input.scss';
 
 const cnInput = cn('Input');
 

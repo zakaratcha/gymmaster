@@ -8,7 +8,7 @@ import { currentUserStore } from '../../stores/currentUser.store';
 import { Button } from '../Button/Button';
 import { Loading } from '../Loading/Loading';
 
-import './Profile.css';
+import './Profile.scss';
 
 const cnProfile = cn('Profile');
 

@@ -1,0 +1,45 @@
+.Profile {
+  display: flex;
+  flex-direction: column;
+
+  min-height: 100%;
+
+  background-color: var(--color-bg);
+
+  &-Main {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+
+    width: 100%;
+    max-width: 24rem;
+    margin: 0 auto;
+    padding: var(--space-xl);
+  }
+
+  &-Title {
+    margin: 0 0 var(--space-xl);
+
+    color: var(--color-text);
+
+    font-size: 1.75rem;
+    font-weight: 700;
+  }
+
+  &-Email {
+    margin: 0 0 var(--space-xl);
+
+    color: var(--color-text-muted);
+
+    font-size: var(--font-size-sm);
+  }
+
+  &-Actions {
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+}
