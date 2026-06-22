@@ -16,6 +16,10 @@ const BOOTSTRAP_EMAIL = 'first-admin@local';
 /** Dev-only пароль первого админа (ADMIN-BOOT-001). */
 const BOOTSTRAP_PASSWORD = 'changeme';
 
+const SECOND_TRAINER_EMAIL = 'second-trainer@local';
+/** Dev-only пароль второго тренера для тестов изоляции. */
+const SECOND_TRAINER_PASSWORD = 'changeme';
+
 function runSqlMigration(filename: string): void {
   const sql = fs.readFileSync(path.join(migrationsDir, filename), 'utf8');
   getSqlite().exec(sql);
@@ -46,10 +50,36 @@ async function seedBootstrapAdmin(): Promise<void> {
   });
 }
 
+async function seedSecondTrainer(): Promise<void> {
+  const db = getDb();
+  const existing = await db
+    .select({ id: trainers.id })
+    .from(trainers)
+    .where(eq(trainers.email, SECOND_TRAINER_EMAIL))
+    .limit(1);
+
+  if (existing.length > 0) {
+    return;
+  }
+
+  const now = new Date().toISOString();
+  // eslint-disable-next-line unicorn/no-unused-array-method-return -- Drizzle insert builder, not Map.values()
+  await db.insert(trainers).values({
+    id: randomUUID(),
+    email: SECOND_TRAINER_EMAIL,
+    password: await hashPassword(SECOND_TRAINER_PASSWORD),
+    status: 'active',
+    admin: 0,
+    createdAt: now,
+    updatedAt: now
+  });
+}
+
 export async function migrate(): Promise<void> {
   runSqlMigration('0001_init.sql');
   runSqlMigration('0002_clients.sql');
   await seedBootstrapAdmin();
+  await seedSecondTrainer();
 }
 
 async function main(): Promise<void> {

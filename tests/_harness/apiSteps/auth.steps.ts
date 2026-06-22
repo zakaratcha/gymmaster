@@ -4,6 +4,8 @@ import { expect } from '@playwright/test';
 import { ApiError } from '../../../src/services/api/api.service';
 import { authClient } from '../../../src/services/auth/auth.client';
 import { fetchUserSession } from '../commands/auth/fetchUserSession';
+import { loginWithJson } from '../commands/auth/loginWithJson';
+import { logoutViaApi, logoutWithoutSession } from '../commands/auth/logout';
 import { requestAsAdmin, requestWithoutAuth } from '../commands/requestAs';
 import { resetApiSession } from '../commands/resetApiSession';
 import type { ApiWorld } from '../world.api';
@@ -48,6 +50,19 @@ When('я запрашиваю текущего пользователя чере
     this.trainer = undefined;
     this.lastError = error instanceof ApiError ? error : undefined;
   }
+});
+
+When('я выхожу через API', async function () {
+  await logoutViaApi();
+});
+
+When('я выхожу через API без сессии', async function () {
+  await logoutWithoutSession();
+});
+
+When('я вхожу через API с телом JSON:', async function (this: ApiWorld, json: string) {
+  this.authResult = await loginWithJson(json);
+  this.lastError = undefined;
 });
 
 Then('вход через API успешен', function (this: ApiWorld) {

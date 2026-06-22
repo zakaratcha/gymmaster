@@ -2,9 +2,13 @@ import type { LoginRequest } from '../../../../src/services/auth/auth.models';
 
 export type TestUser = LoginRequest & { sessionReady?: boolean };
 
-const testUsers: Record<'Администратор', TestUser> = {
+const testUsers: Record<'Администратор' | 'Тренер', TestUser> = {
   Администратор: {
     email: 'first-admin@local',
+    password: 'changeme'
+  },
+  Тренер: {
+    email: 'second-trainer@local',
     password: 'changeme'
   }
 };
