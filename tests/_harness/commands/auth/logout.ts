@@ -1,12 +1,12 @@
 import { authClient } from '../../../../src/services/auth/auth.client';
 import { requestAsAdmin } from '../requestAs';
-import { resetApiSession } from '../resetApiSession';
+import { resetApiSession } from './apiSession';
 
 export async function logoutViaApi(): Promise<void> {
   await requestAsAdmin(authClient.logout);
 }
 
 export async function logoutWithoutSession(): Promise<void> {
-  await resetApiSession();
+  resetApiSession();
   await authClient.logout();
 }

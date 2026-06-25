@@ -41,3 +41,27 @@ export function buildRequestUrl(baseUrl: string, path: string, params?: Record<s
 
   return url.href;
 }
+
+export function buildCookieHeader(cookies: ReadonlyMap<string, string>): string {
+  return [...cookies.entries()].map(([name, value]) => `${name}=${value}`).join('; ');
+}
+
+export function collectCookiesFromResponse(response: Response, target: Map<string, string>): void {
+  const setCookies = response.headers.getSetCookie?.() ?? [];
+
+  for (const cookie of setCookies) {
+    const pair = cookie.split(';', 1)[0];
+    if (pair === undefined) {
+      continue;
+    }
+
+    const eqIndex = pair.indexOf('=');
+    if (eqIndex === -1) {
+      continue;
+    }
+
+    const name = pair.slice(0, eqIndex).trim();
+    const value = pair.slice(eqIndex + 1).trim();
+    target.set(name, value);
+  }
+}

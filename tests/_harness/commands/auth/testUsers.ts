@@ -1,8 +1,10 @@
 import type { LoginRequest } from '../../../../src/services/auth/auth.models';
 
-export type TestUser = LoginRequest & { sessionReady?: boolean };
+export type TestUsername = 'Администратор' | 'Тренер';
 
-const testUsers: Record<'Администратор' | 'Тренер', TestUser> = {
+export type TestUser = LoginRequest;
+
+const testUsers: Record<TestUsername, TestUser> = {
   Администратор: {
     email: 'first-admin@local',
     password: 'changeme'
@@ -13,12 +15,10 @@ const testUsers: Record<'Администратор' | 'Тренер', TestUser>
   }
 };
 
-export function getTestUser(username: keyof typeof testUsers): TestUser {
-  const user = testUsers[username];
+export function getTestUser(name: TestUsername): TestUser {
+  return testUsers[name];
+}
 
-  if (user === undefined) {
-    throw new Error(`Не существует тестовый пользователь "${username}"`);
-  }
-
-  return user;
+export function getTestUsernameByEmail(email: string): TestUsername | undefined {
+  return (Object.keys(testUsers) as TestUsername[]).find(name => testUsers[name].email === email);
 }

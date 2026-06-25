@@ -1,35 +1,9 @@
-import { CustomCache, type CustomCacheConfig } from '../common/CustomCache';
-import { buildRequestUrl, stringifyParams } from './api.utils';
+import { CustomCache } from '../common/CustomCache';
+import { ApiError, type RequestConfig, type RequestConfigWithCache } from './api.models';
+import { isBodyInit } from './api.typeguards';
+import { buildCookieHeader, buildRequestUrl, collectCookiesFromResponse, stringifyParams } from './api.utils';
 
 const JSON_PATCH = 'application/merge-patch+json';
-
-export interface ServerError {
-  status: string;
-  message: string;
-  errors: unknown[];
-}
-
-export class ApiError extends Error {
-  readonly status: number;
-  readonly body: unknown;
-
-  constructor(status: number, body: unknown, message?: string) {
-    super(message ?? `HTTP ${String(status)}`);
-    this.name = 'ApiError';
-    this.status = status;
-    this.body = body;
-  }
-}
-
-interface RequestConfig {
-  params?: Record<string, string | number | undefined>;
-  headers?: Record<string, string>;
-  signal?: AbortSignal;
-}
-
-interface RequestConfigWithCache extends RequestConfig {
-  cache?: CustomCacheConfig;
-}
 
 function readNodeEnv(name: string): string | undefined {
   const proc = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process;
@@ -45,12 +19,6 @@ function getDefaultBaseUrl(): string {
   return readNodeEnv('API_BASE_URL') ?? readNodeEnv('E2E_BASE_URL') ?? 'http://127.0.0.1:5173';
 }
 
-function isBodyInit(data: unknown): data is BodyInit {
-  return (
-    data instanceof FormData || data instanceof URLSearchParams || data instanceof Blob || data instanceof ArrayBuffer
-  );
-}
-
 class Api {
   private static _instance: Api;
 
@@ -60,7 +28,6 @@ class Api {
 
   baseUrl: string;
   cache: CustomCache<Promise<unknown>>;
-  private readonly cookieJar = new Map<string, string>();
 
   private constructor() {
     this.baseUrl = getDefaultBaseUrl();
@@ -144,7 +111,10 @@ class Api {
         }
       }
 
-      this.applyCookies(headers);
+      const requestCookies = config.cookies;
+      if (requestCookies !== undefined && requestCookies.size > 0) {
+        headers.set('Cookie', buildCookieHeader(requestCookies));
+      }
 
       const response = await fetch(requestUrl, {
         method,
@@ -154,7 +124,9 @@ class Api {
         signal: config.signal
       });
 
-      this.storeCookies(response);
+      if (config.collectCookies !== undefined) {
+        collectCookiesFromResponse(response, config.collectCookies);
+      }
 
       if (!response.ok) {
         throw new ApiError(response.status, await this.readErrorBody(response));
@@ -162,35 +134,6 @@ class Api {
 
       return await this.parseResponse<T>(response);
     })();
-  }
-
-  private applyCookies(headers: Headers): void {
-    if (this.cookieJar.size === 0) {
-      return;
-    }
-
-    const cookieHeader = [...this.cookieJar.entries()].map(([name, value]) => `${name}=${value}`).join('; ');
-    headers.set('Cookie', cookieHeader);
-  }
-
-  private storeCookies(response: Response): void {
-    const setCookies = response.headers.getSetCookie?.() ?? [];
-
-    for (const cookie of setCookies) {
-      const pair = cookie.split(';', 1)[0];
-      if (pair === undefined) {
-        continue;
-      }
-
-      const eqIndex = pair.indexOf('=');
-      if (eqIndex === -1) {
-        continue;
-      }
-
-      const name = pair.slice(0, eqIndex).trim();
-      const value = pair.slice(eqIndex + 1).trim();
-      this.cookieJar.set(name, value);
-    }
   }
 
   private async readErrorBody(response: Response): Promise<unknown> {

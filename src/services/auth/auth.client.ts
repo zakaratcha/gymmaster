@@ -4,6 +4,10 @@ import { api } from '../api/api.service';
 import { ApiClient } from '../api/ApiClient';
 import type { AuthResult, CurrentTrainerResponse, LoginRequest } from './auth.models';
 
+type LoginRequestConfig = {
+  collectCookies?: Map<string, string>;
+};
+
 @boundClass
 class AuthClient extends ApiClient {
   private static _instance: AuthClient;
@@ -24,8 +28,8 @@ class AuthClient extends ApiClient {
     return `${this.getApiUrl()}/current-user`;
   }
 
-  async login(payload: LoginRequest): Promise<AuthResult> {
-    return await api.post<AuthResult>(this.getLoginUrl(), payload);
+  async login(payload: LoginRequest, config: LoginRequestConfig = {}): Promise<AuthResult> {
+    return await api.post<AuthResult>(this.getLoginUrl(), payload, config);
   }
 
   async logout(): Promise<void> {

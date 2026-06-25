@@ -31,11 +31,12 @@ export const App: FC = observer(() => {
   return (
     <Router location={routingStore.location} navigator={history}>
       <div className={cnApp()}>
-        <AppRoutes />
-        {currentUserStore.id === undefined && (
+        {currentUserStore.id === undefined ? (
           <div className={cnApp('LoginOverlay')}>
             <LoginForm />
           </div>
+        ) : (
+          <AppRoutes />
         )}
       </div>
     </Router>

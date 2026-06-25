@@ -1,7 +1,7 @@
 import { Given, Then, When } from '@cucumber/cucumber';
 import { expect } from '@playwright/test';
 
-import { ApiError } from '../../../src/services/api/api.service';
+import { ApiError } from '../../../src/services/api/api.models';
 import { UNAUTH_TEST_CLIENT_ID } from '../commands/clients/clientTestIds';
 import { createClient, createClientWithoutAuth } from '../commands/clients/createClient';
 import { deleteAllClients } from '../commands/clients/deleteAllClients';

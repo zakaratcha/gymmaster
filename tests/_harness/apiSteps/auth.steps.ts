@@ -1,30 +1,36 @@
 import { Given, Then, When } from '@cucumber/cucumber';
 import { expect } from '@playwright/test';
 
-import { ApiError } from '../../../src/services/api/api.service';
+import { ApiError } from '../../../src/services/api/api.models';
 import { authClient } from '../../../src/services/auth/auth.client';
-import { fetchUserSession } from '../commands/auth/fetchUserSession';
+import { ensureUserCookies, resetApiSession } from '../commands/auth/apiSession';
 import { loginWithJson } from '../commands/auth/loginWithJson';
 import { logoutViaApi, logoutWithoutSession } from '../commands/auth/logout';
+import { getTestUsernameByEmail } from '../commands/auth/testUsers';
 import { requestAsAdmin, requestWithoutAuth } from '../commands/requestAs';
-import { resetApiSession } from '../commands/resetApiSession';
 import type { ApiWorld } from '../world.api';
 
 Given(
   'я авторизован в API как {string} с паролем {string}',
-  async function (this: ApiWorld, email: string, password: string) {
-    await fetchUserSession({ email, password });
+  async function (this: ApiWorld, email: string, _password: string) {
+    const name = getTestUsernameByEmail(email);
+
+    if (name === undefined) {
+      throw new Error(`Неизвестный тестовый пользователь "${email}"`);
+    }
+
+    await ensureUserCookies(name);
   }
 );
 
-Given('я не авторизован в API', async function () {
-  await resetApiSession();
+Given('я не авторизован в API', function () {
+  resetApiSession();
 });
 
 When(
   'я вхожу через API с email {string} и паролем {string}',
   async function (this: ApiWorld, email: string, password: string) {
-    await resetApiSession();
+    resetApiSession();
     this.authResult = await authClient.login({ email, password });
     this.lastError = undefined;
   }

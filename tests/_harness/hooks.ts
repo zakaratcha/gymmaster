@@ -1,13 +1,17 @@
 import { After, Before, setDefaultTimeout, setWorldConstructor } from '@cucumber/cucumber';
 import { chromium } from 'playwright';
 
-import { getHeadless } from './config/env';
+import { api } from '../../src/services/api/api.service';
+import { resetApiSession } from './commands/auth/apiSession';
+import { getBaseUrl, getHeadless } from './config/env';
 import { CustomWorld } from './world';
 
 setWorldConstructor(CustomWorld);
 setDefaultTimeout(30 * 1000);
 
 Before(async function (this: CustomWorld) {
+  api.baseUrl = getBaseUrl();
+  resetApiSession();
   this.browser = await chromium.launch({ headless: getHeadless() });
   this.context = await this.browser.newContext();
   this.page = await this.context.newPage();

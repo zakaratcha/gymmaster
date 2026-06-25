@@ -1,0 +1,114 @@
+.ClientCreateForm {
+  position: fixed;
+  z-index: 10;
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: var(--space-xl);
+
+  &-Backdrop {
+    position: absolute;
+    inset: 0;
+
+    cursor: pointer;
+
+    border: none;
+    background-color: rgb(0 0 0 / 40%);
+  }
+
+  &-Card {
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+
+    width: 100%;
+    max-width: 24rem;
+    padding: var(--space-xl);
+
+    border-radius: var(--radius-lg);
+    background-color: var(--color-bg);
+    box-shadow: var(--shadow-md);
+  }
+
+  &-Title {
+    margin: 0;
+
+    color: var(--color-text);
+
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  &-NotesField {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+
+    width: 100%;
+  }
+
+  &-NotesLabel {
+    color: var(--color-text-muted);
+
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+  }
+
+  &-NotesControl {
+    width: 100%;
+    min-height: 5rem;
+    padding: var(--space-sm) var(--space-md);
+
+    resize: vertical;
+    transition:
+      border-color var(--transition-fast),
+      box-shadow var(--transition-fast),
+      background-color var(--transition-fast);
+
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: var(--color-surface);
+
+    font-family: inherit;
+    font-size: var(--font-size-md);
+
+    &::placeholder {
+      color: var(--color-text-placeholder);
+    }
+
+    &:focus-visible {
+      border-color: var(--color-accent);
+      outline: none;
+      box-shadow: 0 0 0 3px var(--color-accent-subtle);
+    }
+  }
+
+  &-Error {
+    margin: 0;
+
+    color: var(--color-danger);
+
+    font-size: var(--font-size-sm);
+  }
+
+  &-Actions {
+    display: flex;
+    gap: var(--space-md);
+
+    margin-top: var(--space-sm);
+  }
+
+  &-Cancel {
+    flex: 1;
+  }
+
+  &-Submit {
+    flex: 1;
+  }
+}

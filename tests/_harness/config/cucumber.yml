@@ -4,6 +4,7 @@ default:
     - tests/_harness/world.ts
     - tests/_harness/hooks.ts
     - tests/_harness/commonSteps/**/*.steps.ts
+    - tests/_harness/apiSteps/**/*.steps.ts
     - tests/_harness/pages/**/*.steps.ts
     - tests/_harness/blocks/**/*.steps.ts
   paths:

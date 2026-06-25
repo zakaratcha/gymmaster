@@ -7,7 +7,7 @@ import './Input.scss';
 const cnInput = cn('Input');
 
 export type InputProps = {
-  readonly id: string;
+  readonly id?: string;
   readonly className?: string;
   readonly label?: string;
   readonly error?: string;
@@ -30,14 +30,15 @@ export const Input: FC<InputProps> = ({
   type = 'text'
 }) => {
   const hasError = error !== undefined && error.length > 0;
+  const hasLabel = label !== undefined && id !== undefined;
 
   return (
     <div className={cnInput({ error: hasError }, [className])}>
-      {label === undefined ? null : (
+      {hasLabel ? (
         <Label.Root className={cnInput('Label')} htmlFor={id}>
           {label}
         </Label.Root>
-      )}
+      ) : null}
       <input
         aria-invalid={hasError ? true : undefined}
         className={cnInput('Control')}
