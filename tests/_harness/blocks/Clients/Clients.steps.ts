@@ -11,6 +11,16 @@ When('я ищу клиента {string}', async function (this: CustomWorld, que
   await block.search(query);
 });
 
+When('я открываю карточку клиента {string} из списка', async function (this: CustomWorld, name: string) {
+  const block = new ClientsBlock(this.page);
+  await block.clickClientByName(name);
+});
+
+When('я открываю карточку клиента {string} из недавних', async function (this: CustomWorld, name: string) {
+  const block = new ClientsBlock(this.page);
+  await block.clickRecentChipByName(name);
+});
+
 When('я открываю форму добавления клиента', async function (this: CustomWorld) {
   const block = new ClientsBlock(this.page);
   await block.waitForListReady();

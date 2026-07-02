@@ -10,3 +10,7 @@ Given('нет ни одного клиента', async function () {
 Given('существует клиент {string}', async function (name: string) {
   await createClient({ name });
 });
+
+Given('существует клиент {string} с весом {int}', async function (name: string, bodyWeightKg: number) {
+  await createClient({ name, bodyWeightKg });
+});

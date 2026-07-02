@@ -1,6 +1,7 @@
 import type { Page as PlaywrightPage } from 'playwright';
 
 import { Block } from '../../classes/Block';
+import { findClientByName } from '../../commands/clients/findClientByName';
 
 export class ClientsBlock extends Block {
   readonly selectors = {
@@ -9,6 +10,7 @@ export class ClientsBlock extends Block {
     searchInput: '.Clients-SearchField .Input-Control',
     emptyState: '.Clients-Empty',
     clientRow: '.Clients-RowName',
+    clientRowButton: '.Clients-Row',
     recentChip: '.Clients-RecentChip',
     fab: '.Clients-Fab',
     error: '.Clients-Error'
@@ -47,17 +49,32 @@ export class ClientsBlock extends Block {
     return text?.trim() ?? null;
   }
 
+  async clickClientByName(name: string): Promise<void> {
+    await this.waitForListReady();
+    await this.findBySelector('root')
+      .locator(this.selectors.clientRowButton)
+      .filter({ has: this.page.locator(this.selectors.clientRow, { hasText: name }) })
+      .first()
+      .click();
+  }
+
+  async clickRecentChipByName(name: string): Promise<void> {
+    await this.waitForListReady();
+    const client = await findClientByName(name);
+    await this.findBySelector('root')
+      .locator(this.selectors.recentChip)
+      .and(this.page.locator(`[data-client-id="${client.id}"]`))
+      .click();
+  }
+
   async waitForListReady(): Promise<void> {
     await this.waitForVisible();
 
     const content = this.findBySelector('root').locator('.Clients-Content');
     const loading = content.locator('.Clients-Loading');
     if (await loading.isVisible()) {
-      await loading.waitFor({ state: 'hidden', timeout: 10_000 });
+      await loading.waitFor({ state: 'hidden' });
     }
-    await content.locator('.Clients-Empty, .Clients-RowName, .Clients-Error').first().waitFor({
-      state: 'visible',
-      timeout: 10_000
-    });
+    await content.locator('.Clients-Empty, .Clients-RowName, .Clients-Error').first().waitFor({ state: 'visible' });
   }
 }

@@ -14,11 +14,11 @@ function mergeCookies(
 }
 
 function patchApiCookies(cookies: RequestCookies | undefined): () => void {
-  const originalGet = api.get;
-  const originalPost = api.post;
-  const originalDelete = api.delete;
-  const originalPatch = api.patch;
-  const originalPut = api.put;
+  const originalGet = api.get.bind(api);
+  const originalPost = api.post.bind(api);
+  const originalDelete = api.delete.bind(api);
+  const originalPatch = api.patch.bind(api);
+  const originalPut = api.put.bind(api);
 
   api.get = (url, config) => originalGet(url, mergeCookies(config, cookies));
   api.post = (url, data, config) => originalPost(url, data, mergeCookies(config, cookies));
