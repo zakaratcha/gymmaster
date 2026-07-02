@@ -2,10 +2,12 @@ import { type ChangeEvent, type FC, type SyntheticEvent, useCallback, useEffect 
 import { observer, useLocalObservable } from 'mobx-react-lite';
 import { cn } from '@bem-react/classname';
 import { PlusIcon } from '@radix-ui/react-icons';
+import { useNavigate } from 'react-router-dom';
 
 import type { Client, CreateClientRequest } from '../../services/clients/clients.models';
 import {
   createClient,
+  getRecentClientIds,
   listClients,
   pushRecentClientId,
   resolveRecentClientIds
@@ -109,6 +111,7 @@ function buildCreatePayload(name: string, notes: string, bodyWeightKg: string): 
 }
 
 export const Clients: FC<ClientsProps> = observer(({ initialClients, initialRecentIds }) => {
+  const navigate = useNavigate();
   const isStaticMode = initialClients !== undefined;
 
   const state = useLocalObservable<ClientsState>(() => ({
@@ -283,6 +286,20 @@ export const Clients: FC<ClientsProps> = observer(({ initialClients, initialRece
     void loadClients();
   }, [loadClients]);
 
+  const handleClientClick = useCallback(
+    (event: SyntheticEvent<HTMLButtonElement>) => {
+      const clientId = event.currentTarget.dataset.clientId;
+      if (clientId === undefined) {
+        return;
+      }
+
+      pushRecentClientId(clientId);
+      setRecentClientIds(getRecentClientIds());
+      void navigate(`/clients/${clientId}`);
+    },
+    [navigate, setRecentClientIds]
+  );
+
   const isSearchActive = searchQuery.trim().length > 0;
   const showRecent = !loading && error === undefined && recentClients.length > 0;
   const showEmpty = !loading && error === undefined && filteredClients.length === 0;
@@ -323,7 +340,13 @@ export const Clients: FC<ClientsProps> = observer(({ initialClients, initialRece
                   <h2 className={cnClients('SectionTitle')}>Недавние</h2>
                   <div className={cnClients('RecentList')}>
                     {recentClients.map(client => (
-                      <button key={client.id} className={cnClients('RecentChip')} type='button'>
+                      <button
+                        key={client.id}
+                        className={cnClients('RecentChip')}
+                        data-client-id={client.id}
+                        onClick={handleClientClick}
+                        type='button'
+                      >
                         {getFirstName(client.name)}
                       </button>
                     ))}
@@ -339,7 +362,12 @@ export const Clients: FC<ClientsProps> = observer(({ initialClients, initialRece
                   <ul className={cnClients('List')}>
                     {filteredClients.map(client => (
                       <li key={client.id} className={cnClients('ListItem')}>
-                        <button className={cnClients('Row')} type='button'>
+                        <button
+                          className={cnClients('Row')}
+                          data-client-id={client.id}
+                          onClick={handleClientClick}
+                          type='button'
+                        >
                           <span className={cnClients('RowName')}>{client.name}</span>
                           <span aria-hidden='true' className={cnClients('RowChevron')}>
                             ›

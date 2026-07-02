@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
+import { ClientHub } from '../blocks/ClientHub/ClientHub';
 import { Clients } from '../blocks/Clients/Clients';
 import { Exercises } from '../blocks/Exercises/Exercises';
 import { Profile } from '../blocks/Profile/Profile';
@@ -14,6 +15,7 @@ export const AppRoutes: FC = () => {
       <Route path='/workouts' element={<Workouts />} />
       <Route element={<Shell />}>
         <Route path='/clients' element={<Clients />} />
+        <Route path='/clients/:id' element={<ClientHub />} />
         <Route path='/exercises' element={<Exercises />} />
         <Route path='/account' element={<Profile />} />
       </Route>

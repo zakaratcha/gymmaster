@@ -1,7 +1,14 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { Decorator, Meta, StoryObj } from '@storybook/react-vite';
+import { MemoryRouter } from 'react-router-dom';
 
 import type { Client } from '../../services/clients/clients.models';
 import { Clients } from './Clients';
+
+const withRouter: Decorator = Story => (
+  <MemoryRouter>
+    <Story />
+  </MemoryRouter>
+);
 
 const storyClients: readonly Client[] = [
   { id: 'client-1', name: 'Анна Иванова' },
@@ -18,7 +25,8 @@ const storyRecentIds: readonly string[] = ['client-1', 'client-2', 'client-3'];
 
 const meta = {
   title: 'Blocks/Clients',
-  component: Clients
+  component: Clients,
+  decorators: [withRouter]
 } satisfies Meta<typeof Clients>;
 
 export default meta;

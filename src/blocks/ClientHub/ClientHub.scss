@@ -1,0 +1,281 @@
+.ClientHub {
+  display: flex;
+  flex-direction: column;
+
+  min-height: 100%;
+
+  background-color: var(--color-bg);
+
+  &-Main {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--space-lg);
+
+    width: 100%;
+    padding: var(--space-xl);
+    padding-bottom: calc(var(--tap-target) + var(--space-xl));
+  }
+
+  &-Header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+  }
+
+  &-Back {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    justify-content: center;
+
+    min-width: var(--tap-target);
+    min-height: var(--tap-target);
+    padding: 0;
+
+    cursor: pointer;
+    transition: color var(--transition-fast);
+
+    color: var(--color-text);
+    border: none;
+    background: none;
+
+    font-family: inherit;
+    font-size: 1.5rem;
+    line-height: 1;
+
+    &:hover {
+      color: var(--color-accent);
+    }
+  }
+
+  &-Title {
+    overflow: hidden;
+    flex: 1;
+
+    min-width: 0;
+    margin: 0;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    color: var(--color-text);
+
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  &-Edit {
+    flex-shrink: 0;
+  }
+
+  &-Content {
+    position: relative;
+
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--space-lg);
+
+    min-height: 8rem;
+  }
+
+  &-Loading {
+    position: absolute;
+    inset: 0;
+  }
+
+  &-ErrorBlock {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: var(--space-md);
+
+    padding: var(--space-lg) 0;
+  }
+
+  &-Error {
+    margin: 0;
+
+    text-align: center;
+
+    color: var(--color-danger);
+
+    font-size: var(--font-size-md);
+  }
+
+  &-Retry {
+    min-width: 8rem;
+  }
+
+  &-Section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+
+    padding-bottom: var(--space-lg);
+
+    border-bottom: 1px solid var(--color-border);
+
+    &:last-child {
+      padding-bottom: 0;
+
+      border-bottom: none;
+    }
+  }
+
+  &-SectionTitle {
+    margin: 0;
+
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+
+    color: var(--color-text-muted);
+
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+  }
+
+  &-SectionLabel {
+    color: var(--color-text-muted);
+
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+  }
+
+  &-NotesToggle {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+
+    width: 100%;
+    padding: 0;
+
+    cursor: pointer;
+    text-align: left;
+
+    color: inherit;
+    border: none;
+    background: none;
+
+    font-family: inherit;
+    font-size: var(--font-size-md);
+  }
+
+  &-NotesPreview {
+    white-space: pre-wrap;
+
+    color: var(--color-text);
+
+    font-size: var(--font-size-md);
+    line-height: 1.4;
+  }
+
+  &-Row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+  }
+
+  &-BodyWeight {
+    color: var(--color-text);
+
+    font-size: var(--font-size-md);
+    font-weight: 500;
+  }
+
+  &-StubText {
+    margin: 0;
+
+    color: var(--color-text-muted);
+
+    font-size: var(--font-size-md);
+  }
+
+  &-StubAction {
+    align-self: flex-start;
+  }
+
+  &-SoonHint {
+    margin: 0;
+
+    color: var(--color-text-muted);
+
+    font-size: var(--font-size-sm);
+  }
+
+  &-ActionRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+
+  &-ActionButton {
+    flex: 1;
+
+    min-width: 8rem;
+  }
+
+  &-HistoryList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  &-HistoryItem {
+    display: flex;
+    align-items: center;
+
+    width: 100%;
+    min-height: var(--tap-target);
+    padding: var(--space-sm) 0;
+
+    cursor: not-allowed;
+    text-align: left;
+
+    color: var(--color-text-muted);
+    border: none;
+    border-bottom: 1px solid var(--color-border);
+    background: none;
+
+    font-family: inherit;
+    font-size: var(--font-size-md);
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  &-SplitRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+  }
+
+  &-SplitTags {
+    overflow: hidden;
+    flex: 1;
+
+    min-width: 0;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    color: var(--color-text-muted);
+
+    font-size: var(--font-size-md);
+  }
+
+  &-SplitActions {
+    display: flex;
+    flex-shrink: 0;
+    gap: var(--space-xs);
+  }
+
+  &-SplitButton {
+    min-width: auto;
+    padding: var(--space-sm) var(--space-md);
+  }
+}
