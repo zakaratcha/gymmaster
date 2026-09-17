@@ -1,4 +1,4 @@
-import type { CustomCacheConfig } from '../common/CustomCache';
+import type { CustomCacheConfig } from '../common/CustomCache.ts';
 
 export interface ServerError {
   status: string;

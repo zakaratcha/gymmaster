@@ -12,11 +12,12 @@ alwaysApply: false
 2. Создать стор: `const state = useLocalObservable<ComponentNameState>(() => ({ ... }))`.
 3. Менять поля через методы стора либо иным способом, совместимым с MobX, чтобы асинхронные обновления не нарушали правила реактивности.
 4. Типы полей и сигнатуры методов описывать один раз в `ComponentNameState` (интерфейс или `type`). Внутри `() => ({ ... })` не дублировать аннотации у методов (параметры, `: void` и т.д.): достаточно `useLocalObservable<ComponentNameState>(...)`, проверка согласована с интерфейсом.
-5. Обработчики событий (`onSubmit`, `onClick` и т.п.) — вне `useLocalObservable`, через `useCallback` или inline в компоненте. В `ComponentNameState` только данные и методы их изменения.
+5. **Хендлеры событий (onClick, onChange и т.п.) в стор не класть.** В стейте — данные и сеттеры/доменные методы (`setOpen`, `setSelectedId`). Обёртки над DOM/UI-событиями держать в компоненте (обычно `useCallback`, чтобы удовлетворить `react/jsx-no-bind`); внутри хендлера вызывать методы стора.
 
 Пример именования:
 
-```typescript
+```tsx
+import { type FC, useCallback } from 'react';
 import { observer, useLocalObservable } from 'mobx-react-lite';
 
 type ReportFooState = {
@@ -31,6 +32,20 @@ const ReportFoo: FC<Props> = observer(() => {
       this.open = value;
     }
   }));
-  // ...
+
+  const handleClose = useCallback(() => {
+    state.setOpen(false);
+  }, [state]);
+
+  return <Button onClick={handleClose}>Закрыть</Button>;
 });
+```
+
+Плохо — хендлер события в стейте:
+
+```typescript
+type ReportFooState = {
+  open: boolean;
+  handleClose(event: MouseEvent): void;
+};
 ```

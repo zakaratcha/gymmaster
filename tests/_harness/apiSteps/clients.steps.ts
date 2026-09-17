@@ -219,9 +219,16 @@ Then('список клиентов через API пуст', function (this: Ap
   expect(this.clients).toEqual([]);
 });
 
+Then('созданный клиент через API имеет имя {string} без веса', function (this: ApiWorld, name: string) {
+  expect(this.lastError).toBeUndefined();
+  expect(this.client?.name).toBe(name);
+  expect(this.client).not.toHaveProperty('bodyWeightKg');
+});
+
 Then(
   'созданный клиент через API имеет имя {string} и вес {int}',
   function (this: ApiWorld, name: string, bodyWeightKg: number) {
+    expect(this.lastError).toBeUndefined();
     expect(this.client?.name).toBe(name);
     expect(this.client?.bodyWeightKg).toBe(bodyWeightKg);
   }

@@ -1,11 +1,12 @@
-import { type FC, useCallback, useEffect } from 'react';
+import { type FC, type SyntheticEvent, useCallback, useEffect, useRef } from 'react';
 import { observer, useLocalObservable } from 'mobx-react-lite';
 import { cn } from '@bem-react/classname';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import type { Client } from '../../services/clients/clients.models';
-import { getClientById } from '../../services/clients/clients.service';
+import { deleteClient, getClientById, updateClient } from '../../services/clients/clients.service';
 import { Button } from '../Button/Button';
+import { ClientCreateForm } from '../ClientCreateForm/ClientCreateForm';
 import { Loading } from '../Loading/Loading';
 
 import './ClientHub.scss';
@@ -21,6 +22,19 @@ type ClientHubState = {
   loading: boolean;
   error?: string;
   notesExpanded: boolean;
+  editOpen: boolean;
+  editName: string;
+  editNotes: string;
+  editBodyWeightKg: string;
+  submitting: boolean;
+  mutationError?: string;
+  openEdit(): void;
+  closeEdit(): void;
+  setEditName(value: string): void;
+  setEditNotes(value: string): void;
+  setEditBodyWeightKg(value: string): void;
+  setSubmitting(value: boolean): void;
+  setMutationError(value: string | undefined): void;
   setClient(value: Client | undefined): void;
   setLoading(value: boolean): void;
   setError(value: string | undefined): void;
@@ -52,6 +66,42 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
     client: initialClient,
     loading: !staticMode,
     notesExpanded: false,
+    editOpen: false,
+    editName: '',
+    editNotes: '',
+    editBodyWeightKg: '',
+    submitting: false,
+    mutationError: undefined,
+    openEdit() {
+      if (this.client === undefined) {
+        return;
+      }
+      this.editName = this.client.name;
+      this.editNotes = this.client.notes ?? '';
+      this.editBodyWeightKg = this.client.bodyWeightKg?.toString() ?? '';
+      this.mutationError = undefined;
+      this.editOpen = true;
+    },
+    closeEdit() {
+      if (!this.submitting) {
+        this.editOpen = false;
+      }
+    },
+    setEditName(value) {
+      this.editName = value;
+    },
+    setEditNotes(value) {
+      this.editNotes = value;
+    },
+    setEditBodyWeightKg(value) {
+      this.editBodyWeightKg = value;
+    },
+    setSubmitting(value) {
+      this.submitting = value;
+    },
+    setMutationError(value) {
+      this.mutationError = value;
+    },
     setClient(value) {
       this.client = value;
     },
@@ -103,9 +153,88 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
     void loadClient();
   }, [loadClient]);
 
+  const deleteDialogRef = useRef<HTMLDialogElement>(null);
+
   const handleEdit = useCallback(() => {
-    // TODO: редактор клиента
-  }, []);
+    state.openEdit();
+  }, [state]);
+
+  const handleSave = useCallback(
+    async (event: SyntheticEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      if (state.submitting || client === undefined) {
+        return;
+      }
+      state.setMutationError(undefined);
+      const name = state.editName.trim();
+      const weight = state.editBodyWeightKg.trim();
+      const bodyWeightKg = weight.length === 0 ? null : Number(weight);
+      if (name.length === 0) {
+        state.setMutationError('Укажите имя клиента');
+        return;
+      }
+      if (bodyWeightKg !== null && (!Number.isFinite(bodyWeightKg) || bodyWeightKg <= 0)) {
+        state.setMutationError('Вес должен быть положительным числом');
+        return;
+      }
+      if (staticMode) {
+        state.setMutationError('Сохранение недоступно в демонстрационном режиме');
+        return;
+      }
+      state.setSubmitting(true);
+      try {
+        const updated = await updateClient(client.id, { name, notes: state.editNotes.trim(), bodyWeightKg });
+        setClient(updated);
+        state.setSubmitting(false);
+        state.closeEdit();
+      } catch {
+        state.setMutationError('Не удалось сохранить клиента');
+      } finally {
+        state.setSubmitting(false);
+      }
+    },
+    [client, setClient, state, staticMode]
+  );
+
+  const handleDeleteOpen = useCallback(() => {
+    state.setMutationError(undefined);
+    deleteDialogRef.current?.showModal();
+  }, [state]);
+
+  const handleDeleteCancel = useCallback(() => {
+    if (!state.submitting) {
+      deleteDialogRef.current?.close();
+    }
+  }, [state]);
+
+  const handleDeleteEscape = useCallback(
+    (event: SyntheticEvent<HTMLDialogElement>) => {
+      event.preventDefault();
+      handleDeleteCancel();
+    },
+    [handleDeleteCancel]
+  );
+
+  const handleDeleteConfirm = useCallback(async () => {
+    if (state.submitting || client === undefined) {
+      return;
+    }
+    state.setMutationError(undefined);
+    if (staticMode) {
+      state.setMutationError('Удаление недоступно в демонстрационном режиме');
+      return;
+    }
+    state.setSubmitting(true);
+    try {
+      await deleteClient(client.id);
+      deleteDialogRef.current?.close();
+      void navigate('/clients', { replace: true });
+    } catch {
+      state.setMutationError('Не удалось удалить клиента');
+    } finally {
+      state.setSubmitting(false);
+    }
+  }, [client, navigate, state, staticMode]);
 
   const notes = client?.notes?.trim() ?? '';
   const hasNotes = notes.length > 0;
@@ -130,9 +259,9 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
         </header>
 
         <div className={cnClientHub('Content')}>
-          {loading ? <Loading className={cnClientHub('Loading')} visible /> : null}
+          {loading && <Loading className={cnClientHub('Loading')} visible />}
 
-          {error === undefined ? null : (
+          {error !== undefined && (
             <div className={cnClientHub('ErrorBlock')}>
               <p className={cnClientHub('Error')}>{error}</p>
               <Button className={cnClientHub('Retry')} color='secondary' onClick={handleRetry} type='button'>
@@ -141,7 +270,7 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
             </div>
           )}
 
-          {!loading && error === undefined && client !== undefined ? (
+          {!loading && error === undefined && client !== undefined && (
             <>
               <section className={cnClientHub('Section', { type: 'notes' })}>
                 <button
@@ -214,9 +343,62 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
                 </div>
               </section>
             </>
-          ) : null}
+          )}
+          {!loading && client !== undefined && (
+            <Button className={cnClientHub('Delete')} onClick={handleDeleteOpen} type='button'>
+              Удалить клиента
+            </Button>
+          )}
         </div>
       </main>
+      {state.editOpen && (
+        <ClientCreateForm
+          bodyWeightKg={state.editBodyWeightKg}
+          error={state.mutationError}
+          mode='edit'
+          name={state.editName}
+          notes={state.editNotes}
+          onBodyWeightKgChange={state.setEditBodyWeightKg}
+          onCancel={state.closeEdit}
+          onNameChange={state.setEditName}
+          onNotesChange={state.setEditNotes}
+          onSubmit={handleSave}
+          submitting={state.submitting}
+        />
+      )}
+      <dialog
+        aria-describedby='client-delete-description'
+        aria-labelledby='client-delete-title'
+        className={cnClientHub('DeleteDialog')}
+        onCancel={handleDeleteEscape}
+        ref={deleteDialogRef}
+      >
+        <h2 id='client-delete-title'>Удалить клиента?</h2>
+        <p id='client-delete-description'>Клиент «{client?.name}» будет удалён. Это действие нельзя отменить.</p>
+        {state.mutationError !== undefined && (
+          <p className={cnClientHub('DeleteError')} role='alert'>
+            {state.mutationError}
+          </p>
+        )}
+        <div className={cnClientHub('ActionRow')}>
+          <Button
+            className={cnClientHub('DeleteCancel')}
+            disabled={state.submitting}
+            onClick={handleDeleteCancel}
+            type='button'
+          >
+            Отмена
+          </Button>
+          <Button
+            className={cnClientHub('DeleteConfirm')}
+            disabled={state.submitting}
+            onClick={handleDeleteConfirm}
+            type='button'
+          >
+            {state.submitting ? 'Удаление…' : 'Удалить'}
+          </Button>
+        </div>
+      </dialog>
     </div>
   );
 });

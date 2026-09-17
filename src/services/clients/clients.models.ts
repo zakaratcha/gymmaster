@@ -14,7 +14,7 @@ export type CreateClientRequest = {
 export type UpdateClientRequest = {
   readonly name?: string;
   readonly notes?: string;
-  readonly bodyWeightKg?: number;
+  readonly bodyWeightKg?: number | null;
 };
 
 export type ClientsListResponse = {

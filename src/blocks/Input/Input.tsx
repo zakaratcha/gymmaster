@@ -13,7 +13,7 @@ export type InputProps = {
   readonly error?: string;
 } & Pick<
   InputHTMLAttributes<HTMLInputElement>,
-  'defaultValue' | 'disabled' | 'name' | 'onChange' | 'placeholder' | 'type' | 'value'
+  'defaultValue' | 'disabled' | 'name' | 'onChange' | 'placeholder' | 'step' | 'type' | 'value'
 >;
 
 export const Input: FC<InputProps> = ({
@@ -27,6 +27,7 @@ export const Input: FC<InputProps> = ({
   placeholder,
   disabled,
   name,
+  step,
   type = 'text'
 }) => {
   const hasError = error !== undefined && error.length > 0;
@@ -34,11 +35,11 @@ export const Input: FC<InputProps> = ({
 
   return (
     <div className={cnInput({ error: hasError }, [className])}>
-      {hasLabel ? (
+      {hasLabel && (
         <Label.Root className={cnInput('Label')} htmlFor={id}>
           {label}
         </Label.Root>
-      ) : null}
+      )}
       <input
         aria-invalid={hasError ? true : undefined}
         className={cnInput('Control')}
@@ -48,10 +49,11 @@ export const Input: FC<InputProps> = ({
         name={name}
         onChange={onChange}
         placeholder={placeholder}
+        step={step}
         type={type}
         value={value}
       />
-      {hasError ? <span className={cnInput('Error')}>{error}</span> : null}
+      {hasError && <span className={cnInput('Error')}>{error}</span>}
     </div>
   );
 };
