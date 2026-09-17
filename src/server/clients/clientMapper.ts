@@ -21,7 +21,7 @@ export type ValidatedCreateClientInput = {
 export type ValidatedUpdateClientInput = {
   readonly name?: string;
   readonly notes?: string;
-  readonly bodyWeightKg?: number;
+  readonly bodyWeightKg?: number | null;
 };
 
 type ValidationResult<T> = { readonly ok: true; readonly value: T } | { readonly ok: false; readonly error: string };
@@ -116,7 +116,9 @@ export function validateUpdateClientInput(body: unknown): ValidationResult<Valid
   }
 
   const bodyWeightKg = readRecordField(body, 'bodyWeightKg');
-  if (bodyWeightKg !== undefined) {
+  if (bodyWeightKg === null) {
+    Object.assign(value, { bodyWeightKg: null });
+  } else if (bodyWeightKg !== undefined) {
     const bodyWeightResult = parseOptionalBodyWeightKg(bodyWeightKg);
     if (!bodyWeightResult.ok) {
       return bodyWeightResult;

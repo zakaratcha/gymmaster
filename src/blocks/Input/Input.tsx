@@ -13,7 +13,7 @@ export type InputProps = {
   readonly error?: string;
 } & Pick<
   InputHTMLAttributes<HTMLInputElement>,
-  'defaultValue' | 'disabled' | 'name' | 'onChange' | 'placeholder' | 'type' | 'value'
+  'defaultValue' | 'disabled' | 'name' | 'onChange' | 'placeholder' | 'step' | 'type' | 'value'
 >;
 
 export const Input: FC<InputProps> = ({
@@ -27,6 +27,7 @@ export const Input: FC<InputProps> = ({
   placeholder,
   disabled,
   name,
+  step,
   type = 'text'
 }) => {
   const hasError = error !== undefined && error.length > 0;
@@ -48,6 +49,7 @@ export const Input: FC<InputProps> = ({
         name={name}
         onChange={onChange}
         placeholder={placeholder}
+        step={step}
         type={type}
         value={value}
       />
