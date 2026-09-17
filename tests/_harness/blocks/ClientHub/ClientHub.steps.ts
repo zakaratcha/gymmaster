@@ -15,6 +15,12 @@ Given(
   }
 );
 
+Given('я на карточке клиента {string}', async function (this: CustomWorld, name: string) {
+  await new ClientsPage(this.page).open();
+  await new ClientsBlock(this.page).clickClientByName(name);
+  await new ClientHubBlock(this.page).waitForReady();
+});
+
 Then('на карточке клиента отображается заголовок {string}', async function (this: CustomWorld, title: string) {
   const block = new ClientHubBlock(this.page);
   await block.waitForReady();
@@ -72,7 +78,23 @@ When(
 );
 
 When('я сохраняю изменения клиента', async function (this: CustomWorld) {
-  await new ClientCreateFormBlock(this.page).submit();
+  const form = new ClientCreateFormBlock(this.page);
+  await new ClientHubBlock(this.page).submitMutation('PATCH', 200, () => form.submit());
+  await form.waitForHidden();
+});
+
+When('я сохраняю изменения клиента, ожидая ошибку валидации', async function (this: CustomWorld) {
+  const form = new ClientCreateFormBlock(this.page);
+  await form.submit();
+  await form.expectEditDialog();
+  await form.expectError();
+});
+
+When('я сохраняю изменения клиента, ожидая ошибку 500', async function (this: CustomWorld) {
+  const form = new ClientCreateFormBlock(this.page);
+  await new ClientHubBlock(this.page).submitMutation('PATCH', 500, () => form.submit());
+  await form.expectEditDialog();
+  await form.expectError();
 });
 
 When('я отменяю редактирование клиента', async function (this: CustomWorld) {
@@ -106,7 +128,17 @@ When('я отменяю удаление клиента', async function (this: 
 });
 
 When('я подтверждаю удаление клиента', async function (this: CustomWorld) {
-  await new ClientHubBlock(this.page).confirmDelete();
+  const block = new ClientHubBlock(this.page);
+  await block.confirmDelete();
+  await block.expectDeleteDialogHidden();
+  await new ClientsPage(this.page).testUrl();
+  await new ClientsBlock(this.page).waitForListReady();
+});
+
+When('я подтверждаю удаление клиента, ожидая ошибку 500', async function (this: CustomWorld) {
+  const block = new ClientHubBlock(this.page);
+  await block.submitMutation('DELETE', 500, () => block.confirmDelete());
+  await block.expectDeleteError();
 });
 
 Then('диалог удаления клиента закрыт', async function (this: CustomWorld) {

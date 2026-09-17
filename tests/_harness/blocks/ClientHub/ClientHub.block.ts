@@ -81,6 +81,20 @@ export class ClientHubBlock extends Block {
     await expect(this.findBySelector('deleteConfirm')).toBeEnabled();
   }
 
+  async submitMutation(method: 'PATCH' | 'DELETE', status: number, submit: () => Promise<void>): Promise<void> {
+    const url = new URL(this.page.url());
+    url.pathname = `/api${url.pathname}`;
+    url.search = '';
+    url.hash = '';
+
+    const [response] = await Promise.all([
+      this.page.waitForResponse(result => result.url() === url.href && result.request().method() === method),
+      submit()
+    ]);
+    expect(response.status()).toBe(status);
+    expect(await response.finished()).toBeNull();
+  }
+
   async failNextMutation(method: 'PATCH' | 'DELETE'): Promise<void> {
     const url = new URL(this.page.url());
     url.pathname = `/api${url.pathname}`;

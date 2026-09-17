@@ -35,11 +35,11 @@ export const Input: FC<InputProps> = ({
 
   return (
     <div className={cnInput({ error: hasError }, [className])}>
-      {hasLabel ? (
+      {hasLabel && (
         <Label.Root className={cnInput('Label')} htmlFor={id}>
           {label}
         </Label.Root>
-      ) : null}
+      )}
       <input
         aria-invalid={hasError ? true : undefined}
         className={cnInput('Control')}
@@ -53,7 +53,7 @@ export const Input: FC<InputProps> = ({
         type={type}
         value={value}
       />
-      {hasError ? <span className={cnInput('Error')}>{error}</span> : null}
+      {hasError && <span className={cnInput('Error')}>{error}</span>}
     </div>
   );
 };

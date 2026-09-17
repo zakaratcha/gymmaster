@@ -259,9 +259,9 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
         </header>
 
         <div className={cnClientHub('Content')}>
-          {loading ? <Loading className={cnClientHub('Loading')} visible /> : null}
+          {loading && <Loading className={cnClientHub('Loading')} visible />}
 
-          {error === undefined ? null : (
+          {error !== undefined && (
             <div className={cnClientHub('ErrorBlock')}>
               <p className={cnClientHub('Error')}>{error}</p>
               <Button className={cnClientHub('Retry')} color='secondary' onClick={handleRetry} type='button'>
@@ -270,7 +270,7 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
             </div>
           )}
 
-          {!loading && error === undefined && client !== undefined ? (
+          {!loading && error === undefined && client !== undefined && (
             <>
               <section className={cnClientHub('Section', { type: 'notes' })}>
                 <button
@@ -343,15 +343,15 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
                 </div>
               </section>
             </>
-          ) : null}
-          {!loading && client !== undefined ? (
+          )}
+          {!loading && client !== undefined && (
             <Button className={cnClientHub('Delete')} onClick={handleDeleteOpen} type='button'>
               Удалить клиента
             </Button>
-          ) : null}
+          )}
         </div>
       </main>
-      {state.editOpen ? (
+      {state.editOpen && (
         <ClientCreateForm
           bodyWeightKg={state.editBodyWeightKg}
           error={state.mutationError}
@@ -365,7 +365,7 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
           onSubmit={handleSave}
           submitting={state.submitting}
         />
-      ) : null}
+      )}
       <dialog
         aria-describedby='client-delete-description'
         aria-labelledby='client-delete-title'
@@ -375,7 +375,7 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
       >
         <h2 id='client-delete-title'>Удалить клиента?</h2>
         <p id='client-delete-description'>Клиент «{client?.name}» будет удалён. Это действие нельзя отменить.</p>
-        {state.mutationError === undefined ? null : (
+        {state.mutationError !== undefined && (
           <p className={cnClientHub('DeleteError')} role='alert'>
             {state.mutationError}
           </p>

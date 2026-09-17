@@ -124,7 +124,7 @@ export const ClientCreateForm: FC<ClientCreateFormProps> = ({
           type='number'
           value={bodyWeightKg}
         />
-        {error === undefined ? null : (
+        {error !== undefined && (
           <p className={cnClientCreateForm('Error')} role='alert'>
             {error}
           </p>
