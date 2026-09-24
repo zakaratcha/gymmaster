@@ -1,8 +1,10 @@
-import { type ChangeEvent, type FC, type SyntheticEvent, useCallback, useEffect, useRef } from 'react';
+import { type ChangeEvent, type FC, type SyntheticEvent, useCallback } from 'react';
 import { cn } from '@bem-react/classname';
 
 import { Button } from '../Button/Button';
+import { Dialog } from '../Dialog/Dialog';
 import { Input } from '../Input/Input';
+import { Textarea } from '../Textarea/Textarea';
 
 import './ExerciseForm.scss';
 
@@ -31,18 +33,8 @@ export const ExerciseForm: FC<ExerciseFormProps> = ({
   onSubmit,
   onCancel
 }) => {
-  const dialogRef = useRef<HTMLDialogElement>(null);
-
-  const handleCancel = useCallback(
-    (event: SyntheticEvent<HTMLDialogElement>) => {
-      event.preventDefault();
-      if (!submitting) {
-        onCancel();
-      }
-    },
-    [onCancel, submitting]
-  );
-
+  const title = mode === 'edit' ? 'Редактирование упражнения' : 'Новое упражнение';
+  const submitLabel = mode === 'edit' ? 'Сохранить' : 'Создать';
   const handleNameChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       onNameChange(event.target.value);
@@ -50,25 +42,29 @@ export const ExerciseForm: FC<ExerciseFormProps> = ({
     [onNameChange]
   );
 
-  const handleNotesChange = useCallback(
-    (event: ChangeEvent<HTMLTextAreaElement>) => {
-      onNotesChange(event.target.value);
-    },
-    [onNotesChange]
-  );
-
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    dialog?.showModal();
-    return () => dialog?.close();
-  }, []);
-
   return (
-    <dialog aria-labelledby='exercise-form-title' className={cnExerciseForm()} onCancel={handleCancel} ref={dialogRef}>
-      <form className={cnExerciseForm('Card')} onSubmit={onSubmit}>
-        <h2 className={cnExerciseForm('Title')} id='exercise-form-title'>
-          {mode === 'edit' ? 'Редактирование упражнения' : 'Новое упражнение'}
-        </h2>
+    <Dialog
+      actions={
+        <>
+          <Button className={cnExerciseForm('Cancel')} disabled={submitting} onClick={onCancel} type='button'>
+            Отмена
+          </Button>
+          <Button
+            className={cnExerciseForm('Submit')}
+            color='primary'
+            disabled={submitting}
+            form='exercise-form'
+            type='submit'
+          >
+            {submitLabel}
+          </Button>
+        </>
+      }
+      error={error}
+      onCancel={onCancel}
+      title={title}
+    >
+      <form className={cnExerciseForm()} id='exercise-form' onSubmit={onSubmit}>
         <Input
           className={cnExerciseForm('NameField')}
           disabled={submitting}
@@ -79,35 +75,18 @@ export const ExerciseForm: FC<ExerciseFormProps> = ({
           placeholder='Например, приседание со штангой'
           value={name}
         />
-        <div className={cnExerciseForm('NotesField')}>
-          <label className={cnExerciseForm('NotesLabel')} htmlFor='exercise-notes'>
-            Заметки
-          </label>
-          <textarea
-            className={cnExerciseForm('NotesControl')}
-            disabled={submitting}
-            id='exercise-notes'
-            name='notes'
-            onChange={handleNotesChange}
-            placeholder='Необязательно'
-            rows={3}
-            value={notes}
-          />
-        </div>
-        {error !== undefined && (
-          <p className={cnExerciseForm('Error')} role='alert'>
-            {error}
-          </p>
-        )}
-        <div className={cnExerciseForm('Actions')}>
-          <Button className={cnExerciseForm('Cancel')} disabled={submitting} onClick={onCancel} type='button'>
-            Отмена
-          </Button>
-          <Button className={cnExerciseForm('Submit')} color='primary' disabled={submitting} type='submit'>
-            {mode === 'edit' ? 'Сохранить' : 'Создать'}
-          </Button>
-        </div>
+        <Textarea
+          className={cnExerciseForm('NotesField')}
+          disabled={submitting}
+          id='exercise-notes'
+          label='Заметки'
+          name='notes'
+          onChange={onNotesChange}
+          placeholder='Необязательно'
+          rows={3}
+          value={notes}
+        />
       </form>
-    </dialog>
+    </Dialog>
   );
 };

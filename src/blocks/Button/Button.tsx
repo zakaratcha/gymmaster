@@ -15,9 +15,7 @@ type ButtonProps = {
   readonly startIcon?: ReactNode;
   readonly endIcon?: ReactNode;
   readonly children?: ReactNode;
-} & Pick<ButtonHTMLAttributes<HTMLButtonElement>, 'aria-label' | 'disabled' | 'onClick' | 'type'> & {
-    readonly 'data-exercise-id'?: string;
-  };
+} & Pick<ButtonHTMLAttributes<HTMLButtonElement>, 'aria-label' | 'disabled' | 'form' | 'onClick' | 'type'>;
 
 export const Button: FC<ButtonProps> = ({
   className,
@@ -30,7 +28,7 @@ export const Button: FC<ButtonProps> = ({
   onClick,
   type = 'button',
   'aria-label': ariaLabel,
-  'data-exercise-id': exerciseId
+  form
 }) => {
   const buttonClassName = color === 'default' ? cnButton(null, [className]) : cnButton({ color }, [className]);
 
@@ -46,8 +44,8 @@ export const Button: FC<ButtonProps> = ({
     <button
       aria-label={ariaLabel}
       className={buttonClassName}
-      data-exercise-id={exerciseId}
       disabled={disabled}
+      form={form}
       onClick={onClick}
       type={type}
     >

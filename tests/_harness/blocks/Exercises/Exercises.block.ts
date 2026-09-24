@@ -8,11 +8,11 @@ export class ExercisesBlock extends Block {
     root: '.Exercises',
     title: '.Exercises-Title',
     searchInput: '.Exercises-SearchField .Input-Control',
-    emptyState: '.Exercises-Empty',
-    exerciseRow: '.Exercises-RowName',
-    exerciseRowButton: '.Exercises-Row',
-    archiveButton: '.Exercises-ArchiveButton',
-    archiveDialog: '.Exercises-ArchiveDialog',
+    emptyState: '.ExerciseList-Empty',
+    exerciseRow: '.ExerciseList-RowName',
+    exerciseRowButton: '.ExerciseList-Row',
+    archiveButton: '.ExerciseList-ArchiveButton',
+    archiveDialog: 'dialog.Dialog',
     archiveConfirm: '.Exercises-ArchiveConfirm',
     archiveCancel: '.Exercises-ArchiveCancel',
     fab: '.Exercises-Fab',
@@ -80,7 +80,7 @@ export class ExercisesBlock extends Block {
       await loading.waitFor({ state: 'hidden' });
     }
     await content
-      .locator('.Exercises-Empty, .Exercises-RowName, .Exercises-Error')
+      .locator('.ExerciseList-Empty, .ExerciseList-RowName, .Exercises-Error')
       .first()
       .waitFor({ state: 'visible' });
   }

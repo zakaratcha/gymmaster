@@ -1,0 +1,103 @@
+.ExerciseList {
+  &-Section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  &-SectionTitle {
+    margin: 0;
+
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+
+    color: var(--color-text-muted);
+
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+  }
+
+  &-List {
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+  }
+
+  &-ListItem {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+
+    margin: 0;
+    padding: var(--space-sm) 0;
+
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  &-Row {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    justify-content: space-between;
+    gap: var(--space-md);
+
+    min-width: 0;
+    min-height: var(--tap-target);
+    padding: var(--space-sm) 0;
+
+    cursor: pointer;
+    transition: color var(--transition-fast);
+    text-align: left;
+
+    color: var(--color-text);
+    border: none;
+    background: none;
+
+    font-family: inherit;
+    font-size: var(--font-size-md);
+
+    &:hover {
+      color: var(--color-accent);
+    }
+  }
+
+  &-RowName {
+    overflow: hidden;
+    flex: 1;
+
+    min-width: 0;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  &-RowChevron {
+    flex-shrink: 0;
+
+    color: var(--color-text-muted);
+
+    font-size: 1.25rem;
+    line-height: 1;
+  }
+
+  &-ArchiveButton {
+    flex-shrink: 0;
+
+    min-width: auto;
+    padding: var(--space-sm) var(--space-md);
+
+    font-size: var(--font-size-sm);
+  }
+
+  &-Empty {
+    margin: 0;
+    padding: var(--space-lg) 0;
+
+    text-align: center;
+
+    color: var(--color-text-muted);
+
+    font-size: var(--font-size-md);
+  }
+}

@@ -1,4 +1,4 @@
-import { type ChangeEvent, type FC, type SyntheticEvent, useCallback, useEffect, useRef } from 'react';
+import { type ChangeEvent, type FC, type SyntheticEvent, useCallback, useEffect } from 'react';
 import { observer, useLocalObservable } from 'mobx-react-lite';
 import { cn } from '@bem-react/classname';
 import { PlusIcon } from '@radix-ui/react-icons';
@@ -6,7 +6,9 @@ import { PlusIcon } from '@radix-ui/react-icons';
 import type { CreateExerciseRequest, Exercise } from '../../services/exercises/exercises.models';
 import { createExercise, listExercises, updateExercise } from '../../services/exercises/exercises.service';
 import { Button } from '../Button/Button';
+import { Dialog } from '../Dialog/Dialog';
 import { ExerciseForm } from '../ExerciseForm/ExerciseForm';
+import { ExerciseList } from '../ExerciseList/ExerciseList';
 import { Fab } from '../Fab/Fab';
 import { Input } from '../Input/Input';
 import { Loading } from '../Loading/Loading';
@@ -73,17 +75,13 @@ function buildCreatePayload(name: string, notes: string): CreateExerciseRequest 
 }
 
 function buildUpdatePayload(name: string, notes: string): { readonly name: string; readonly notes: string | null } {
-  const trimmedName = name.trim();
-  const trimmedNotes = notes.trim();
   return {
-    name: trimmedName,
-    ...(trimmedNotes.length > 0 ? { notes: trimmedNotes } : { notes: null })
+    name: name.trim(),
+    notes: notes.trim().length > 0 ? notes.trim() : null
   };
 }
 
 export const Exercises: FC = observer(() => {
-  const archiveDialogRef = useRef<HTMLDialogElement>(null);
-
   const state = useLocalObservable<ExercisesState>(() => ({
     searchQuery: '',
     exercises: [],
@@ -192,16 +190,6 @@ export const Exercises: FC = observer(() => {
     setArchiveError
   } = state;
 
-  useEffect(() => {
-    if (archiveTarget === undefined) {
-      return;
-    }
-
-    const dialog = archiveDialogRef.current;
-    dialog?.showModal();
-    return () => dialog?.close();
-  }, [archiveTarget]);
-
   const loadExercises = useCallback(async () => {
     setLoading(true);
     setError(undefined);
@@ -288,16 +276,6 @@ export const Exercises: FC = observer(() => {
     ]
   );
 
-  const handleArchiveCancel = useCallback(
-    (event: SyntheticEvent<HTMLDialogElement>) => {
-      event.preventDefault();
-      if (!archiveSubmitting) {
-        closeArchiveDialog();
-      }
-    },
-    [archiveSubmitting, closeArchiveDialog]
-  );
-
   const handleArchiveConfirm = useCallback(async () => {
     if (archiveTarget === undefined || archiveSubmitting) {
       return;
@@ -328,30 +306,7 @@ export const Exercises: FC = observer(() => {
     void loadExercises();
   }, [loadExercises]);
 
-  const handleArchiveClick = useCallback(
-    (event: SyntheticEvent<HTMLButtonElement>) => {
-      const exerciseId = event.currentTarget.dataset.exerciseId;
-      const exercise = state.exercises.find(item => item.id === exerciseId);
-      if (exercise !== undefined) {
-        openArchiveDialog(exercise);
-      }
-    },
-    [openArchiveDialog, state.exercises]
-  );
-
-  const handleRowClick = useCallback(
-    (event: SyntheticEvent<HTMLButtonElement>) => {
-      const exerciseId = event.currentTarget.dataset.exerciseId;
-      const exercise = state.exercises.find(item => item.id === exerciseId);
-      if (exercise !== undefined) {
-        openEditForm(exercise);
-      }
-    },
-    [openEditForm, state.exercises]
-  );
-
   const isSearchActive = searchQuery.trim().length > 0;
-  const showEmpty = !loading && error === undefined && filteredExercises.length === 0;
   const showLists = !loading && error === undefined;
 
   return (
@@ -371,9 +326,9 @@ export const Exercises: FC = observer(() => {
         </div>
 
         <div className={cnExercises('Content')}>
-          {loading ? <Loading className={cnExercises('Loading')} visible /> : null}
+          {loading && <Loading className={cnExercises('Loading')} visible />}
 
-          {error === undefined ? null : (
+          {error !== undefined && (
             <div className={cnExercises('ErrorBlock')}>
               <p className={cnExercises('Error')}>{error}</p>
               <Button className={cnExercises('Retry')} color='secondary' onClick={handleRetry} type='button'>
@@ -382,41 +337,14 @@ export const Exercises: FC = observer(() => {
             </div>
           )}
 
-          {showLists ? (
-            <section className={cnExercises('Section')}>
-              <h2 className={cnExercises('SectionTitle')}>Справочник</h2>
-              {showEmpty ? (
-                <p className={cnExercises('Empty')}>{isSearchActive ? 'Ничего не найдено' : 'Добавить упражнение'}</p>
-              ) : (
-                <ul className={cnExercises('List')}>
-                  {filteredExercises.map(exercise => (
-                    <li key={exercise.id} className={cnExercises('ListItem')}>
-                      <button
-                        className={cnExercises('Row')}
-                        data-exercise-id={exercise.id}
-                        onClick={handleRowClick}
-                        type='button'
-                      >
-                        <span className={cnExercises('RowName')}>{exercise.name}</span>
-                        <span aria-hidden='true' className={cnExercises('RowChevron')}>
-                          ›
-                        </span>
-                      </button>
-                      <Button
-                        aria-label={`Архивировать ${exercise.name}`}
-                        className={cnExercises('ArchiveButton')}
-                        onClick={handleArchiveClick}
-                        data-exercise-id={exercise.id}
-                        type='button'
-                      >
-                        Архив
-                      </Button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </section>
-          ) : null}
+          {showLists && (
+            <ExerciseList
+              exercises={filteredExercises}
+              isSearchActive={isSearchActive}
+              onArchive={openArchiveDialog}
+              onEdit={openEditForm}
+            />
+          )}
         </div>
       </main>
 
@@ -427,7 +355,7 @@ export const Exercises: FC = observer(() => {
         onClick={openCreateForm}
       />
 
-      {createFormOpen ? (
+      {createFormOpen && (
         <ExerciseForm
           error={formError}
           mode={editExercise === undefined ? 'create' : 'edit'}
@@ -439,47 +367,36 @@ export const Exercises: FC = observer(() => {
           onSubmit={saveExercise}
           submitting={submitting}
         />
-      ) : null}
+      )}
 
-      {archiveTarget === undefined ? null : (
-        <dialog
-          aria-describedby='exercise-archive-description'
-          aria-labelledby='exercise-archive-title'
-          className={cnExercises('ArchiveDialog')}
-          onCancel={handleArchiveCancel}
-          ref={archiveDialogRef}
-        >
-          <h2 className={cnExercises('ArchiveTitle')} id='exercise-archive-title'>
-            Архивировать упражнение?
-          </h2>
-          <p className={cnExercises('ArchiveDescription')} id='exercise-archive-description'>
-            «{archiveTarget.name}» скроется из справочника, но сохранится в истории.
-          </p>
-          {archiveError !== undefined && (
-            <p className={cnExercises('ArchiveError')} role='alert'>
-              {archiveError}
-            </p>
-          )}
-          <div className={cnExercises('ArchiveActions')}>
-            <Button
-              className={cnExercises('ArchiveCancel')}
-              disabled={archiveSubmitting}
-              onClick={closeArchiveDialog}
-              type='button'
-            >
-              Отмена
-            </Button>
-            <Button
-              className={cnExercises('ArchiveConfirm')}
-              color='primary'
-              disabled={archiveSubmitting}
-              onClick={handleArchiveConfirm}
-              type='button'
-            >
-              {archiveSubmitting ? 'Архивирование…' : 'Архивировать'}
-            </Button>
-          </div>
-        </dialog>
+      {archiveTarget !== undefined && (
+        <Dialog
+          actions={
+            <>
+              <Button
+                className={cnExercises('ArchiveCancel')}
+                disabled={archiveSubmitting}
+                onClick={closeArchiveDialog}
+                type='button'
+              >
+                Отмена
+              </Button>
+              <Button
+                className={cnExercises('ArchiveConfirm')}
+                color='primary'
+                disabled={archiveSubmitting}
+                onClick={handleArchiveConfirm}
+                type='button'
+              >
+                {archiveSubmitting ? 'Архивирование…' : 'Архивировать'}
+              </Button>
+            </>
+          }
+          description={`«${archiveTarget.name}» скроется из справочника, но сохранится в истории.`}
+          error={archiveError}
+          onCancel={closeArchiveDialog}
+          title='Архивировать упражнение?'
+        />
       )}
     </div>
   );

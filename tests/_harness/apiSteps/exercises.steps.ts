@@ -25,6 +25,14 @@ Given('все упражнения архивированы через API', asy
   await deleteAllExercises();
 });
 
+Given('существует упражнение {string}', async function (name: string) {
+  await createExercise({ name });
+});
+
+Given('существует упражнение {string} с заметками {string}', async function (name: string, notes: string) {
+  await createExercise({ name, notes });
+});
+
 When('я запрашиваю список упражнений через API', async function (this: ApiWorld) {
   try {
     const response = await listExercisesAsAdmin();

@@ -5,7 +5,7 @@ import { Block } from '../../classes/Block';
 
 export class ExerciseFormBlock extends Block {
   readonly selectors = {
-    root: 'dialog.ExerciseForm',
+    root: 'dialog.Dialog',
     nameInput: '.ExerciseForm [name="name"]',
     notesInput: '.ExerciseForm [name="notes"]',
     submitButton: '.ExerciseForm-Submit',
