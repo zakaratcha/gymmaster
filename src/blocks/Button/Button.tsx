@@ -15,10 +15,6 @@ type ButtonProps = {
   readonly startIcon?: ReactNode;
   readonly endIcon?: ReactNode;
   readonly children?: ReactNode;
-  readonly 'data-action'?: string;
-  readonly 'data-exercise-position'?: number;
-  readonly 'data-plan-id'?: string;
-  readonly 'data-set-position'?: number;
 } & Pick<ButtonHTMLAttributes<HTMLButtonElement>, 'aria-label' | 'disabled' | 'form' | 'onClick' | 'type'>;
 
 export const Button: FC<ButtonProps> = ({
@@ -32,11 +28,7 @@ export const Button: FC<ButtonProps> = ({
   onClick,
   type = 'button',
   'aria-label': ariaLabel,
-  form,
-  'data-action': dataAction,
-  'data-exercise-position': dataExercisePosition,
-  'data-plan-id': dataPlanId,
-  'data-set-position': dataSetPosition
+  form
 }) => {
   const buttonClassName = color === 'default' ? cnButton(null, [className]) : cnButton({ color }, [className]);
 
@@ -52,10 +44,6 @@ export const Button: FC<ButtonProps> = ({
     <button
       aria-label={ariaLabel}
       className={buttonClassName}
-      data-action={dataAction}
-      data-exercise-position={dataExercisePosition}
-      data-plan-id={dataPlanId}
-      data-set-position={dataSetPosition}
       disabled={disabled}
       form={form}
       onClick={onClick}

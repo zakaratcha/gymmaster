@@ -46,6 +46,28 @@ function formatPlanSummary(plan: PlannedWorkout): string {
   return `${plan.exercises.length} упр. · ${setCount} подходов`;
 }
 
+type DeletePlanButtonProps = {
+  readonly plan: PlannedWorkout;
+  onDelete(plan: PlannedWorkout): void;
+};
+
+const DeletePlanButton: FC<DeletePlanButtonProps> = ({ plan, onDelete }) => {
+  const handleDelete = useCallback(() => {
+    onDelete(plan);
+  }, [onDelete, plan]);
+
+  return (
+    <Button
+      aria-label={`Удалить план ${plan.splitTag}`}
+      className={cnPlannedWorkoutList('Delete')}
+      color='secondary'
+      onClick={handleDelete}
+    >
+      Удалить
+    </Button>
+  );
+};
+
 export const PlannedWorkoutList: FC = observer(() => {
   const navigate = useNavigate();
   const { id: clientId } = useParams<{ id: string }>();
@@ -131,17 +153,6 @@ export const PlannedWorkoutList: FC = observer(() => {
     [handleOpenPlan]
   );
 
-  const handleDeleteOpenClick = useCallback(
-    (event: SyntheticEvent<HTMLButtonElement>) => {
-      const planId = event.currentTarget.dataset.planId;
-      const plan = state.plans.find(item => item.id === planId);
-      if (plan !== undefined) {
-        state.openDeleteDialog(plan);
-      }
-    },
-    [state]
-  );
-
   const handleRetry = useCallback(() => {
     void loadPlans();
   }, [loadPlans]);
@@ -219,15 +230,7 @@ export const PlannedWorkoutList: FC = observer(() => {
                       <span>{formatPlanSummary(plan)}</span>
                     </span>
                   </button>
-                  <Button
-                    aria-label={`Удалить план ${plan.splitTag}`}
-                    className={cnPlannedWorkoutList('Delete')}
-                    color='secondary'
-                    onClick={handleDeleteOpenClick}
-                    data-plan-id={plan.id}
-                  >
-                    Удалить
-                  </Button>
+                  <DeletePlanButton onDelete={state.openDeleteDialog} plan={plan} />
                 </li>
               ))}
             </ul>

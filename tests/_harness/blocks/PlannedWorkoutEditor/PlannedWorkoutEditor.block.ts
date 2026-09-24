@@ -7,8 +7,8 @@ export class PlannedWorkoutEditorBlock extends Block {
   readonly selectors = {
     root: '.PlannedWorkoutEditor',
     form: '.PlannedWorkoutEditor-Form',
-    date: '#planned-date',
-    tag: '#split-tag',
+    date: '.PlannedWorkoutEditor-Form #planned-date',
+    tag: '.PlannedWorkoutEditor-Form #split-tag',
     exerciseSelect: '.PlannedWorkoutEditor-ExerciseSelect',
     addExercise: '.PlannedWorkoutEditor-AddExercise button',
     save: '.PlannedWorkoutEditor-Save',
@@ -38,12 +38,13 @@ export class PlannedWorkoutEditorBlock extends Block {
 
   async fillSet(exercisePosition: number, setPosition: number, reps: string, weightKg: string): Promise<void> {
     const card = this.findBySelector('exerciseCard').nth(exercisePosition);
-    await card.locator('[data-field="reps"]').nth(setPosition).fill(reps);
-    await card.locator('[data-field="weightKg"]').nth(setPosition).fill(weightKg);
+    const inputs = card.locator('.PlannedWorkoutEditor-SetRow input[type="number"]');
+    await inputs.nth(setPosition * 2).fill(reps);
+    await inputs.nth(setPosition * 2 + 1).fill(weightKg);
   }
 
   async moveExerciseDown(exerciseName: string): Promise<void> {
-    await this.page.getByRole('button', { name: `Переместить ${exerciseName} ниже`, exact: true }).click();
+    await this.page.getByRole('button', { name: `Переместить упражнение ${exerciseName} вниз`, exact: true }).click();
   }
 
   async clickSave(): Promise<void> {

@@ -126,6 +126,108 @@ function toDraftExercises(plan: PlannedWorkout): DraftExercise[] {
   }));
 }
 
+type ExerciseAction = 'up' | 'down' | 'remove';
+
+type PlannedExerciseActionProps = {
+  readonly action: ExerciseAction;
+  readonly disabled?: boolean;
+  readonly exerciseName: string;
+  readonly exercisePosition: number;
+  onAction(action: ExerciseAction, exercisePosition: number): void;
+};
+
+const PlannedExerciseAction: FC<PlannedExerciseActionProps> = ({
+  action,
+  disabled,
+  exerciseName,
+  exercisePosition,
+  onAction
+}) => {
+  const handleClick = useCallback(() => {
+    onAction(action, exercisePosition);
+  }, [action, exercisePosition, onAction]);
+
+  const isRemove = action === 'remove';
+  const direction = action === 'up' ? 'вверх' : 'вниз';
+  const ariaLabel = isRemove
+    ? `Удалить упражнение ${exerciseName}`
+    : `Переместить упражнение ${exerciseName} ${direction}`;
+  let content = '↓';
+  if (action === 'up') {
+    content = '↑';
+  }
+  if (isRemove) {
+    content = 'Удалить';
+  }
+
+  return (
+    <Button aria-label={ariaLabel} color={isRemove ? 'secondary' : 'default'} disabled={disabled} onClick={handleClick}>
+      {content}
+    </Button>
+  );
+};
+
+type SetAction = 'add' | 'remove';
+
+type PlannedSetActionProps = {
+  readonly action: SetAction;
+  readonly className?: string;
+  readonly exercisePosition: number;
+  readonly setPosition?: number;
+  onAction(action: SetAction, exercisePosition: number, setPosition: number | undefined): void;
+};
+
+const PlannedSetAction: FC<PlannedSetActionProps> = ({
+  action,
+  className,
+  exercisePosition,
+  setPosition,
+  onAction
+}) => {
+  const handleClick = useCallback(() => {
+    onAction(action, exercisePosition, setPosition);
+  }, [action, exercisePosition, onAction, setPosition]);
+
+  const ariaLabel =
+    action === 'add'
+      ? `Добавить подход в упражнение ${exercisePosition + 1}`
+      : `Удалить подход ${(setPosition ?? 0) + 1} у упражнения ${exercisePosition + 1}`;
+
+  return (
+    <Button aria-label={ariaLabel} className={className} onClick={handleClick}>
+      {action === 'add' ? '+ Подход' : '×'}
+    </Button>
+  );
+};
+
+type PlannedSetInputProps = {
+  readonly exercisePosition: number;
+  readonly field: 'reps' | 'weightKg';
+  readonly setPosition: number;
+  readonly step: string;
+  readonly value: string;
+  onChange(exercisePosition: number, setPosition: number, field: 'reps' | 'weightKg', value: string): void;
+};
+
+const PlannedSetInput: FC<PlannedSetInputProps> = ({ exercisePosition, field, setPosition, step, value, onChange }) => {
+  const handleChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      onChange(exercisePosition, setPosition, field, event.target.value);
+    },
+    [exercisePosition, field, onChange, setPosition]
+  );
+
+  return (
+    <Input
+      className={cnPlannedWorkoutEditor('SetInput')}
+      onChange={handleChange}
+      step={step}
+      type='number'
+      value={value}
+    />
+  );
+};
+
 export const PlannedWorkoutEditor: FC = observer(() => {
   const navigate = useNavigate();
   const { id: clientId, planId } = useParams<{ id: string; planId: string }>();
@@ -312,9 +414,7 @@ export const PlannedWorkoutEditor: FC = observer(() => {
   }, [state]);
 
   const handleExerciseAction = useCallback(
-    (event: SyntheticEvent<HTMLButtonElement>) => {
-      const exercisePosition = Number(event.currentTarget.dataset.exercisePosition);
-      const action = event.currentTarget.dataset.action;
+    (action: ExerciseAction, exercisePosition: number) => {
       if (action === 'up') {
         state.moveExercise(exercisePosition, exercisePosition - 1);
       }
@@ -329,14 +429,11 @@ export const PlannedWorkoutEditor: FC = observer(() => {
   );
 
   const handleSetAction = useCallback(
-    (event: SyntheticEvent<HTMLButtonElement>) => {
-      const exercisePosition = Number(event.currentTarget.dataset.exercisePosition);
-      const setPosition = Number(event.currentTarget.dataset.setPosition);
-      const action = event.currentTarget.dataset.action;
+    (action: SetAction, exercisePosition: number, setPosition: number | undefined) => {
       if (action === 'add') {
         state.addSet(exercisePosition);
       }
-      if (action === 'remove') {
+      if (action === 'remove' && setPosition !== undefined) {
         state.removeSet(exercisePosition, setPosition);
       }
     },
@@ -344,13 +441,8 @@ export const PlannedWorkoutEditor: FC = observer(() => {
   );
 
   const handleSetChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      const exercisePosition = Number(event.currentTarget.dataset.exercisePosition);
-      const setPosition = Number(event.currentTarget.dataset.setPosition);
-      const field = event.currentTarget.dataset.field;
-      if (field === 'reps' || field === 'weightKg') {
-        state.setSetValue(exercisePosition, setPosition, field, event.currentTarget.value);
-      }
+    (exercisePosition: number, setPosition: number, field: 'reps' | 'weightKg', value: string) => {
+      state.setSetValue(exercisePosition, setPosition, field, value);
     },
     [state]
   );
@@ -472,33 +564,26 @@ export const PlannedWorkoutEditor: FC = observer(() => {
                         {exercisePosition + 1}. {draft.exerciseName}
                       </strong>
                       <div className={cnPlannedWorkoutEditor('ExerciseActions')}>
-                        <Button
-                          aria-label={`Переместить ${draft.exerciseName} выше`}
+                        <PlannedExerciseAction
+                          action='up'
                           disabled={exercisePosition === 0}
-                          onClick={handleExerciseAction}
-                          data-action='up'
-                          data-exercise-position={exercisePosition}
-                        >
-                          ↑
-                        </Button>
-                        <Button
-                          aria-label={`Переместить ${draft.exerciseName} ниже`}
+                          exerciseName={draft.exerciseName}
+                          exercisePosition={exercisePosition}
+                          onAction={handleExerciseAction}
+                        />
+                        <PlannedExerciseAction
+                          action='down'
                           disabled={exercisePosition === state.drafts.length - 1}
-                          onClick={handleExerciseAction}
-                          data-action='down'
-                          data-exercise-position={exercisePosition}
-                        >
-                          ↓
-                        </Button>
-                        <Button
-                          aria-label={`Удалить ${draft.exerciseName}`}
-                          color='secondary'
-                          onClick={handleExerciseAction}
-                          data-action='remove'
-                          data-exercise-position={exercisePosition}
-                        >
-                          Удалить
-                        </Button>
+                          exerciseName={draft.exerciseName}
+                          exercisePosition={exercisePosition}
+                          onAction={handleExerciseAction}
+                        />
+                        <PlannedExerciseAction
+                          action='remove'
+                          exerciseName={draft.exerciseName}
+                          exercisePosition={exercisePosition}
+                          onAction={handleExerciseAction}
+                        />
                       </div>
                     </div>
 
@@ -506,49 +591,40 @@ export const PlannedWorkoutEditor: FC = observer(() => {
                       {draft.sets.map((set, setPosition) => (
                         <div className={cnPlannedWorkoutEditor('SetRow')} key={setPosition}>
                           <span className={cnPlannedWorkoutEditor('SetLabel')}>{setPosition + 1}</span>
-                          <Input
-                            className={cnPlannedWorkoutEditor('SetInput')}
-                            data-exercise-position={exercisePosition}
-                            data-field='reps'
-                            data-set-position={setPosition}
-                            onChange={handleSetChange}
+                          <PlannedSetInput
+                            exercisePosition={exercisePosition}
+                            field='reps'
+                            setPosition={setPosition}
                             step='1'
-                            type='number'
                             value={set.reps}
+                            onChange={handleSetChange}
                           />
                           <span className={cnPlannedWorkoutEditor('SetUnit')}>повт.</span>
-                          <Input
-                            className={cnPlannedWorkoutEditor('SetInput')}
-                            data-exercise-position={exercisePosition}
-                            data-field='weightKg'
-                            data-set-position={setPosition}
-                            onChange={handleSetChange}
+                          <PlannedSetInput
+                            exercisePosition={exercisePosition}
+                            field='weightKg'
+                            setPosition={setPosition}
                             step='0.1'
-                            type='number'
                             value={set.weightKg}
+                            onChange={handleSetChange}
                           />
                           <span className={cnPlannedWorkoutEditor('SetUnit')}>кг</span>
-                          <Button
-                            aria-label={`Удалить подход ${setPosition + 1}`}
+                          <PlannedSetAction
+                            action='remove'
                             className={cnPlannedWorkoutEditor('RemoveSet')}
-                            onClick={handleSetAction}
-                            data-action='remove'
-                            data-exercise-position={exercisePosition}
-                            data-set-position={setPosition}
-                          >
-                            ×
-                          </Button>
+                            exercisePosition={exercisePosition}
+                            setPosition={setPosition}
+                            onAction={handleSetAction}
+                          />
                         </div>
                       ))}
                     </div>
-                    <Button
+                    <PlannedSetAction
+                      action='add'
                       className={cnPlannedWorkoutEditor('AddSet')}
-                      onClick={handleSetAction}
-                      data-action='add'
-                      data-exercise-position={exercisePosition}
-                    >
-                      + Подход
-                    </Button>
+                      exercisePosition={exercisePosition}
+                      onAction={handleSetAction}
+                    />
                   </article>
                 ))}
               </div>
