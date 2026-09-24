@@ -1,12 +1,12 @@
 import { type FC } from 'react';
 import { cn } from '@bem-react/classname';
 
-import { Button } from '../../Button/Button';
+import { WorkoutSessionComplete } from '../Complete/WorkoutSession-Complete';
+import { WorkoutSessionSave } from '../Save/WorkoutSession-Save';
 
 import './WorkoutSession-Actions.scss';
 
 const cnWorkoutSessionActions = cn('WorkoutSession', 'Actions');
-const cnWorkoutSession = cn('WorkoutSession');
 
 type WorkoutSessionActionsProps = {
   readonly completing: boolean;
@@ -18,24 +18,8 @@ type WorkoutSessionActionsProps = {
 export const WorkoutSessionActions: FC<WorkoutSessionActionsProps> = ({ completing, disabled, saving, onComplete }) => {
   return (
     <div className={cnWorkoutSessionActions()}>
-      <Button
-        className={cnWorkoutSession('Save')}
-        color='secondary'
-        disabled={disabled}
-        form='workout-session-form'
-        type='submit'
-      >
-        {saving ? 'Сохранение…' : 'Сохранить факт'}
-      </Button>
-      <Button
-        className={cnWorkoutSession('Complete')}
-        color='primary'
-        disabled={disabled}
-        onClick={onComplete}
-        type='button'
-      >
-        {completing ? 'Завершение…' : 'Завершить тренировку'}
-      </Button>
+      <WorkoutSessionSave disabled={disabled} saving={saving} />
+      <WorkoutSessionComplete completing={completing} disabled={disabled} onClick={onComplete} />
     </div>
   );
 };

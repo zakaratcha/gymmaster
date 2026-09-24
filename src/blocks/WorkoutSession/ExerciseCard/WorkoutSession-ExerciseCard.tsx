@@ -1,15 +1,16 @@
 import { type FC, useCallback } from 'react';
 import { cn } from '@bem-react/classname';
 
-import { Button } from '../../Button/Button';
+import { WorkoutSessionAddSet } from '../AddSet/WorkoutSession-AddSet';
 import { WorkoutSessionExerciseActions } from '../ExerciseActions/WorkoutSession-ExerciseActions';
+import { WorkoutSessionExerciseHeader } from '../ExerciseHeader/WorkoutSession-ExerciseHeader';
+import { WorkoutSessionSetList } from '../SetList/WorkoutSession-SetList';
 import { WorkoutSessionSetRow } from '../SetRow/WorkoutSession-SetRow';
 import type { DraftExercise, ExerciseAction, SetAction, SetField } from '../types';
 
 import './WorkoutSession-ExerciseCard.scss';
 
 const cnWorkoutSessionExerciseCard = cn('WorkoutSession', 'ExerciseCard');
-const cnWorkoutSession = cn('WorkoutSession');
 
 type WorkoutSessionExerciseCardProps = {
   readonly draft: DraftExercise;
@@ -38,7 +39,7 @@ export const WorkoutSessionExerciseCard: FC<WorkoutSessionExerciseCardProps> = (
 
   return (
     <article className={cnWorkoutSessionExerciseCard()}>
-      <div className={cnWorkoutSession('ExerciseHeader')}>
+      <WorkoutSessionExerciseHeader>
         <strong>
           {exercisePosition + 1}. {draft.exerciseName}
         </strong>
@@ -51,9 +52,9 @@ export const WorkoutSessionExerciseCard: FC<WorkoutSessionExerciseCardProps> = (
             onAction={onExerciseAction}
           />
         )}
-      </div>
+      </WorkoutSessionExerciseHeader>
 
-      <div className={cnWorkoutSession('SetList')}>
+      <WorkoutSessionSetList>
         {draft.sets.map((set, setPosition) => (
           <WorkoutSessionSetRow
             disabled={mutationDisabled}
@@ -66,17 +67,9 @@ export const WorkoutSessionExerciseCard: FC<WorkoutSessionExerciseCardProps> = (
             setPosition={setPosition}
           />
         ))}
-      </div>
+      </WorkoutSessionSetList>
       {isInProgress && (
-        <Button
-          aria-label={`Добавить подход в упражнение ${exercisePosition + 1}`}
-          className={cnWorkoutSession('AddSet')}
-          disabled={mutationDisabled}
-          onClick={handleAddSet}
-          type='button'
-        >
-          + Подход
-        </Button>
+        <WorkoutSessionAddSet disabled={mutationDisabled} exercisePosition={exercisePosition} onAdd={handleAddSet} />
       )}
     </article>
   );

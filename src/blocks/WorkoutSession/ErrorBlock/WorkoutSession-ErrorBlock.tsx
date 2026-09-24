@@ -2,11 +2,11 @@ import { type FC } from 'react';
 import { cn } from '@bem-react/classname';
 
 import { Button } from '../../Button/Button';
+import { WorkoutSessionError } from '../Error/WorkoutSession-Error';
 
 import './WorkoutSession-ErrorBlock.scss';
 
 const cnWorkoutSessionErrorBlock = cn('WorkoutSession', 'ErrorBlock');
-const cnWorkoutSession = cn('WorkoutSession');
 
 type WorkoutSessionErrorBlockProps = {
   readonly error: string;
@@ -16,9 +16,7 @@ type WorkoutSessionErrorBlockProps = {
 export const WorkoutSessionErrorBlock: FC<WorkoutSessionErrorBlockProps> = ({ error, onRetry }) => {
   return (
     <div className={cnWorkoutSessionErrorBlock()}>
-      <p className={cnWorkoutSession('Error')} role='alert'>
-        {error}
-      </p>
+      <WorkoutSessionError error={error} />
       <Button color='secondary' onClick={onRetry} type='button'>
         Повторить
       </Button>

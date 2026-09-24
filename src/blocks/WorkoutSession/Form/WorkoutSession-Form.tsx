@@ -1,6 +1,9 @@
 import { type FC, type ReactNode, type SyntheticEvent } from 'react';
 import { cn } from '@bem-react/classname';
 
+import { WorkoutSessionFormError } from '../FormError/WorkoutSession-FormError';
+import { WorkoutSessionSuccess } from '../Success/WorkoutSession-Success';
+
 import './WorkoutSession-Form.scss';
 
 const cnWorkoutSessionForm = cn('WorkoutSession', 'Form');
@@ -23,16 +26,8 @@ export const WorkoutSessionForm: FC<WorkoutSessionFormProps> = ({
   return (
     <form className={cnWorkoutSessionForm()} id='workout-session-form' onSubmit={onSubmit}>
       {children}
-      {formError !== undefined && (
-        <p className={cn('WorkoutSession')('FormError')} role='alert'>
-          {formError}
-        </p>
-      )}
-      {saveSuccess && (
-        <p className={cn('WorkoutSession')('Success')} role='status'>
-          Факт сохранён
-        </p>
-      )}
+      {formError !== undefined && <WorkoutSessionFormError>{formError}</WorkoutSessionFormError>}
+      {saveSuccess && <WorkoutSessionSuccess>Факт сохранён</WorkoutSessionSuccess>}
       {actions}
     </form>
   );

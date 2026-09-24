@@ -1,0 +1,7 @@
+.ClientHub-OpenWorkout {
+  flex-shrink: 0;
+
+  @media (width <= 30rem) {
+    align-self: flex-start;
+  }
+}

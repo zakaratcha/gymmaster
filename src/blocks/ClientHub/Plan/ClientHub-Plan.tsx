@@ -1,16 +1,14 @@
 import { type FC } from 'react';
-import { cn } from '@bem-react/classname';
 
 import type { PlannedWorkout } from '../../../services/plans/plans.models';
-import { Button } from '../../Button/Button';
-import { Loading } from '../../Loading/Loading';
 import { formatPlannedDate } from '../format';
+import { ClientHubPlanCount } from '../PlanCount/ClientHub-PlanCount';
+import { ClientHubPlanRow } from '../PlanRow/ClientHub-PlanRow';
+import { ClientHubPlansError } from '../PlansError/ClientHub-PlansError';
+import { ClientHubPlansLoading } from '../PlansLoading/ClientHub-PlansLoading';
 import { ClientHubSection } from '../Section/ClientHub-Section';
+import { ClientHubStubAction } from '../StubAction/ClientHub-StubAction';
 import { ClientHubStubText } from '../StubText/ClientHub-StubText';
-
-import './ClientHub-Plan.scss';
-
-const cnClientHub = cn('ClientHub');
 
 type ClientHubPlanProps = {
   readonly error: string | undefined;
@@ -33,29 +31,20 @@ export const ClientHubPlan: FC<ClientHubPlanProps> = ({
 
   return (
     <ClientHubSection title='Ближайший план' type='plan'>
-      {loading && <Loading className={cnClientHub('PlansLoading')} visible />}
-      {error !== undefined && (
-        <div className={cnClientHub('PlansError')}>
-          <p>{error}</p>
-          <Button color='secondary' onClick={onRetry} type='button'>
-            Повторить
-          </Button>
-        </div>
-      )}
+      {loading && <ClientHubPlansLoading />}
+      {error !== undefined && <ClientHubPlansError error={error} onRetry={onRetry} />}
       {!loading && error === undefined && plans.length === 0 && (
         <ClientHubStubText>Нет предстоящих планов</ClientHubStubText>
       )}
       {!loading && error === undefined && nearestPlan !== undefined && (
-        <div className={cnClientHub('PlanRow')}>
+        <ClientHubPlanRow>
           <span>
             {formatPlannedDate(nearestPlan.plannedDate)} · {nearestPlan.splitTag}
           </span>
-          {plans.length > 1 && <span className={cnClientHub('PlanCount')}>+ ещё {plans.length - 1}</span>}
-        </div>
+          {plans.length > 1 && <ClientHubPlanCount>+ ещё {plans.length - 1}</ClientHubPlanCount>}
+        </ClientHubPlanRow>
       )}
-      <Button className={cnClientHub('StubAction')} disabled={!plansAvailable} onClick={onAllPlans} type='button'>
-        Все планы
-      </Button>
+      <ClientHubStubAction disabled={!plansAvailable} onClick={onAllPlans} />
     </ClientHubSection>
   );
 };

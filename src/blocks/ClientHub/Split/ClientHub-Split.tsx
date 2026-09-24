@@ -1,28 +1,25 @@
 import { type FC } from 'react';
-import { cn } from '@bem-react/classname';
 
-import { Button } from '../../Button/Button';
 import { ClientHubSection } from '../Section/ClientHub-Section';
-
-import './ClientHub-Split.scss';
-
-const cnClientHub = cn('ClientHub');
+import { ClientHubSoonHint } from '../SoonHint/ClientHub-SoonHint';
+import { ClientHubSplitActions } from '../SplitActions/ClientHub-SplitActions';
+import { ClientHubSplitButton } from '../SplitButton/ClientHub-SplitButton';
+import { ClientHubSplitRow } from '../SplitRow/ClientHub-SplitRow';
+import { ClientHubSplitTags } from '../SplitTags/ClientHub-SplitTags';
 
 export const ClientHubSplit: FC = () => {
   return (
     <ClientHubSection title='Сплит' type='split'>
-      <p className={cnClientHub('SoonHint')}>Скоро</p>
-      <div className={cnClientHub('SplitRow')}>
-        <span className={cnClientHub('SplitTags')}>ноги · верх · день А</span>
-        <div className={cnClientHub('SplitActions')}>
-          <Button className={cnClientHub('SplitButton')} disabled type='button'>
-            + тег
-          </Button>
-          <Button aria-label='Настройки сплита' className={cnClientHub('SplitButton')} disabled type='button'>
+      <ClientHubSoonHint>Скоро</ClientHubSoonHint>
+      <ClientHubSplitRow>
+        <ClientHubSplitTags>ноги · верх · день А</ClientHubSplitTags>
+        <ClientHubSplitActions>
+          <ClientHubSplitButton disabled>+ тег</ClientHubSplitButton>
+          <ClientHubSplitButton ariaLabel='Настройки сплита' disabled>
             ⚙
-          </Button>
-        </div>
-      </div>
+          </ClientHubSplitButton>
+        </ClientHubSplitActions>
+      </ClientHubSplitRow>
     </ClientHubSection>
   );
 };

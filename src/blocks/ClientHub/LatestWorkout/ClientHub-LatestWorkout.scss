@@ -1,58 +1,6 @@
-.ClientHub-SessionsLoading {
-  min-height: 2rem;
-}
-
-.ClientHub-SessionsError {
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  gap: var(--space-sm);
-
-  color: var(--color-danger);
-
-  p {
-    margin: 0;
-  }
-}
-
 .ClientHub-LatestWorkout {
   display: flex;
   align-items: flex-start;
   flex-direction: column;
   gap: var(--space-xs);
-}
-
-.ClientHub-LatestWorkoutDate {
-  color: var(--color-text);
-
-  font-size: var(--font-size-md);
-  font-weight: 600;
-}
-
-.ClientHub-LatestWorkoutTag {
-  color: var(--color-text);
-
-  font-size: var(--font-size-md);
-}
-
-.ClientHub-LatestWorkoutStats {
-  color: var(--color-text-muted);
-
-  font-size: var(--font-size-sm);
-}
-
-.ClientHub-LatestWorkoutLink {
-  min-height: var(--tap-target);
-  padding: var(--space-sm) 0;
-
-  text-decoration: none;
-
-  color: var(--color-accent);
-
-  font-size: var(--font-size-md);
-  font-weight: 600;
-
-  &:hover {
-    text-decoration: underline;
-  }
 }

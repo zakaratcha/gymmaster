@@ -1,4 +1,4 @@
-import { type ChangeEvent, type FC, useCallback } from 'react';
+import { type FC, useCallback } from 'react';
 import { cn } from '@bem-react/classname';
 
 import type { PlannedWorkout } from '../../../services/plans/plans.models';
@@ -7,7 +7,9 @@ import { DialogActions } from '../../Dialog/Actions/Dialog-Actions';
 import { DialogContent } from '../../Dialog/Content/Dialog-Content';
 import { Dialog } from '../../Dialog/Dialog';
 import { DialogTitle } from '../../Dialog/Title/Dialog-Title';
-import { formatPlannedDate, formatWorkoutCount } from '../format';
+import { ClientHubPlanOption } from '../PlanOption/ClientHub-PlanOption';
+import { ClientHubPlanOptions } from '../PlanOptions/ClientHub-PlanOptions';
+import { ClientHubStartError } from '../StartError/ClientHub-StartError';
 
 import './ClientHub-StartDialog.scss';
 
@@ -33,8 +35,8 @@ export const ClientHubStartDialog: FC<ClientHubStartDialogProps> = ({
   onStart
 }) => {
   const handlePlanChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      onPlanChange(event.currentTarget.value);
+    (value: string) => {
+      onPlanChange(value);
     },
     [onPlanChange]
   );
@@ -43,31 +45,18 @@ export const ClientHubStartDialog: FC<ClientHubStartDialogProps> = ({
     <Dialog ariaLabel='Выбор плана тренировки' className={cnClientHub('StartDialog')} onCancel={onCancel}>
       <DialogTitle>Начать тренировку с плана</DialogTitle>
       <DialogContent>
-        {error !== undefined && (
-          <p className={cnClientHub('StartError')} role='alert'>
-            {error}
-          </p>
-        )}
-        <div className={cnClientHub('PlanOptions')}>
+        {error !== undefined && <ClientHubStartError>{error}</ClientHubStartError>}
+        <ClientHubPlanOptions>
           {plans.map(plan => (
-            <label className={cnClientHub('PlanOption', { selected: plan.id === selectedPlanId })} key={plan.id}>
-              <input
-                checked={plan.id === selectedPlanId}
-                disabled={starting}
-                name='planned-workout'
-                onChange={handlePlanChange}
-                type='radio'
-                value={plan.id}
-              />
-              <span className={cnClientHub('PlanOptionText')}>
-                <strong>
-                  {formatPlannedDate(plan.plannedDate)} · {plan.splitTag}
-                </strong>
-                <span>{formatWorkoutCount(plan.exercises.length, 'упражнение', 'упражнения', 'упражнений')}</span>
-              </span>
-            </label>
+            <ClientHubPlanOption
+              disabled={starting}
+              key={plan.id}
+              plan={plan}
+              selected={plan.id === selectedPlanId}
+              onPlanChange={handlePlanChange}
+            />
           ))}
-        </div>
+        </ClientHubPlanOptions>
       </DialogContent>
       <DialogActions>
         <Button disabled={starting} onClick={onCancel} type='button'>

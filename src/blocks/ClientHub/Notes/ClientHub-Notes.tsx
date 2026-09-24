@@ -1,13 +1,8 @@
 import { type FC } from 'react';
-import { cn } from '@bem-react/classname';
 
 import { truncateNotes } from '../format';
+import { ClientHubNotesToggle } from '../NotesToggle/ClientHub-NotesToggle';
 import { ClientHubSection } from '../Section/ClientHub-Section';
-import { ClientHubSectionLabel } from '../SectionLabel/ClientHub-SectionLabel';
-
-import './ClientHub-Notes.scss';
-
-const cnClientHub = cn('ClientHub');
 
 type ClientHubNotesProps = {
   readonly expanded: boolean;
@@ -21,10 +16,7 @@ export const ClientHubNotes: FC<ClientHubNotesProps> = ({ expanded, notes, onTog
 
   return (
     <ClientHubSection type='notes'>
-      <button aria-expanded={expanded} className={cnClientHub('NotesToggle')} onClick={onToggle} type='button'>
-        <ClientHubSectionLabel>Заметки</ClientHubSectionLabel>
-        <span className={cnClientHub('NotesPreview')}>{expanded && hasNotes ? notes : notesPreview}</span>
-      </button>
+      <ClientHubNotesToggle expanded={expanded} notes={notes} notesPreview={notesPreview} onToggle={onToggle} />
     </ClientHubSection>
   );
 };

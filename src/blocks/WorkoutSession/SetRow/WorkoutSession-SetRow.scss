@@ -5,28 +5,6 @@
   grid-template-columns: 1.5rem minmax(4rem, 1fr) auto minmax(4rem, 1fr) auto auto;
 }
 
-.WorkoutSession-SetLabel,
-.WorkoutSession-SetUnit {
-  color: var(--color-text-muted);
-
-  font-size: var(--font-size-sm);
-}
-
-.WorkoutSession-SetValue {
-  color: var(--color-text);
-
-  font-size: var(--font-size-md);
-}
-
-.WorkoutSession-SetInput {
-  min-width: 0;
-}
-
-.WorkoutSession-RemoveSet {
-  min-width: auto;
-  padding: var(--space-sm);
-}
-
 @media (width <= 30rem) {
   .WorkoutSession-SetRow {
     grid-template-columns: 1.5rem minmax(0, 1fr) auto minmax(0, 1fr) auto auto;

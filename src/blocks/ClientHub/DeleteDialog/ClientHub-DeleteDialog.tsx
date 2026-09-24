@@ -2,8 +2,10 @@ import { type FC, type RefObject, type SyntheticEvent, useCallback } from 'react
 import { cn } from '@bem-react/classname';
 
 import type { Client } from '../../../services/clients/clients.models';
-import { Button } from '../../Button/Button';
 import { ClientHubActionRow } from '../ActionRow/ClientHub-ActionRow';
+import { ClientHubDeleteCancel } from '../DeleteCancel/ClientHub-DeleteCancel';
+import { ClientHubDeleteConfirm } from '../DeleteConfirm/ClientHub-DeleteConfirm';
+import { ClientHubDeleteError } from '../DeleteError/ClientHub-DeleteError';
 
 import './ClientHub-DeleteDialog.scss';
 
@@ -44,18 +46,10 @@ export const ClientHubDeleteDialog: FC<ClientHubDeleteDialogProps> = ({
     >
       <h2 id='client-delete-title'>Удалить клиента?</h2>
       <p id='client-delete-description'>Клиент «{client?.name}» будет удалён. Это действие нельзя отменить.</p>
-      {error !== undefined && (
-        <p className={cnClientHub('DeleteError')} role='alert'>
-          {error}
-        </p>
-      )}
+      {error !== undefined && <ClientHubDeleteError error={error} />}
       <ClientHubActionRow>
-        <Button className={cnClientHub('DeleteCancel')} disabled={submitting} onClick={onCancel} type='button'>
-          Отмена
-        </Button>
-        <Button className={cnClientHub('DeleteConfirm')} disabled={submitting} onClick={onConfirm} type='button'>
-          {submitting ? 'Удаление…' : 'Удалить'}
-        </Button>
+        <ClientHubDeleteCancel disabled={submitting} onClick={onCancel} />
+        <ClientHubDeleteConfirm disabled={submitting} submitting={submitting} onClick={onConfirm} />
       </ClientHubActionRow>
     </dialog>
   );

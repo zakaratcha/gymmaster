@@ -1,0 +1,10 @@
+.ClientHub-PlanRow {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+
+  color: var(--color-text);
+
+  font-size: var(--font-size-md);
+}

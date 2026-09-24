@@ -1,10 +1,11 @@
 import { type FC, type ReactNode } from 'react';
 import { cn } from '@bem-react/classname';
 
+import { ClientHubSectionTitle } from '../SectionTitle/ClientHub-SectionTitle';
+
 import './ClientHub-Section.scss';
 
 const cnClientHubSection = cn('ClientHub', 'Section');
-const cnClientHub = cn('ClientHub');
 
 type ClientHubSectionProps = {
   readonly children: ReactNode;
@@ -15,7 +16,7 @@ type ClientHubSectionProps = {
 export const ClientHubSection: FC<ClientHubSectionProps> = ({ children, title, type }) => {
   return (
     <section className={cnClientHubSection({ type })}>
-      {title !== undefined && <h2 className={cnClientHub('SectionTitle')}>{title}</h2>}
+      {title !== undefined && <ClientHubSectionTitle>{title}</ClientHubSectionTitle>}
       {children}
     </section>
   );

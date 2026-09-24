@@ -10,39 +10,6 @@
   background-color: var(--color-surface);
 }
 
-.WorkoutSession-MetaRow {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-}
-
-.WorkoutSession-MetaLabel {
-  color: var(--color-text-muted);
-
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-}
-
-.WorkoutSession-Client,
-.WorkoutSession-Split,
-.WorkoutSession-StartedAt,
-.WorkoutSession-CompletedAt {
-  color: var(--color-text);
-
-  font-size: var(--font-size-md);
-}
-
-.WorkoutSession-Status {
-  color: var(--color-accent);
-
-  font-size: var(--font-size-md);
-  font-weight: 600;
-
-  &_completed {
-    color: var(--color-text-muted);
-  }
-}
-
 @media (width <= 30rem) {
   .WorkoutSession-Meta {
     grid-template-columns: 1fr;
