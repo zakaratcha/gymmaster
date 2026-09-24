@@ -188,10 +188,10 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
       this.plansError = value;
     },
     setActiveSession(value) {
-      this.activeSession = value;
+      this.activeSession = value ?? null;
     },
     setLatestCompletedSession(value) {
-      this.latestCompletedSession = value;
+      this.latestCompletedSession = value ?? null;
     },
     setSessionsLoading(value) {
       this.sessionsLoading = value;
