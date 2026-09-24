@@ -18,6 +18,8 @@ export class ClientHubBlock extends Block {
     bodyWeight: '.ClientHub-BodyWeight',
     notesPreview: '.ClientHub-NotesPreview',
     sectionTitle: '.ClientHub-SectionTitle',
+    allPlans: '.ClientHub-Section_type_plan .ClientHub-StubAction',
+    planRow: '.ClientHub-PlanRow',
     error: '.ClientHub-Error'
   };
 
@@ -119,5 +121,13 @@ export class ClientHubBlock extends Block {
 
   async clickBack(): Promise<void> {
     await this.findBySelector('back').click();
+  }
+
+  async clickAllPlans(): Promise<void> {
+    await this.findBySelector('allPlans').click();
+  }
+
+  async expectNearestPlan(text: string): Promise<void> {
+    await expect(this.findBySelector('planRow')).toContainText(text);
   }
 }

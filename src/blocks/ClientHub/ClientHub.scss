@@ -35,6 +35,7 @@
 
     cursor: pointer;
     transition: color var(--transition-fast);
+    text-decoration: none;
 
     color: var(--color-text);
     border: none;
@@ -195,6 +196,40 @@
 
   &-StubAction {
     align-self: flex-start;
+  }
+
+  &-PlansLoading {
+    min-height: 2rem;
+  }
+
+  &-PlansError {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: var(--space-sm);
+
+    color: var(--color-danger);
+
+    p {
+      margin: 0;
+    }
+  }
+
+  &-PlanRow {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+
+    color: var(--color-text);
+
+    font-size: var(--font-size-md);
+  }
+
+  &-PlanCount {
+    color: var(--color-text-muted);
+
+    font-size: var(--font-size-sm);
   }
 
   &-SoonHint {

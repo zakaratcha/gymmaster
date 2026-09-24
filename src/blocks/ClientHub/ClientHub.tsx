@@ -1,10 +1,12 @@
 import { type FC, type SyntheticEvent, useCallback, useEffect, useRef } from 'react';
 import { observer, useLocalObservable } from 'mobx-react-lite';
 import { cn } from '@bem-react/classname';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import type { Client } from '../../services/clients/clients.models';
 import { deleteClient, getClientById, updateClient } from '../../services/clients/clients.service';
+import type { PlannedWorkout } from '../../services/plans/plans.models';
+import { listPlans } from '../../services/plans/plans.service';
 import { Button } from '../Button/Button';
 import { ClientCreateForm } from '../ClientCreateForm/ClientCreateForm';
 import { Loading } from '../Loading/Loading';
@@ -19,6 +21,9 @@ type ClientHubProps = {
 
 type ClientHubState = {
   client?: Client;
+  plans: readonly PlannedWorkout[];
+  plansLoading: boolean;
+  plansError?: string;
   loading: boolean;
   error?: string;
   notesExpanded: boolean;
@@ -36,6 +41,9 @@ type ClientHubState = {
   setSubmitting(value: boolean): void;
   setMutationError(value: string | undefined): void;
   setClient(value: Client | undefined): void;
+  setPlans(value: readonly PlannedWorkout[]): void;
+  setPlansLoading(value: boolean): void;
+  setPlansError(value: string | undefined): void;
   setLoading(value: boolean): void;
   setError(value: string | undefined): void;
   toggleNotesExpanded(): void;
@@ -47,6 +55,11 @@ function formatBodyWeightKg(bodyWeightKg: number | undefined): string {
   }
 
   return `${bodyWeightKg} кг`;
+}
+
+function formatPlannedDate(value: string): string {
+  const [year, month, day] = value.split('-');
+  return `${day}.${month}.${year}`;
 }
 
 function truncateNotes(notes: string, maxLength: number): string {
@@ -64,6 +77,8 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
 
   const state = useLocalObservable<ClientHubState>(() => ({
     client: initialClient,
+    plans: [],
+    plansLoading: !staticMode,
     loading: !staticMode,
     notesExpanded: false,
     editOpen: false,
@@ -105,6 +120,15 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
     setClient(value) {
       this.client = value;
     },
+    setPlans(value) {
+      this.plans = value;
+    },
+    setPlansLoading(value) {
+      this.plansLoading = value;
+    },
+    setPlansError(value) {
+      this.plansError = value;
+    },
     setLoading(value) {
       this.loading = value;
     },
@@ -137,19 +161,43 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
     }
   }, [id, state]);
 
+  const loadPlans = useCallback(async () => {
+    if (staticMode || id === undefined || id.length === 0) {
+      state.setPlansLoading(false);
+      return;
+    }
+
+    state.setPlansLoading(true);
+    state.setPlansError(undefined);
+    try {
+      state.setPlans(await listPlans(id));
+    } catch {
+      state.setPlansError('Не удалось загрузить планы');
+    } finally {
+      state.setPlansLoading(false);
+    }
+  }, [id, state, staticMode]);
+
   useEffect(() => {
     if (!staticMode) {
       void loadClient();
+      void loadPlans();
     }
-  }, [staticMode, loadClient]);
-
-  const handleBack = useCallback(() => {
-    void navigate('/clients');
-  }, [navigate]);
+  }, [staticMode, loadClient, loadPlans]);
 
   const handleRetry = useCallback(() => {
     void loadClient();
   }, [loadClient]);
+
+  const handlePlansRetry = useCallback(() => {
+    void loadPlans();
+  }, [loadPlans]);
+
+  const handleAllPlans = useCallback(() => {
+    if (id !== undefined) {
+      void navigate(`/clients/${id}/plans`);
+    }
+  }, [id, navigate]);
 
   const deleteDialogRef = useRef<HTMLDialogElement>(null);
 
@@ -235,6 +283,7 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
   }, [navigate, state, staticMode]);
 
   const notes = state.client?.notes?.trim() ?? '';
+  const nearestPlan = state.plans[0];
   const hasNotes = notes.length > 0;
   const notesPreview = hasNotes ? truncateNotes(notes, 60) : 'Нет заметок';
 
@@ -242,14 +291,9 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
     <div className={cnClientHub()}>
       <main className={cnClientHub('Main')}>
         <header className={cnClientHub('Header')}>
-          <button
-            aria-label='Назад к списку клиентов'
-            className={cnClientHub('Back')}
-            onClick={handleBack}
-            type='button'
-          >
+          <Link aria-label='Назад к списку клиентов' className={cnClientHub('Back')} to='/clients'>
             ←
-          </button>
+          </Link>
           <h1 className={cnClientHub('Title')}>{state.client?.name ?? 'Клиент'}</h1>
           <Button
             className={cnClientHub('Edit')}
@@ -298,8 +342,34 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
 
               <section className={cnClientHub('Section', { type: 'plan' })}>
                 <h2 className={cnClientHub('SectionTitle')}>Ближайший план</h2>
-                <p className={cnClientHub('StubText')}>Нет предстоящих планов</p>
-                <Button className={cnClientHub('StubAction')} disabled type='button'>
+                {state.plansLoading && <Loading className={cnClientHub('PlansLoading')} visible />}
+                {state.plansError !== undefined && (
+                  <div className={cnClientHub('PlansError')}>
+                    <p>{state.plansError}</p>
+                    <Button color='secondary' onClick={handlePlansRetry} type='button'>
+                      Повторить
+                    </Button>
+                  </div>
+                )}
+                {!state.plansLoading && state.plansError === undefined && state.plans.length === 0 && (
+                  <p className={cnClientHub('StubText')}>Нет предстоящих планов</p>
+                )}
+                {!state.plansLoading && state.plansError === undefined && nearestPlan !== undefined && (
+                  <div className={cnClientHub('PlanRow')}>
+                    <span>
+                      {formatPlannedDate(nearestPlan.plannedDate)} · {nearestPlan.splitTag}
+                    </span>
+                    {state.plans.length > 1 && (
+                      <span className={cnClientHub('PlanCount')}>+ ещё {state.plans.length - 1}</span>
+                    )}
+                  </div>
+                )}
+                <Button
+                  className={cnClientHub('StubAction')}
+                  disabled={id === undefined}
+                  onClick={handleAllPlans}
+                  type='button'
+                >
                   Все планы
                 </Button>
               </section>

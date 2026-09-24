@@ -1,0 +1,189 @@
+.PlannedWorkoutList {
+  display: flex;
+  flex-direction: column;
+
+  min-height: 100%;
+
+  background-color: var(--color-bg);
+
+  &-Main {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--space-lg);
+
+    width: 100%;
+    padding: var(--space-xl);
+  }
+
+  &-Header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+  }
+
+  &-Back {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    justify-content: center;
+
+    min-width: var(--tap-target);
+    min-height: var(--tap-target);
+    padding: 0;
+
+    cursor: pointer;
+    text-decoration: none;
+
+    color: var(--color-text);
+    border: none;
+    background: none;
+
+    font-family: inherit;
+    font-size: 1.5rem;
+  }
+
+  &-Title {
+    overflow: hidden;
+    flex: 1;
+
+    min-width: 0;
+    margin: 0;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    color: var(--color-text);
+
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  &-Create {
+    flex-shrink: 0;
+  }
+
+  &-Content {
+    position: relative;
+
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--space-lg);
+
+    min-height: 8rem;
+  }
+
+  &-Loading {
+    position: absolute;
+    inset: 0;
+  }
+
+  &-ErrorBlock,
+  &-Empty {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: var(--space-md);
+
+    padding: var(--space-xl) 0;
+
+    text-align: center;
+  }
+
+  &-Error,
+  &-Empty p {
+    margin: 0;
+
+    color: var(--color-danger);
+  }
+
+  &-Empty p {
+    color: var(--color-text-muted);
+  }
+
+  &-Retry {
+    min-width: 8rem;
+  }
+
+  &-List {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+  }
+
+  &-Item {
+    display: flex;
+    align-items: stretch;
+    gap: var(--space-xs);
+
+    min-width: 0;
+
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  &-Row {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    gap: var(--space-lg);
+
+    min-width: 0;
+    min-height: var(--tap-target);
+    padding: var(--space-md) 0;
+
+    cursor: pointer;
+    text-align: left;
+
+    color: inherit;
+    border: none;
+    background: none;
+
+    font-family: inherit;
+  }
+
+  &-Date {
+    flex-shrink: 0;
+
+    color: var(--color-text-muted);
+
+    font-size: var(--font-size-sm);
+  }
+
+  &-Details {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--space-xs);
+
+    min-width: 0;
+
+    color: var(--color-text-muted);
+
+    font-size: var(--font-size-sm);
+
+    strong {
+      overflow: hidden;
+
+      white-space: nowrap;
+      text-overflow: ellipsis;
+
+      color: var(--color-text);
+
+      font-size: var(--font-size-md);
+    }
+  }
+
+  &-Delete {
+    align-self: center;
+    flex-shrink: 0;
+
+    min-width: auto;
+    padding: var(--space-sm) var(--space-md);
+  }
+}
