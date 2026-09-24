@@ -1,0 +1,10 @@
+.ClientHub-Content {
+  position: relative;
+
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-lg);
+
+  min-height: 8rem;
+}

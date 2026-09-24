@@ -20,6 +20,12 @@ export class ClientHubBlock extends Block {
     sectionTitle: '.ClientHub-SectionTitle',
     allPlans: '.ClientHub-Section_type_plan .ClientHub-StubAction',
     planRow: '.ClientHub-PlanRow',
+    start: '.ClientHub-Section_type_actions .ClientHub-ActionButton',
+    startDialog: 'dialog.ClientHub-StartDialog',
+    latestWorkout: '.ClientHub-LatestWorkout',
+    latestWorkoutTag: '.ClientHub-LatestWorkoutTag',
+    latestWorkoutStats: '.ClientHub-LatestWorkoutStats',
+    latestWorkoutLink: '.ClientHub-LatestWorkoutLink',
     error: '.ClientHub-Error'
   };
 
@@ -129,5 +135,53 @@ export class ClientHubBlock extends Block {
 
   async expectNearestPlan(text: string): Promise<void> {
     await expect(this.findBySelector('planRow')).toContainText(text);
+  }
+
+  async waitForWorkoutDataReady(): Promise<void> {
+    await this.waitForVisible();
+    await expect(this.page.locator('.ClientHub-PlansLoading, .ClientHub-SessionsLoading')).toHaveCount(0);
+    await expect(
+      this.page.locator(
+        '.ClientHub-PlanRow, .ClientHub-Section_type_plan .ClientHub-StubText, .ClientHub-Section_type_plan .ClientHub-PlansError'
+      )
+    ).toBeVisible();
+    await expect(
+      this.page.locator(
+        '.ClientHub-LatestWorkout, .ClientHub-Section_type_latestWorkout .ClientHub-StubText, .ClientHub-Section_type_latestWorkout .ClientHub-SessionsError'
+      )
+    ).toBeVisible();
+  }
+
+  async startPlan(splitTag: string): Promise<void> {
+    await this.waitForWorkoutDataReady();
+    await this.findBySelector('start').click();
+    await expect(this.findBySelector('startDialog')).toBeVisible();
+    const planOption = this.findBySelector('startDialog')
+      .locator('.ClientHub-PlanOption')
+      .filter({ hasText: splitTag });
+    await expect(planOption).toHaveCount(1);
+    await planOption.locator('input[type="radio"]').check();
+
+    const responsePromise = this.page.waitForResponse(response => {
+      const url = new URL(response.url());
+      return response.request().method() === 'POST' && /\/api\/clients\/[^/]+\/workout-sessions$/.test(url.pathname);
+    });
+    await this.findBySelector('startDialog').getByRole('button', { name: 'Начать тренировку', exact: true }).click();
+    const response = await responsePromise;
+    expect(response.status()).toBe(201);
+    await expect(this.page).toHaveURL(/\/workouts\/[^/]+\/[^/]+$/);
+  }
+
+  async expectLatestCompleted(splitTag: string, stats: string): Promise<void> {
+    await this.waitForWorkoutDataReady();
+    await expect(this.findBySelector('latestWorkout')).toBeVisible();
+    await expect(this.findBySelector('latestWorkoutTag')).toHaveText(splitTag);
+    await expect(this.findBySelector('latestWorkoutStats')).toHaveText(stats);
+  }
+
+  async openLatestCompletedResult(): Promise<void> {
+    await this.waitForWorkoutDataReady();
+    await this.findBySelector('latestWorkoutLink').click();
+    await expect(this.page).toHaveURL(/\/workouts\/[^/]+\/[^/]+$/);
   }
 }

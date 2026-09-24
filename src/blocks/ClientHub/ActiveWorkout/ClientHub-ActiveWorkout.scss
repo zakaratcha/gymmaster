@@ -1,0 +1,13 @@
+.ClientHub-ActiveWorkout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+@media (width <= 30rem) {
+  .ClientHub-ActiveWorkout {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

@@ -1,15 +1,25 @@
 import { type FC, type SyntheticEvent, useCallback, useEffect, useRef } from 'react';
 import { observer, useLocalObservable } from 'mobx-react-lite';
 import { cn } from '@bem-react/classname';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
+import { ApiError } from '../../services/api/api.models';
 import type { Client } from '../../services/clients/clients.models';
 import { deleteClient, getClientById, updateClient } from '../../services/clients/clients.service';
 import type { PlannedWorkout } from '../../services/plans/plans.models';
 import { listPlans } from '../../services/plans/plans.service';
-import { Button } from '../Button/Button';
+import type { WorkoutSession } from '../../services/workoutSessions/workoutSessions.models';
+import {
+  createWorkoutSession,
+  getActiveWorkoutSession,
+  getLatestCompletedWorkoutSession
+} from '../../services/workoutSessions/workoutSessions.service';
 import { ClientCreateForm } from '../ClientCreateForm/ClientCreateForm';
-import { Loading } from '../Loading/Loading';
+import { ClientHubContent } from './Content/ClientHub-Content';
+import { ClientHubDeleteDialog } from './DeleteDialog/ClientHub-DeleteDialog';
+import { ClientHubHeader } from './Header/ClientHub-Header';
+import { ClientHubMain } from './Main/ClientHub-Main';
+import { ClientHubStartDialog } from './StartDialog/ClientHub-StartDialog';
 
 import './ClientHub.scss';
 
@@ -24,6 +34,14 @@ type ClientHubState = {
   plans: readonly PlannedWorkout[];
   plansLoading: boolean;
   plansError?: string;
+  activeSession: WorkoutSession | null;
+  latestCompletedSession: WorkoutSession | null;
+  sessionsLoading: boolean;
+  sessionsError?: string;
+  startDialogOpen: boolean;
+  selectedPlanId: string;
+  starting: boolean;
+  startingError?: string;
   loading: boolean;
   error?: string;
   notesExpanded: boolean;
@@ -44,30 +62,41 @@ type ClientHubState = {
   setPlans(value: readonly PlannedWorkout[]): void;
   setPlansLoading(value: boolean): void;
   setPlansError(value: string | undefined): void;
+  setActiveSession(value: WorkoutSession | null): void;
+  setLatestCompletedSession(value: WorkoutSession | null): void;
+  setSessionsLoading(value: boolean): void;
+  setSessionsError(value: string | undefined): void;
+  openStartDialog(): void;
+  closeStartDialog(): void;
+  setSelectedPlanId(value: string): void;
+  setStarting(value: boolean): void;
+  setStartingError(value: string | undefined): void;
   setLoading(value: boolean): void;
   setError(value: string | undefined): void;
   toggleNotesExpanded(): void;
 };
 
-function formatBodyWeightKg(bodyWeightKg: number | undefined): string {
-  if (bodyWeightKg === undefined) {
-    return '—';
+function getStartWorkoutErrorMessage(error: unknown): string {
+  if (!(error instanceof ApiError)) {
+    return 'Не удалось начать тренировку';
   }
 
-  return `${bodyWeightKg} кг`;
-}
-
-function formatPlannedDate(value: string): string {
-  const [year, month, day] = value.split('-');
-  return `${day}.${month}.${year}`;
-}
-
-function truncateNotes(notes: string, maxLength: number): string {
-  if (notes.length <= maxLength) {
-    return notes;
+  if (error.status === 404) {
+    return 'План тренировки не найден';
   }
 
-  return `${notes.slice(0, maxLength).trimEnd()}…`;
+  if (error.status === 409) {
+    return 'У клиента уже есть тренировка в процессе';
+  }
+
+  if (typeof error.body === 'object' && error.body !== null) {
+    const bodyError: unknown = Reflect.get(error.body, 'error');
+    if (typeof bodyError === 'string' && bodyError.length > 0) {
+      return bodyError;
+    }
+  }
+
+  return `Не удалось начать тренировку (HTTP ${error.status})`;
 }
 
 export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
@@ -79,6 +108,13 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
     client: initialClient,
     plans: [],
     plansLoading: !staticMode,
+    activeSession: null,
+    latestCompletedSession: null,
+    sessionsLoading: !staticMode,
+    startDialogOpen: false,
+    selectedPlanId: '',
+    starting: false,
+    startingError: undefined,
     loading: !staticMode,
     notesExpanded: false,
     editOpen: false,
@@ -129,6 +165,37 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
     setPlansError(value) {
       this.plansError = value;
     },
+    setActiveSession(value) {
+      this.activeSession = value ?? null;
+    },
+    setLatestCompletedSession(value) {
+      this.latestCompletedSession = value ?? null;
+    },
+    setSessionsLoading(value) {
+      this.sessionsLoading = value;
+    },
+    setSessionsError(value) {
+      this.sessionsError = value;
+    },
+    openStartDialog() {
+      this.selectedPlanId = this.plans[0]?.id ?? '';
+      this.startingError = undefined;
+      this.startDialogOpen = true;
+    },
+    closeStartDialog() {
+      if (!this.starting) {
+        this.startDialogOpen = false;
+      }
+    },
+    setSelectedPlanId(value) {
+      this.selectedPlanId = value;
+    },
+    setStarting(value) {
+      this.starting = value;
+    },
+    setStartingError(value) {
+      this.startingError = value;
+    },
     setLoading(value) {
       this.loading = value;
     },
@@ -178,12 +245,35 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
     }
   }, [id, state, staticMode]);
 
+  const loadSessions = useCallback(async () => {
+    if (staticMode || id === undefined || id.length === 0) {
+      state.setSessionsLoading(false);
+      return;
+    }
+
+    state.setSessionsLoading(true);
+    state.setSessionsError(undefined);
+    try {
+      const [activeSession, latestCompletedSession] = await Promise.all([
+        getActiveWorkoutSession(id),
+        getLatestCompletedWorkoutSession(id)
+      ]);
+      state.setActiveSession(activeSession);
+      state.setLatestCompletedSession(latestCompletedSession);
+    } catch {
+      state.setSessionsError('Не удалось загрузить тренировки');
+    } finally {
+      state.setSessionsLoading(false);
+    }
+  }, [id, state, staticMode]);
+
   useEffect(() => {
     if (!staticMode) {
       void loadClient();
       void loadPlans();
+      void loadSessions();
     }
-  }, [staticMode, loadClient, loadPlans]);
+  }, [loadClient, loadPlans, loadSessions, staticMode]);
 
   const handleRetry = useCallback(() => {
     void loadClient();
@@ -192,6 +282,54 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
   const handlePlansRetry = useCallback(() => {
     void loadPlans();
   }, [loadPlans]);
+
+  const handleSessionsRetry = useCallback(() => {
+    void loadSessions();
+  }, [loadSessions]);
+
+  const handleStartOpen = useCallback(() => {
+    state.openStartDialog();
+  }, [state]);
+
+  const handleStartCancel = useCallback(() => {
+    state.closeStartDialog();
+  }, [state]);
+
+  const handlePlanChange = useCallback(
+    (value: string) => {
+      state.setSelectedPlanId(value);
+    },
+    [state]
+  );
+
+  const handleStart = useCallback(async () => {
+    if (id === undefined || state.starting || state.activeSession !== null) {
+      return;
+    }
+
+    const selectedPlan = state.plans.find(plan => plan.id === state.selectedPlanId);
+    if (selectedPlan === undefined) {
+      state.setStartingError('Выберите план тренировки');
+      return;
+    }
+
+    if (staticMode) {
+      state.setStartingError('Запуск недоступен в демонстрационном режиме');
+      return;
+    }
+
+    state.setStartingError(undefined);
+    state.setStarting(true);
+    try {
+      const session = await createWorkoutSession(id, { plannedWorkoutId: selectedPlan.id });
+      state.setActiveSession(session);
+      await navigate(`/workouts/${session.clientId}/${session.id}`);
+    } catch (error) {
+      state.setStartingError(getStartWorkoutErrorMessage(error));
+    } finally {
+      state.setStarting(false);
+    }
+  }, [id, navigate, state, staticMode]);
 
   const handleAllPlans = useCallback(() => {
     if (id !== undefined) {
@@ -253,14 +391,6 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
     }
   }, [state]);
 
-  const handleDeleteEscape = useCallback(
-    (event: SyntheticEvent<HTMLDialogElement>) => {
-      event.preventDefault();
-      handleDeleteCancel();
-    },
-    [handleDeleteCancel]
-  );
-
   const handleDeleteConfirm = useCallback(async () => {
     if (state.submitting || state.client === undefined) {
       return;
@@ -282,148 +412,37 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
     }
   }, [navigate, state, staticMode]);
 
-  const notes = state.client?.notes?.trim() ?? '';
-  const nearestPlan = state.plans[0];
-  const hasNotes = notes.length > 0;
-  const notesPreview = hasNotes ? truncateNotes(notes, 60) : 'Нет заметок';
+  const handleNotesToggle = useCallback(() => {
+    state.toggleNotesExpanded();
+  }, [state]);
 
   return (
     <div className={cnClientHub()}>
-      <main className={cnClientHub('Main')}>
-        <header className={cnClientHub('Header')}>
-          <Link aria-label='Назад к списку клиентов' className={cnClientHub('Back')} to='/clients'>
-            ←
-          </Link>
-          <h1 className={cnClientHub('Title')}>{state.client?.name ?? 'Клиент'}</h1>
-          <Button
-            className={cnClientHub('Edit')}
-            disabled={state.client === undefined}
-            onClick={handleEdit}
-            type='button'
-          >
-            Править
-          </Button>
-        </header>
-
-        <div className={cnClientHub('Content')}>
-          {state.loading && <Loading className={cnClientHub('Loading')} visible />}
-
-          {state.error !== undefined && (
-            <div className={cnClientHub('ErrorBlock')}>
-              <p className={cnClientHub('Error')}>{state.error}</p>
-              <Button className={cnClientHub('Retry')} color='secondary' onClick={handleRetry} type='button'>
-                Повторить
-              </Button>
-            </div>
-          )}
-
-          {!state.loading && state.error === undefined && state.client !== undefined && (
-            <>
-              <section className={cnClientHub('Section', { type: 'notes' })}>
-                <button
-                  aria-expanded={state.notesExpanded}
-                  className={cnClientHub('NotesToggle')}
-                  onClick={state.toggleNotesExpanded}
-                  type='button'
-                >
-                  <span className={cnClientHub('SectionLabel')}>Заметки</span>
-                  <span className={cnClientHub('NotesPreview')}>
-                    {state.notesExpanded && hasNotes ? notes : notesPreview}
-                  </span>
-                </button>
-              </section>
-
-              <section className={cnClientHub('Section', { type: 'bodyWeight' })}>
-                <div className={cnClientHub('Row')}>
-                  <span className={cnClientHub('SectionLabel')}>Вес тела</span>
-                  <span className={cnClientHub('BodyWeight')}>{formatBodyWeightKg(state.client.bodyWeightKg)}</span>
-                </div>
-              </section>
-
-              <section className={cnClientHub('Section', { type: 'plan' })}>
-                <h2 className={cnClientHub('SectionTitle')}>Ближайший план</h2>
-                {state.plansLoading && <Loading className={cnClientHub('PlansLoading')} visible />}
-                {state.plansError !== undefined && (
-                  <div className={cnClientHub('PlansError')}>
-                    <p>{state.plansError}</p>
-                    <Button color='secondary' onClick={handlePlansRetry} type='button'>
-                      Повторить
-                    </Button>
-                  </div>
-                )}
-                {!state.plansLoading && state.plansError === undefined && state.plans.length === 0 && (
-                  <p className={cnClientHub('StubText')}>Нет предстоящих планов</p>
-                )}
-                {!state.plansLoading && state.plansError === undefined && nearestPlan !== undefined && (
-                  <div className={cnClientHub('PlanRow')}>
-                    <span>
-                      {formatPlannedDate(nearestPlan.plannedDate)} · {nearestPlan.splitTag}
-                    </span>
-                    {state.plans.length > 1 && (
-                      <span className={cnClientHub('PlanCount')}>+ ещё {state.plans.length - 1}</span>
-                    )}
-                  </div>
-                )}
-                <Button
-                  className={cnClientHub('StubAction')}
-                  disabled={id === undefined}
-                  onClick={handleAllPlans}
-                  type='button'
-                >
-                  Все планы
-                </Button>
-              </section>
-
-              <section className={cnClientHub('Section', { type: 'actions' })}>
-                <h2 className={cnClientHub('SectionTitle')}>Действия</h2>
-                <p className={cnClientHub('SoonHint')}>Скоро</p>
-                <div className={cnClientHub('ActionRow')}>
-                  <Button className={cnClientHub('ActionButton')} disabled type='button'>
-                    Старт с плана ▼
-                  </Button>
-                  <Button className={cnClientHub('ActionButton')} disabled type='button'>
-                    Пустая сессия
-                  </Button>
-                </div>
-              </section>
-
-              <section className={cnClientHub('Section', { type: 'history' })}>
-                <h2 className={cnClientHub('SectionTitle')}>История</h2>
-                <p className={cnClientHub('SoonHint')}>Скоро</p>
-                <div className={cnClientHub('HistoryList')}>
-                  <button className={cnClientHub('HistoryItem')} disabled type='button'>
-                    Последние тренировки
-                  </button>
-                  <button className={cnClientHub('HistoryItem')} disabled type='button'>
-                    История упражнения…
-                  </button>
-                </div>
-              </section>
-
-              <section className={cnClientHub('Section', { type: 'split' })}>
-                <h2 className={cnClientHub('SectionTitle')}>Сплит</h2>
-                <p className={cnClientHub('SoonHint')}>Скоро</p>
-                <div className={cnClientHub('SplitRow')}>
-                  <span className={cnClientHub('SplitTags')}>ноги · верх · день А</span>
-                  <div className={cnClientHub('SplitActions')}>
-                    <Button className={cnClientHub('SplitButton')} disabled type='button'>
-                      + тег
-                    </Button>
-                    <Button aria-label='Настройки сплита' className={cnClientHub('SplitButton')} disabled type='button'>
-                      ⚙
-                    </Button>
-                  </div>
-                </div>
-              </section>
-            </>
-          )}
-          {!state.loading && state.client !== undefined && (
-            <Button className={cnClientHub('Delete')} onClick={handleDeleteOpen} type='button'>
-              Удалить клиента
-            </Button>
-          )}
-        </div>
-      </main>
+      <ClientHubMain>
+        <ClientHubHeader client={state.client} onEdit={handleEdit} />
+        <ClientHubContent
+          activeSession={state.activeSession}
+          client={state.client}
+          error={state.error}
+          id={id}
+          latestCompletedSession={state.latestCompletedSession}
+          loading={state.loading}
+          notesExpanded={state.notesExpanded}
+          plans={state.plans}
+          plansError={state.plansError}
+          plansLoading={state.plansLoading}
+          sessionsError={state.sessionsError}
+          sessionsLoading={state.sessionsLoading}
+          staticMode={staticMode}
+          onAllPlans={handleAllPlans}
+          onDelete={handleDeleteOpen}
+          onPlansRetry={handlePlansRetry}
+          onRetry={handleRetry}
+          onSessionsRetry={handleSessionsRetry}
+          onStartOpen={handleStartOpen}
+          onToggleNotes={handleNotesToggle}
+        />
+      </ClientHubMain>
       {state.editOpen && (
         <ClientCreateForm
           bodyWeightKg={state.editBodyWeightKg}
@@ -439,39 +458,25 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
           submitting={state.submitting}
         />
       )}
-      <dialog
-        aria-describedby='client-delete-description'
-        aria-labelledby='client-delete-title'
-        className={cnClientHub('DeleteDialog')}
-        onCancel={handleDeleteEscape}
-        ref={deleteDialogRef}
-      >
-        <h2 id='client-delete-title'>Удалить клиента?</h2>
-        <p id='client-delete-description'>Клиент «{state.client?.name}» будет удалён. Это действие нельзя отменить.</p>
-        {state.mutationError !== undefined && (
-          <p className={cnClientHub('DeleteError')} role='alert'>
-            {state.mutationError}
-          </p>
-        )}
-        <div className={cnClientHub('ActionRow')}>
-          <Button
-            className={cnClientHub('DeleteCancel')}
-            disabled={state.submitting}
-            onClick={handleDeleteCancel}
-            type='button'
-          >
-            Отмена
-          </Button>
-          <Button
-            className={cnClientHub('DeleteConfirm')}
-            disabled={state.submitting}
-            onClick={handleDeleteConfirm}
-            type='button'
-          >
-            {state.submitting ? 'Удаление…' : 'Удалить'}
-          </Button>
-        </div>
-      </dialog>
+      {state.startDialogOpen && (
+        <ClientHubStartDialog
+          error={state.startingError}
+          plans={state.plans}
+          selectedPlanId={state.selectedPlanId}
+          starting={state.starting}
+          onCancel={handleStartCancel}
+          onPlanChange={handlePlanChange}
+          onStart={handleStart}
+        />
+      )}
+      <ClientHubDeleteDialog
+        client={state.client}
+        dialogRef={deleteDialogRef}
+        error={state.mutationError}
+        submitting={state.submitting}
+        onCancel={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+      />
     </div>
   );
 });

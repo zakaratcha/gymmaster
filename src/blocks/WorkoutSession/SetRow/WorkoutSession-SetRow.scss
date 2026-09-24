@@ -1,0 +1,12 @@
+.WorkoutSession-SetRow {
+  display: grid;
+  align-items: center;
+  gap: var(--space-xs);
+  grid-template-columns: 1.5rem minmax(4rem, 1fr) auto minmax(4rem, 1fr) auto auto;
+}
+
+@media (width <= 30rem) {
+  .WorkoutSession-SetRow {
+    grid-template-columns: 1.5rem minmax(0, 1fr) auto minmax(0, 1fr) auto auto;
+  }
+}

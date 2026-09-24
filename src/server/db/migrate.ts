@@ -81,6 +81,7 @@ export async function migrate(): Promise<void> {
   runSqlMigration('0002_clients.sql');
   runSqlMigration('0003_exercises.sql');
   runSqlMigration('0004_planned_workouts.sql');
+  runSqlMigration('0005_workout_sessions.sql');
   await seedBootstrapAdmin();
   await seedSecondTrainer();
   await seedExercises();
