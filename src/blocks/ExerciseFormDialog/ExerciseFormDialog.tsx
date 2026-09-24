@@ -13,7 +13,7 @@ import './ExerciseFormDialog.scss';
 
 const cnExerciseFormDialog = cn('ExerciseFormDialog');
 
-export type ExerciseFormDialogProps = {
+type ExerciseFormDialogProps = {
   readonly name: string;
   readonly notes: string;
   readonly submitting: boolean;
