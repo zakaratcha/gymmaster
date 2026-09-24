@@ -1,0 +1,219 @@
+.PlannedWorkoutEditor {
+  display: flex;
+  flex-direction: column;
+
+  min-height: 100%;
+
+  background-color: var(--color-bg);
+
+  &-Main {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--space-lg);
+
+    width: 100%;
+    padding: var(--space-xl);
+  }
+
+  &-Header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+  }
+
+  &-Back {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    justify-content: center;
+
+    min-width: var(--tap-target);
+    min-height: var(--tap-target);
+    padding: 0;
+
+    cursor: pointer;
+    text-decoration: none;
+
+    color: var(--color-text);
+    border: none;
+    background: none;
+
+    font-family: inherit;
+    font-size: 1.5rem;
+  }
+
+  &-Title {
+    overflow: hidden;
+    flex: 1;
+
+    min-width: 0;
+    margin: 0;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    color: var(--color-text);
+
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  &-Save {
+    flex-shrink: 0;
+  }
+
+  &-Loading {
+    position: absolute;
+    inset: 0;
+  }
+
+  &-ErrorBlock {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: var(--space-md);
+
+    padding: var(--space-xl) 0;
+
+    text-align: center;
+  }
+
+  &-ErrorBlock p,
+  &-FormError {
+    margin: 0;
+
+    color: var(--color-danger);
+  }
+
+  &-Form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+
+  &-Field {
+    width: 100%;
+  }
+
+  &-ExercisesSection {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  &-ExercisesHeader {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-md);
+  }
+
+  &-SectionTitle {
+    margin: 0;
+
+    text-transform: uppercase;
+
+    color: var(--color-text-muted);
+
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+  }
+
+  &-AddExercise {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+
+  &-ExerciseSelect {
+    max-width: 14rem;
+    min-height: var(--tap-target);
+    padding: var(--space-sm) var(--space-md);
+
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+
+    font: inherit;
+  }
+
+  &-Empty {
+    margin: 0;
+
+    color: var(--color-text-muted);
+  }
+
+  &-ExerciseList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  &-ExerciseCard {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+
+    padding: var(--space-md);
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+
+  &-ExerciseHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+
+    color: var(--color-text);
+  }
+
+  &-ExerciseActions {
+    display: flex;
+    flex-shrink: 0;
+    gap: var(--space-xs);
+  }
+
+  &-ExerciseActions button {
+    min-width: auto;
+    padding: var(--space-sm);
+  }
+
+  &-SetList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  &-SetRow {
+    display: grid;
+    align-items: center;
+    gap: var(--space-xs);
+    grid-template-columns: 1.5rem minmax(4rem, 1fr) auto minmax(4rem, 1fr) auto auto;
+  }
+
+  &-SetLabel,
+  &-SetUnit {
+    color: var(--color-text-muted);
+
+    font-size: var(--font-size-sm);
+  }
+
+  &-SetInput {
+    min-width: 0;
+  }
+
+  &-RemoveSet {
+    min-width: auto;
+    padding: var(--space-sm);
+  }
+
+  &-AddSet {
+    align-self: flex-start;
+  }
+}
