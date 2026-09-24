@@ -1,0 +1,43 @@
+.ClientHub-ActiveWorkout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.ClientHub-ActiveWorkoutInfo {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-xs);
+
+  min-width: 0;
+}
+
+.ClientHub-ActiveWorkoutTag {
+  color: var(--color-text);
+
+  font-size: var(--font-size-md);
+  font-weight: 600;
+}
+
+.ClientHub-ActiveWorkoutTime {
+  color: var(--color-text-muted);
+
+  font-size: var(--font-size-sm);
+}
+
+.ClientHub-OpenWorkout {
+  flex-shrink: 0;
+}
+
+@media (width <= 30rem) {
+  .ClientHub-ActiveWorkout {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .ClientHub-OpenWorkout {
+    align-self: flex-start;
+  }
+}

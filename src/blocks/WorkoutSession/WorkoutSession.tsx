@@ -1,7 +1,7 @@
 import { type ChangeEvent, type FC, type SyntheticEvent, useCallback, useEffect } from 'react';
 import { observer, useLocalObservable } from 'mobx-react-lite';
 import { cn } from '@bem-react/classname';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import type { Client } from '../../services/clients/clients.models';
 import { getClientById } from '../../services/clients/clients.service';
@@ -16,24 +16,19 @@ import {
   getWorkoutSession,
   updateWorkoutSession
 } from '../../services/workoutSessions/workoutSessions.service';
-import { Button } from '../Button/Button';
-import { Input } from '../Input/Input';
-import { Loading } from '../Loading/Loading';
+import { WorkoutSessionActions } from './Actions/WorkoutSession-Actions';
+import { WorkoutSessionErrorBlock } from './ErrorBlock/WorkoutSession-ErrorBlock';
+import { WorkoutSessionExerciseList } from './ExerciseList/WorkoutSession-ExerciseList';
+import { WorkoutSessionForm } from './Form/WorkoutSession-Form';
+import { WorkoutSessionHeader } from './Header/WorkoutSession-Header';
+import { WorkoutSessionLoading } from './Loading/WorkoutSession-Loading';
+import { WorkoutSessionMain } from './Main/WorkoutSession-Main';
+import { WorkoutSessionMeta } from './Meta/WorkoutSession-Meta';
+import type { DraftExercise, DraftSet, ExerciseAction, SetAction, SetField } from './types';
 
 import './WorkoutSession.scss';
 
 const cnWorkoutSession = cn('WorkoutSession');
-
-type DraftSet = {
-  readonly reps: string;
-  readonly weightKg: string;
-};
-
-type DraftExercise = {
-  readonly exerciseId: string;
-  readonly exerciseName: string;
-  readonly sets: DraftSet[];
-};
 
 type WorkoutSessionState = {
   client?: Client;
@@ -62,25 +57,12 @@ type WorkoutSessionState = {
   moveExercise(from: number, to: number): void;
   addSet(exercisePosition: number): void;
   removeSet(exercisePosition: number, setPosition: number): void;
-  setSetValue(exercisePosition: number, setPosition: number, field: keyof DraftSet, value: string): void;
+  setSetValue(exercisePosition: number, setPosition: number, field: SetField, value: string): void;
 };
 
 type ValidationResult =
   | { readonly ok: true; readonly payload: UpdateWorkoutSessionRequest }
   | { readonly ok: false; readonly error: string };
-
-const timestampFormatter = new Intl.DateTimeFormat('ru-RU', {
-  day: '2-digit',
-  hour: '2-digit',
-  minute: '2-digit',
-  month: '2-digit',
-  year: 'numeric'
-});
-
-function formatTimestamp(value: string): string {
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? value : timestampFormatter.format(date);
-}
 
 function toDraftExercises(session: WorkoutSessionModel): DraftExercise[] {
   return session.exercises.map(exercise => ({
@@ -114,118 +96,6 @@ function buildPayload(drafts: readonly DraftExercise[]): ValidationResult {
 
   return { ok: true, payload: { exercises } };
 }
-
-type ExerciseAction = 'up' | 'down' | 'remove';
-
-type WorkoutSessionExerciseActionProps = {
-  readonly action: ExerciseAction;
-  readonly disabled: boolean;
-  readonly exerciseName: string;
-  readonly exercisePosition: number;
-  onAction(action: ExerciseAction, exercisePosition: number): void;
-};
-
-const WorkoutSessionExerciseAction: FC<WorkoutSessionExerciseActionProps> = ({
-  action,
-  disabled,
-  exerciseName,
-  exercisePosition,
-  onAction
-}) => {
-  const handleClick = useCallback(() => {
-    onAction(action, exercisePosition);
-  }, [action, exercisePosition, onAction]);
-
-  const isRemove = action === 'remove';
-  const direction = action === 'up' ? 'вверх' : 'вниз';
-  const ariaLabel = isRemove
-    ? `Удалить упражнение ${exerciseName}`
-    : `Переместить упражнение ${exerciseName} ${direction}`;
-  let content = '↓';
-  if (action === 'up') {
-    content = '↑';
-  }
-  if (isRemove) {
-    content = 'Удалить';
-  }
-
-  return (
-    <Button aria-label={ariaLabel} color={isRemove ? 'secondary' : 'default'} disabled={disabled} onClick={handleClick}>
-      {content}
-    </Button>
-  );
-};
-
-type SetAction = 'add' | 'remove';
-
-type WorkoutSessionSetActionProps = {
-  readonly action: SetAction;
-  readonly className?: string;
-  readonly disabled: boolean;
-  readonly exercisePosition: number;
-  readonly setPosition?: number;
-  onAction(action: SetAction, exercisePosition: number, setPosition: number | undefined): void;
-};
-
-const WorkoutSessionSetAction: FC<WorkoutSessionSetActionProps> = ({
-  action,
-  className,
-  disabled,
-  exercisePosition,
-  setPosition,
-  onAction
-}) => {
-  const handleClick = useCallback(() => {
-    onAction(action, exercisePosition, setPosition);
-  }, [action, exercisePosition, onAction, setPosition]);
-
-  const ariaLabel =
-    action === 'add'
-      ? `Добавить подход в упражнение ${exercisePosition + 1}`
-      : `Удалить подход ${(setPosition ?? 0) + 1} у упражнения ${exercisePosition + 1}`;
-
-  return (
-    <Button aria-label={ariaLabel} className={className} disabled={disabled} onClick={handleClick}>
-      {action === 'add' ? '+ Подход' : '×'}
-    </Button>
-  );
-};
-
-type WorkoutSessionSetInputProps = {
-  readonly disabled: boolean;
-  readonly exercisePosition: number;
-  readonly field: 'reps' | 'weightKg';
-  readonly setPosition: number;
-  readonly value: string;
-  onChange(exercisePosition: number, setPosition: number, field: 'reps' | 'weightKg', value: string): void;
-};
-
-const WorkoutSessionSetInput: FC<WorkoutSessionSetInputProps> = ({
-  disabled,
-  exercisePosition,
-  field,
-  setPosition,
-  value,
-  onChange
-}) => {
-  const handleChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      onChange(exercisePosition, setPosition, field, event.target.value);
-    },
-    [exercisePosition, field, onChange, setPosition]
-  );
-
-  return (
-    <Input
-      className={cnWorkoutSession('SetInput')}
-      disabled={disabled}
-      onChange={handleChange}
-      step={field === 'reps' ? '1' : '0.1'}
-      type='number'
-      value={value}
-    />
-  );
-};
 
 export const WorkoutSession: FC = observer(() => {
   const navigate = useNavigate();
@@ -415,7 +285,7 @@ export const WorkoutSession: FC = observer(() => {
   );
 
   const handleSetAction = useCallback(
-    (action: SetAction, exercisePosition: number, setPosition: number | undefined) => {
+    (action: SetAction, exercisePosition: number, setPosition?: number) => {
       if (action === 'add') {
         state.addSet(exercisePosition);
       }
@@ -427,7 +297,7 @@ export const WorkoutSession: FC = observer(() => {
   );
 
   const handleSetChange = useCallback(
-    (exercisePosition: number, setPosition: number, field: 'reps' | 'weightKg', value: string) => {
+    (exercisePosition: number, setPosition: number, field: SetField, value: string) => {
       state.setSetValue(exercisePosition, setPosition, field, value);
     },
     [state]
@@ -502,222 +372,47 @@ export const WorkoutSession: FC = observer(() => {
 
   return (
     <div className={cnWorkoutSession()}>
-      <main className={cnWorkoutSession('Main')}>
-        <header className={cnWorkoutSession('Header')}>
-          <Link
-            aria-label='Назад к карточке клиента'
-            className={cnWorkoutSession('Back')}
-            to={clientId === undefined ? '/clients' : `/clients/${clientId}`}
-          >
-            ←
-          </Link>
-          <h1 className={cnWorkoutSession('Title')}>Тренировка</h1>
-        </header>
+      <WorkoutSessionMain>
+        <WorkoutSessionHeader clientId={clientId} />
 
-        {state.loading && <Loading className={cnWorkoutSession('Loading')} visible />}
+        {state.loading && <WorkoutSessionLoading />}
 
-        {state.error !== undefined && (
-          <div className={cnWorkoutSession('ErrorBlock')}>
-            <p className={cnWorkoutSession('Error')} role='alert'>
-              {state.error}
-            </p>
-            <Button color='secondary' onClick={handleRetry} type='button'>
-              Повторить
-            </Button>
-          </div>
-        )}
+        {state.error !== undefined && <WorkoutSessionErrorBlock error={state.error} onRetry={handleRetry} />}
 
         {!state.loading && state.error === undefined && session !== undefined && client !== undefined && (
           <>
-            <section className={cnWorkoutSession('Meta')}>
-              <div className={cnWorkoutSession('MetaRow')}>
-                <span className={cnWorkoutSession('MetaLabel')}>Клиент</span>
-                <span className={cnWorkoutSession('Client')}>{client.name}</span>
-              </div>
-              <div className={cnWorkoutSession('MetaRow')}>
-                <span className={cnWorkoutSession('MetaLabel')}>Тег</span>
-                <span className={cnWorkoutSession('Split')}>{session.splitTag}</span>
-              </div>
-              <div className={cnWorkoutSession('MetaRow')}>
-                <span className={cnWorkoutSession('MetaLabel')}>Статус</span>
-                <span className={cnWorkoutSession('Status', { completed: session.status === 'completed' })}>
-                  {isInProgress ? 'В процессе' : 'Завершена'}
-                </span>
-              </div>
-              <div className={cnWorkoutSession('MetaRow')}>
-                <span className={cnWorkoutSession('MetaLabel')}>Начало</span>
-                <span className={cnWorkoutSession('StartedAt')}>{formatTimestamp(session.startedAt)}</span>
-              </div>
-              {session.completedAt !== undefined && (
-                <div className={cnWorkoutSession('MetaRow')}>
-                  <span className={cnWorkoutSession('MetaLabel')}>Завершение</span>
-                  <span className={cnWorkoutSession('CompletedAt')}>{formatTimestamp(session.completedAt)}</span>
-                </div>
-              )}
-            </section>
-
-            <form className={cnWorkoutSession('Form')} id='workout-session-form' onSubmit={handleSave}>
-              <section className={cnWorkoutSession('ExercisesSection')}>
-                <div className={cnWorkoutSession('ExercisesHeader')}>
-                  <h2 className={cnWorkoutSession('SectionTitle')}>Фактические упражнения</h2>
-                  {isInProgress && (
-                    <div className={cnWorkoutSession('AddExercise')}>
-                      <select
-                        aria-label='Упражнение'
-                        className={cnWorkoutSession('ExerciseSelect')}
-                        disabled={state.exercises.length === 0 || mutationDisabled}
-                        onChange={handleExerciseChange}
-                        value={state.selectedExerciseId}
-                      >
-                        {state.exercises.map(exercise => (
-                          <option key={exercise.id} value={exercise.id}>
-                            {exercise.name}
-                          </option>
-                        ))}
-                      </select>
-                      <Button
-                        disabled={state.exercises.length === 0 || mutationDisabled}
-                        onClick={handleAddExercise}
-                        type='button'
-                      >
-                        + Упражнение
-                      </Button>
-                    </div>
-                  )}
-                </div>
-
-                {state.drafts.length === 0 && <p className={cnWorkoutSession('Empty')}>Упражнения не добавлены</p>}
-
-                <div className={cnWorkoutSession('ExerciseList')}>
-                  {state.drafts.map((draft, exercisePosition) => (
-                    <article
-                      className={cnWorkoutSession('ExerciseCard')}
-                      key={`${draft.exerciseId}-${exercisePosition}`}
-                    >
-                      <div className={cnWorkoutSession('ExerciseHeader')}>
-                        <strong>
-                          {exercisePosition + 1}. {draft.exerciseName}
-                        </strong>
-                        {isInProgress && (
-                          <div className={cnWorkoutSession('ExerciseActions')}>
-                            <WorkoutSessionExerciseAction
-                              action='up'
-                              disabled={exercisePosition === 0 || mutationDisabled}
-                              exerciseName={draft.exerciseName}
-                              exercisePosition={exercisePosition}
-                              onAction={handleExerciseAction}
-                            />
-                            <WorkoutSessionExerciseAction
-                              action='down'
-                              disabled={exercisePosition === state.drafts.length - 1 || mutationDisabled}
-                              exerciseName={draft.exerciseName}
-                              exercisePosition={exercisePosition}
-                              onAction={handleExerciseAction}
-                            />
-                            <WorkoutSessionExerciseAction
-                              action='remove'
-                              disabled={mutationDisabled}
-                              exerciseName={draft.exerciseName}
-                              exercisePosition={exercisePosition}
-                              onAction={handleExerciseAction}
-                            />
-                          </div>
-                        )}
-                      </div>
-
-                      <div className={cnWorkoutSession('SetList')}>
-                        {draft.sets.map((set, setPosition) => (
-                          <div className={cnWorkoutSession('SetRow')} key={setPosition}>
-                            <span className={cnWorkoutSession('SetLabel')}>{setPosition + 1}</span>
-                            {isInProgress ? (
-                              <>
-                                <WorkoutSessionSetInput
-                                  disabled={mutationDisabled}
-                                  exercisePosition={exercisePosition}
-                                  field='reps'
-                                  setPosition={setPosition}
-                                  value={set.reps}
-                                  onChange={handleSetChange}
-                                />
-                                <span className={cnWorkoutSession('SetUnit')}>повт.</span>
-                                <WorkoutSessionSetInput
-                                  disabled={mutationDisabled}
-                                  exercisePosition={exercisePosition}
-                                  field='weightKg'
-                                  setPosition={setPosition}
-                                  value={set.weightKg}
-                                  onChange={handleSetChange}
-                                />
-                                <span className={cnWorkoutSession('SetUnit')}>кг</span>
-                                <WorkoutSessionSetAction
-                                  action='remove'
-                                  className={cnWorkoutSession('RemoveSet')}
-                                  disabled={mutationDisabled}
-                                  exercisePosition={exercisePosition}
-                                  setPosition={setPosition}
-                                  onAction={handleSetAction}
-                                />
-                              </>
-                            ) : (
-                              <>
-                                <span className={cnWorkoutSession('SetValue')}>{set.reps} повт.</span>
-                                <span className={cnWorkoutSession('SetValue')}>{set.weightKg} кг</span>
-                              </>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                      {isInProgress && (
-                        <WorkoutSessionSetAction
-                          action='add'
-                          className={cnWorkoutSession('AddSet')}
-                          disabled={mutationDisabled}
-                          exercisePosition={exercisePosition}
-                          onAction={handleSetAction}
-                        />
-                      )}
-                    </article>
-                  ))}
-                </div>
-              </section>
-
-              {state.formError !== undefined && (
-                <p className={cnWorkoutSession('FormError')} role='alert'>
-                  {state.formError}
-                </p>
-              )}
-              {state.saveSuccess && (
-                <p className={cnWorkoutSession('Success')} role='status'>
-                  Факт сохранён
-                </p>
-              )}
-
-              {isInProgress && (
-                <div className={cnWorkoutSession('Actions')}>
-                  <Button
-                    className={cnWorkoutSession('Save')}
-                    color='secondary'
+            <WorkoutSessionMeta client={client} session={session} />
+            <WorkoutSessionForm
+              actions={
+                isInProgress && (
+                  <WorkoutSessionActions
+                    completing={state.completing}
                     disabled={mutationDisabled}
-                    form='workout-session-form'
-                    type='submit'
-                  >
-                    {state.saving ? 'Сохранение…' : 'Сохранить факт'}
-                  </Button>
-                  <Button
-                    className={cnWorkoutSession('Complete')}
-                    color='primary'
-                    disabled={mutationDisabled}
-                    onClick={handleComplete}
-                    type='button'
-                  >
-                    {state.completing ? 'Завершение…' : 'Завершить тренировку'}
-                  </Button>
-                </div>
-              )}
-            </form>
+                    saving={state.saving}
+                    onComplete={handleComplete}
+                  />
+                )
+              }
+              formError={state.formError}
+              saveSuccess={state.saveSuccess}
+              onSubmit={handleSave}
+            >
+              <WorkoutSessionExerciseList
+                drafts={state.drafts}
+                exercises={state.exercises}
+                isInProgress={isInProgress}
+                mutationDisabled={mutationDisabled}
+                selectedExerciseId={state.selectedExerciseId}
+                onAddExercise={handleAddExercise}
+                onExerciseAction={handleExerciseAction}
+                onExerciseChange={handleExerciseChange}
+                onSetAction={handleSetAction}
+                onSetChange={handleSetChange}
+              />
+            </WorkoutSessionForm>
           </>
         )}
-      </main>
+      </WorkoutSessionMain>
     </div>
   );
 });

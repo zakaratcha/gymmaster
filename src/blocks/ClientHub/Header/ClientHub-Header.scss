@@ -1,0 +1,52 @@
+.ClientHub-Header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.ClientHub-Back {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  justify-content: center;
+
+  min-width: var(--tap-target);
+  min-height: var(--tap-target);
+  padding: 0;
+
+  cursor: pointer;
+  transition: color var(--transition-fast);
+  text-decoration: none;
+
+  color: var(--color-text);
+  border: none;
+  background: none;
+
+  font-family: inherit;
+  font-size: 1.5rem;
+  line-height: 1;
+
+  &:hover {
+    color: var(--color-accent);
+  }
+}
+
+.ClientHub-Title {
+  overflow: hidden;
+  flex: 1;
+
+  min-width: 0;
+  margin: 0;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  color: var(--color-text);
+
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.ClientHub-Edit {
+  flex-shrink: 0;
+}

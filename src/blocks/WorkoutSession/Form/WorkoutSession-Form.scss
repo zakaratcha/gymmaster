@@ -1,0 +1,18 @@
+.WorkoutSession-Form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.WorkoutSession-FormError,
+.WorkoutSession-Success {
+  margin: 0;
+}
+
+.WorkoutSession-FormError {
+  color: var(--color-danger);
+}
+
+.WorkoutSession-Success {
+  color: var(--color-text-muted);
+}

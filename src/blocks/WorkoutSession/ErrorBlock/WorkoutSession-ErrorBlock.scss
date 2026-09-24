@@ -1,0 +1,16 @@
+.WorkoutSession-ErrorBlock {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: var(--space-md);
+
+  padding: var(--space-xl) 0;
+
+  text-align: center;
+}
+
+.WorkoutSession-Error {
+  margin: 0;
+
+  color: var(--color-danger);
+}

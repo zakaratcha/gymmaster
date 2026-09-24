@@ -1,0 +1,13 @@
+.WorkoutSession-Actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+
+  padding-top: var(--space-md);
+}
+
+.WorkoutSession-Actions button {
+  flex: 1;
+
+  min-width: 10rem;
+}

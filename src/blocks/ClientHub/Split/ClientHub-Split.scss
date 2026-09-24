@@ -1,0 +1,39 @@
+.ClientHub-SoonHint {
+  margin: 0;
+
+  color: var(--color-text-muted);
+
+  font-size: var(--font-size-sm);
+}
+
+.ClientHub-SplitRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.ClientHub-SplitTags {
+  overflow: hidden;
+  flex: 1;
+
+  min-width: 0;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  color: var(--color-text-muted);
+
+  font-size: var(--font-size-md);
+}
+
+.ClientHub-SplitActions {
+  display: flex;
+  flex-shrink: 0;
+  gap: var(--space-xs);
+}
+
+.ClientHub-SplitButton {
+  min-width: auto;
+  padding: var(--space-sm) var(--space-md);
+}

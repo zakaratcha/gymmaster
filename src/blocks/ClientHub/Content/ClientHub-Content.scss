@@ -1,0 +1,42 @@
+.ClientHub-Content {
+  position: relative;
+
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-lg);
+
+  min-height: 8rem;
+}
+
+.ClientHub-Loading {
+  position: absolute;
+  inset: 0;
+}
+
+.ClientHub-ErrorBlock {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: var(--space-md);
+
+  padding: var(--space-lg) 0;
+}
+
+.ClientHub-Error {
+  margin: 0;
+
+  text-align: center;
+
+  color: var(--color-danger);
+
+  font-size: var(--font-size-md);
+}
+
+.ClientHub-Retry {
+  min-width: 8rem;
+}
+
+.ClientHub-Delete {
+  align-self: flex-start;
+}
