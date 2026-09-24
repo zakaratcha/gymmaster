@@ -6,6 +6,17 @@
 
   background-color: var(--color-bg);
 
+  @media (width <= 30rem) {
+    &-ActiveWorkout {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    &-OpenWorkout {
+      align-self: flex-start;
+    }
+  }
+
   &-Main {
     display: flex;
     flex: 1;
@@ -312,5 +323,153 @@
   &-SplitButton {
     min-width: auto;
     padding: var(--space-sm) var(--space-md);
+  }
+
+  &-SessionsLoading {
+    min-height: 2rem;
+  }
+
+  &-SessionsError {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: var(--space-sm);
+
+    color: var(--color-danger);
+
+    p {
+      margin: 0;
+    }
+  }
+
+  &-ActiveWorkout {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+  }
+
+  &-ActiveWorkoutInfo {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--space-xs);
+
+    min-width: 0;
+  }
+
+  &-ActiveWorkoutTag {
+    color: var(--color-text);
+
+    font-size: var(--font-size-md);
+    font-weight: 600;
+  }
+
+  &-ActiveWorkoutTime {
+    color: var(--color-text-muted);
+
+    font-size: var(--font-size-sm);
+  }
+
+  &-OpenWorkout {
+    flex-shrink: 0;
+  }
+
+  &-ActionHint {
+    margin: 0;
+
+    color: var(--color-text-muted);
+
+    font-size: var(--font-size-sm);
+  }
+
+  &-LatestWorkout {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  &-LatestWorkoutDate {
+    color: var(--color-text);
+
+    font-size: var(--font-size-md);
+    font-weight: 600;
+  }
+
+  &-LatestWorkoutTag {
+    color: var(--color-text);
+
+    font-size: var(--font-size-md);
+  }
+
+  &-LatestWorkoutStats {
+    color: var(--color-text-muted);
+
+    font-size: var(--font-size-sm);
+  }
+
+  &-LatestWorkoutLink {
+    min-height: var(--tap-target);
+    padding: var(--space-sm) 0;
+
+    text-decoration: none;
+
+    color: var(--color-accent);
+
+    font-size: var(--font-size-md);
+    font-weight: 600;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &-StartError {
+    margin: 0;
+
+    color: var(--color-danger);
+
+    font-size: var(--font-size-sm);
+  }
+
+  &-PlanOptions {
+    display: flex;
+    overflow-y: auto;
+    flex-direction: column;
+    gap: var(--space-sm);
+
+    max-height: 22rem;
+  }
+
+  &-PlanOption {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+
+    min-height: var(--tap-target);
+    padding: var(--space-sm) var(--space-md);
+
+    cursor: pointer;
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: var(--color-surface);
+
+    &_selected {
+      border-color: var(--color-accent);
+      background-color: var(--color-accent-subtle);
+    }
+  }
+
+  &-PlanOptionText {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--space-xs);
+
+    color: var(--color-text);
+
+    font-size: var(--font-size-sm);
   }
 }

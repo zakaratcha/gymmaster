@@ -1,6 +1,8 @@
-import { index, integer, real, sqliteTable, text, unique } from 'drizzle-orm/sqlite-core';
+import { sql } from 'drizzle-orm';
+import { check, index, integer, real, sqliteTable, text, unique, uniqueIndex } from 'drizzle-orm/sqlite-core';
 
 import type { TrainerStatus } from '../../services/trainers/trainers.models.ts';
+import type { WorkoutSessionStatus } from '../../services/workoutSessions/workoutSessions.models.ts';
 
 export const trainers = sqliteTable('trainers', {
   id: text('id').primaryKey(),
@@ -123,6 +125,88 @@ export const plannedSets = sqliteTable(
   ]
 );
 
+export const workoutSessions = sqliteTable(
+  'workout_sessions',
+  {
+    id: text('id').primaryKey(),
+    trainerId: text('trainer_id')
+      .notNull()
+      .references(() => trainers.id, { onDelete: 'cascade' }),
+    clientId: text('client_id')
+      .notNull()
+      .references(() => clients.id, { onDelete: 'cascade' }),
+    plannedWorkoutId: text('planned_workout_id').references(() => plannedWorkouts.id, { onDelete: 'set null' }),
+    splitTag: text('split_tag').notNull(),
+    status: text('status').$type<WorkoutSessionStatus>().notNull(),
+    startedAt: text('started_at').notNull(),
+    completedAt: text('completed_at'),
+    createdAt: text('created_at').notNull(),
+    updatedAt: text('updated_at').notNull()
+  },
+  table => [
+    index('idx_workout_sessions_trainer_client').on(table.trainerId, table.clientId),
+    index('idx_workout_sessions_trainer_client_status').on(table.trainerId, table.clientId, table.status),
+    uniqueIndex('uq_workout_sessions_trainer_client_active')
+      .on(table.trainerId, table.clientId)
+      .where(sql`${table.status} = 'in_progress'`),
+    check('chk_workout_sessions_status', sql`${table.status} in ('in_progress', 'completed')`),
+    check(
+      'chk_workout_sessions_completed_at',
+      sql`(${table.status} = 'in_progress' and ${table.completedAt} is null) or (${table.status} = 'completed' and ${table.completedAt} is not null)`
+    ),
+    check('chk_workout_sessions_split_tag', sql`length(trim(${table.splitTag})) > 0`)
+  ]
+);
+
+export const sessionExercises = sqliteTable(
+  'session_exercises',
+  {
+    id: text('id').primaryKey(),
+    trainerId: text('trainer_id')
+      .notNull()
+      .references(() => trainers.id, { onDelete: 'cascade' }),
+    workoutSessionId: text('workout_session_id')
+      .notNull()
+      .references(() => workoutSessions.id, { onDelete: 'cascade' }),
+    exerciseId: text('exercise_id')
+      .notNull()
+      .references(() => exercises.id),
+    position: integer('position').notNull(),
+    createdAt: text('created_at').notNull(),
+    updatedAt: text('updated_at').notNull()
+  },
+  table => [
+    index('idx_session_exercises_workout_position').on(table.trainerId, table.workoutSessionId, table.position),
+    unique('uq_session_exercises_workout_position').on(table.workoutSessionId, table.position),
+    check('chk_session_exercises_position', sql`${table.position} >= 0`)
+  ]
+);
+
+export const sessionSets = sqliteTable(
+  'session_sets',
+  {
+    id: text('id').primaryKey(),
+    trainerId: text('trainer_id')
+      .notNull()
+      .references(() => trainers.id, { onDelete: 'cascade' }),
+    sessionExerciseId: text('session_exercise_id')
+      .notNull()
+      .references(() => sessionExercises.id, { onDelete: 'cascade' }),
+    position: integer('position').notNull(),
+    reps: integer('reps').notNull(),
+    weightKg: real('weight_kg').notNull(),
+    createdAt: text('created_at').notNull(),
+    updatedAt: text('updated_at').notNull()
+  },
+  table => [
+    index('idx_session_sets_exercise_position').on(table.trainerId, table.sessionExerciseId, table.position),
+    unique('uq_session_sets_exercise_position').on(table.sessionExerciseId, table.position),
+    check('chk_session_sets_position', sql`${table.position} >= 0`),
+    check('chk_session_sets_reps', sql`${table.reps} > 0`),
+    check('chk_session_sets_weight_kg', sql`${table.weightKg} >= 0`)
+  ]
+);
+
 export type TrainerRow = typeof trainers.$inferSelect;
 export type SessionRow = typeof sessions.$inferSelect;
 export type ClientRow = typeof clients.$inferSelect;
@@ -130,3 +214,6 @@ export type ExerciseRow = typeof exercises.$inferSelect;
 export type PlannedWorkoutRow = typeof plannedWorkouts.$inferSelect;
 export type PlannedExerciseRow = typeof plannedExercises.$inferSelect;
 export type PlannedSetRow = typeof plannedSets.$inferSelect;
+export type WorkoutSessionRow = typeof workoutSessions.$inferSelect;
+export type SessionExerciseRow = typeof sessionExercises.$inferSelect;
+export type SessionSetRow = typeof sessionSets.$inferSelect;
