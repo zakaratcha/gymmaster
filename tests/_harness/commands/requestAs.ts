@@ -26,6 +26,13 @@ export async function requestWithoutAuth<R, A extends unknown[]>(
   return await withApiCookies(undefined, () => clientMethod(...args));
 }
 
+export async function requestAsTrainer<R, A extends unknown[]>(
+  clientMethod: (...args: A) => Promise<R>,
+  ...args: A
+): Promise<R> {
+  return await requestAs('Тренер', clientMethod, ...args);
+}
+
 export async function requestAsAdmin<R, A extends unknown[]>(
   clientMethod: (...args: A) => Promise<R>,
   ...args: A
