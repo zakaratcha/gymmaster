@@ -3,6 +3,7 @@ import { observer, useLocalObservable } from 'mobx-react-lite';
 import { cn } from '@bem-react/classname';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
+import { ApiError } from '../../services/api/api.models';
 import type { Client } from '../../services/clients/clients.models';
 import { deleteClient, getClientById, updateClient } from '../../services/clients/clients.service';
 import type { PlannedWorkout } from '../../services/plans/plans.models';
@@ -99,6 +100,29 @@ function formatPlannedDate(value: string): string {
 function formatSessionTimestamp(value: string): string {
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? value : sessionTimestampFormatter.format(date);
+}
+
+function getStartWorkoutErrorMessage(error: unknown): string {
+  if (!(error instanceof ApiError)) {
+    return 'Не удалось начать тренировку';
+  }
+
+  if (error.status === 404) {
+    return 'План тренировки не найден';
+  }
+
+  if (error.status === 409) {
+    return 'У клиента уже есть тренировка в процессе';
+  }
+
+  if (typeof error.body === 'object' && error.body !== null) {
+    const bodyError: unknown = Reflect.get(error.body, 'error');
+    if (typeof bodyError === 'string' && bodyError.length > 0) {
+      return bodyError;
+    }
+  }
+
+  return `Не удалось начать тренировку (HTTP ${error.status})`;
 }
 
 function formatWorkoutCount(value: number, singular: string, paucal: string, plural: string): string {
@@ -346,8 +370,8 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
       const session = await createWorkoutSession(id, { plannedWorkoutId: selectedPlan.id });
       state.setActiveSession(session);
       await navigate(`/workouts/${session.clientId}/${session.id}`);
-    } catch {
-      state.setStartingError('Не удалось начать тренировку');
+    } catch (error) {
+      state.setStartingError(getStartWorkoutErrorMessage(error));
     } finally {
       state.setStarting(false);
     }
