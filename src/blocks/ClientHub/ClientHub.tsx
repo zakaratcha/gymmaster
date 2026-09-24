@@ -116,28 +116,26 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
     }
   }));
 
-  const { client, loading, error, notesExpanded, setClient, setLoading, setError, toggleNotesExpanded } = state;
-
   const loadClient = useCallback(async () => {
     if (id === undefined || id.length === 0) {
-      setError('Клиент не найден');
-      setLoading(false);
+      state.setError('Клиент не найден');
+      state.setLoading(false);
       return;
     }
 
-    setLoading(true);
-    setError(undefined);
+    state.setLoading(true);
+    state.setError(undefined);
 
     try {
       const loadedClient = await getClientById(id);
-      setClient(loadedClient);
+      state.setClient(loadedClient);
     } catch {
-      setError('Не удалось загрузить клиента');
-      setClient(undefined);
+      state.setError('Не удалось загрузить клиента');
+      state.setClient(undefined);
     } finally {
-      setLoading(false);
+      state.setLoading(false);
     }
-  }, [id, setClient, setError, setLoading]);
+  }, [id, state]);
 
   useEffect(() => {
     if (!staticMode) {
@@ -162,7 +160,7 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
   const handleSave = useCallback(
     async (event: SyntheticEvent<HTMLFormElement>) => {
       event.preventDefault();
-      if (state.submitting || client === undefined) {
+      if (state.submitting || state.client === undefined) {
         return;
       }
       state.setMutationError(undefined);
@@ -183,8 +181,8 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
       }
       state.setSubmitting(true);
       try {
-        const updated = await updateClient(client.id, { name, notes: state.editNotes.trim(), bodyWeightKg });
-        setClient(updated);
+        const updated = await updateClient(state.client.id, { name, notes: state.editNotes.trim(), bodyWeightKg });
+        state.setClient(updated);
         state.setSubmitting(false);
         state.closeEdit();
       } catch {
@@ -193,7 +191,7 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
         state.setSubmitting(false);
       }
     },
-    [client, setClient, state, staticMode]
+    [state, staticMode]
   );
 
   const handleDeleteOpen = useCallback(() => {
@@ -216,7 +214,7 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
   );
 
   const handleDeleteConfirm = useCallback(async () => {
-    if (state.submitting || client === undefined) {
+    if (state.submitting || state.client === undefined) {
       return;
     }
     state.setMutationError(undefined);
@@ -226,7 +224,7 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
     }
     state.setSubmitting(true);
     try {
-      await deleteClient(client.id);
+      await deleteClient(state.client.id);
       deleteDialogRef.current?.close();
       void navigate('/clients', { replace: true });
     } catch {
@@ -234,9 +232,9 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
     } finally {
       state.setSubmitting(false);
     }
-  }, [client, navigate, state, staticMode]);
+  }, [navigate, state, staticMode]);
 
-  const notes = client?.notes?.trim() ?? '';
+  const notes = state.client?.notes?.trim() ?? '';
   const hasNotes = notes.length > 0;
   const notesPreview = hasNotes ? truncateNotes(notes, 60) : 'Нет заметок';
 
@@ -252,36 +250,41 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
           >
             ←
           </button>
-          <h1 className={cnClientHub('Title')}>{client?.name ?? 'Клиент'}</h1>
-          <Button className={cnClientHub('Edit')} disabled={client === undefined} onClick={handleEdit} type='button'>
+          <h1 className={cnClientHub('Title')}>{state.client?.name ?? 'Клиент'}</h1>
+          <Button
+            className={cnClientHub('Edit')}
+            disabled={state.client === undefined}
+            onClick={handleEdit}
+            type='button'
+          >
             Править
           </Button>
         </header>
 
         <div className={cnClientHub('Content')}>
-          {loading && <Loading className={cnClientHub('Loading')} visible />}
+          {state.loading && <Loading className={cnClientHub('Loading')} visible />}
 
-          {error !== undefined && (
+          {state.error !== undefined && (
             <div className={cnClientHub('ErrorBlock')}>
-              <p className={cnClientHub('Error')}>{error}</p>
+              <p className={cnClientHub('Error')}>{state.error}</p>
               <Button className={cnClientHub('Retry')} color='secondary' onClick={handleRetry} type='button'>
                 Повторить
               </Button>
             </div>
           )}
 
-          {!loading && error === undefined && client !== undefined && (
+          {!state.loading && state.error === undefined && state.client !== undefined && (
             <>
               <section className={cnClientHub('Section', { type: 'notes' })}>
                 <button
-                  aria-expanded={notesExpanded}
+                  aria-expanded={state.notesExpanded}
                   className={cnClientHub('NotesToggle')}
-                  onClick={toggleNotesExpanded}
+                  onClick={state.toggleNotesExpanded}
                   type='button'
                 >
                   <span className={cnClientHub('SectionLabel')}>Заметки</span>
                   <span className={cnClientHub('NotesPreview')}>
-                    {notesExpanded && hasNotes ? notes : notesPreview}
+                    {state.notesExpanded && hasNotes ? notes : notesPreview}
                   </span>
                 </button>
               </section>
@@ -289,7 +292,7 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
               <section className={cnClientHub('Section', { type: 'bodyWeight' })}>
                 <div className={cnClientHub('Row')}>
                   <span className={cnClientHub('SectionLabel')}>Вес тела</span>
-                  <span className={cnClientHub('BodyWeight')}>{formatBodyWeightKg(client.bodyWeightKg)}</span>
+                  <span className={cnClientHub('BodyWeight')}>{formatBodyWeightKg(state.client.bodyWeightKg)}</span>
                 </div>
               </section>
 
@@ -344,7 +347,7 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
               </section>
             </>
           )}
-          {!loading && client !== undefined && (
+          {!state.loading && state.client !== undefined && (
             <Button className={cnClientHub('Delete')} onClick={handleDeleteOpen} type='button'>
               Удалить клиента
             </Button>
@@ -374,7 +377,7 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
         ref={deleteDialogRef}
       >
         <h2 id='client-delete-title'>Удалить клиента?</h2>
-        <p id='client-delete-description'>Клиент «{client?.name}» будет удалён. Это действие нельзя отменить.</p>
+        <p id='client-delete-description'>Клиент «{state.client?.name}» будет удалён. Это действие нельзя отменить.</p>
         {state.mutationError !== undefined && (
           <p className={cnClientHub('DeleteError')} role='alert'>
             {state.mutationError}

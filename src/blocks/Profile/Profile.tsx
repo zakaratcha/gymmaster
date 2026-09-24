@@ -18,7 +18,7 @@ type ProfileState = {
 };
 
 export const Profile: FC = observer(() => {
-  const { submitting, setSubmitting } = useLocalObservable<ProfileState>(() => ({
+  const state = useLocalObservable<ProfileState>(() => ({
     submitting: false,
     setSubmitting(value) {
       this.submitting = value;
@@ -26,14 +26,14 @@ export const Profile: FC = observer(() => {
   }));
 
   const handleLogout = useCallback(async () => {
-    setSubmitting(true);
+    state.setSubmitting(true);
 
     try {
       await logout();
     } finally {
-      setSubmitting(false);
+      state.setSubmitting(false);
     }
-  }, [setSubmitting]);
+  }, [state]);
 
   return (
     <div className={cnProfile()}>
@@ -41,8 +41,8 @@ export const Profile: FC = observer(() => {
         <h1 className={cnProfile('Title')}>Профиль</h1>
         <p className={cnProfile('Email')}>{currentUserStore.email}</p>
         <div className={cnProfile('Actions')}>
-          <Loading visible={submitting} />
-          <Button className={cnProfile('Logout')} disabled={submitting} onClick={handleLogout}>
+          <Loading visible={state.submitting} />
+          <Button className={cnProfile('Logout')} disabled={state.submitting} onClick={handleLogout}>
             Выйти
           </Button>
         </div>

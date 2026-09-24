@@ -177,49 +177,20 @@ export const Clients: FC<ClientsProps> = observer(({ initialClients, initialRece
     }
   }));
 
-  const {
-    searchQuery,
-    loading,
-    error,
-    createFormOpen,
-    createName,
-    createNotes,
-    createBodyWeightKg,
-    submitting,
-    createError,
-    filteredClients,
-    recentClients,
-    clients,
-    setSearchQuery,
-    setClients,
-    appendClient,
-    setRecentClientIds,
-    setLoading,
-    setError,
-    openCreateForm,
-    closeCreateForm,
-    resetCreateForm,
-    setCreateName,
-    setCreateNotes,
-    setCreateBodyWeightKg,
-    setSubmitting,
-    setCreateError
-  } = state;
-
   const loadClients = useCallback(async () => {
-    setLoading(true);
-    setError(undefined);
+    state.setLoading(true);
+    state.setError(undefined);
 
     try {
       const clients = await listClients();
-      setClients(clients);
-      setRecentClientIds(resolveRecentClientIds(clients));
+      state.setClients(clients);
+      state.setRecentClientIds(resolveRecentClientIds(clients));
     } catch {
-      setError('Не удалось загрузить клиентов');
+      state.setError('Не удалось загрузить клиентов');
     } finally {
-      setLoading(false);
+      state.setLoading(false);
     }
-  }, [setClients, setError, setLoading, setRecentClientIds]);
+  }, [state]);
 
   useEffect(() => {
     if (!isStaticMode) {
@@ -229,57 +200,46 @@ export const Clients: FC<ClientsProps> = observer(({ initialClients, initialRece
 
   const handleSearchChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      setSearchQuery(event.target.value);
+      state.setSearchQuery(event.target.value);
     },
-    [setSearchQuery]
+    [state]
   );
 
   const handleCreateCancel = useCallback(() => {
-    if (submitting) {
+    if (state.submitting) {
       return;
     }
-    closeCreateForm();
-    resetCreateForm();
-  }, [closeCreateForm, resetCreateForm, submitting]);
+    state.closeCreateForm();
+    state.resetCreateForm();
+  }, [state]);
 
   const handleCreateSubmit = useCallback(
     async (event: SyntheticEvent<HTMLFormElement>) => {
       event.preventDefault();
-      setCreateError(undefined);
+      state.setCreateError(undefined);
 
-      const payload = buildCreatePayload(createName, createNotes, createBodyWeightKg);
+      const payload = buildCreatePayload(state.createName, state.createNotes, state.createBodyWeightKg);
       if (payload === undefined) {
-        setCreateError('Укажите имя клиента');
+        state.setCreateError('Укажите имя клиента');
         return;
       }
 
-      setSubmitting(true);
+      state.setSubmitting(true);
 
       try {
         const client = await createClient(payload);
-        appendClient(client);
+        state.appendClient(client);
         pushRecentClientId(client.id);
-        setRecentClientIds(resolveRecentClientIds([...clients, client]));
-        closeCreateForm();
-        resetCreateForm();
+        state.setRecentClientIds(resolveRecentClientIds([...state.clients, client]));
+        state.closeCreateForm();
+        state.resetCreateForm();
       } catch {
-        setCreateError('Не удалось создать клиента');
+        state.setCreateError('Не удалось создать клиента');
       } finally {
-        setSubmitting(false);
+        state.setSubmitting(false);
       }
     },
-    [
-      appendClient,
-      clients,
-      closeCreateForm,
-      createBodyWeightKg,
-      createName,
-      createNotes,
-      resetCreateForm,
-      setCreateError,
-      setRecentClientIds,
-      setSubmitting
-    ]
+    [state]
   );
 
   const handleRetry = useCallback(() => {
@@ -294,16 +254,16 @@ export const Clients: FC<ClientsProps> = observer(({ initialClients, initialRece
       }
 
       pushRecentClientId(clientId);
-      setRecentClientIds(getRecentClientIds());
+      state.setRecentClientIds(getRecentClientIds());
       void navigate(`/clients/${clientId}`);
     },
-    [navigate, setRecentClientIds]
+    [navigate, state]
   );
 
-  const isSearchActive = searchQuery.trim().length > 0;
-  const showRecent = !loading && error === undefined && recentClients.length > 0;
-  const showEmpty = !loading && error === undefined && filteredClients.length === 0;
-  const showLists = !loading && error === undefined;
+  const isSearchActive = state.searchQuery.trim().length > 0;
+  const showRecent = !state.loading && state.error === undefined && state.recentClients.length > 0;
+  const showEmpty = !state.loading && state.error === undefined && state.filteredClients.length === 0;
+  const showLists = !state.loading && state.error === undefined;
 
   return (
     <div className={cnClients()}>
@@ -317,16 +277,16 @@ export const Clients: FC<ClientsProps> = observer(({ initialClients, initialRece
             className={cnClients('SearchField')}
             onChange={handleSearchChange}
             placeholder='Поиск по имени…'
-            value={searchQuery}
+            value={state.searchQuery}
           />
         </div>
 
         <div className={cnClients('Content')}>
-          {loading ? <Loading className={cnClients('Loading')} visible /> : null}
+          {state.loading ? <Loading className={cnClients('Loading')} visible /> : null}
 
-          {error === undefined ? null : (
+          {state.error === undefined ? null : (
             <div className={cnClients('ErrorBlock')}>
-              <p className={cnClients('Error')}>{error}</p>
+              <p className={cnClients('Error')}>{state.error}</p>
               <Button className={cnClients('Retry')} color='secondary' onClick={handleRetry} type='button'>
                 Повторить
               </Button>
@@ -339,7 +299,7 @@ export const Clients: FC<ClientsProps> = observer(({ initialClients, initialRece
                 <section className={cnClients('Section', { type: 'recent' })}>
                   <h2 className={cnClients('SectionTitle')}>Недавние</h2>
                   <div className={cnClients('RecentList')}>
-                    {recentClients.map(client => (
+                    {state.recentClients.map(client => (
                       <button
                         key={client.id}
                         className={cnClients('RecentChip')}
@@ -360,7 +320,7 @@ export const Clients: FC<ClientsProps> = observer(({ initialClients, initialRece
                   <p className={cnClients('Empty')}>{isSearchActive ? 'Ничего не найдено' : 'Добавить клиента'}</p>
                 ) : (
                   <ul className={cnClients('List')}>
-                    {filteredClients.map(client => (
+                    {state.filteredClients.map(client => (
                       <li key={client.id} className={cnClients('ListItem')}>
                         <button
                           className={cnClients('Row')}
@@ -383,20 +343,25 @@ export const Clients: FC<ClientsProps> = observer(({ initialClients, initialRece
         </div>
       </main>
 
-      <Fab ariaLabel='Добавить клиента' className={cnClients('Fab')} icon={<PlusIcon />} onClick={openCreateForm} />
+      <Fab
+        ariaLabel='Добавить клиента'
+        className={cnClients('Fab')}
+        icon={<PlusIcon />}
+        onClick={state.openCreateForm}
+      />
 
-      {createFormOpen ? (
+      {state.createFormOpen ? (
         <ClientCreateForm
-          bodyWeightKg={createBodyWeightKg}
-          error={createError}
-          name={createName}
-          notes={createNotes}
-          onBodyWeightKgChange={setCreateBodyWeightKg}
+          bodyWeightKg={state.createBodyWeightKg}
+          error={state.createError}
+          name={state.createName}
+          notes={state.createNotes}
+          onBodyWeightKgChange={state.setCreateBodyWeightKg}
           onCancel={handleCreateCancel}
-          onNameChange={setCreateName}
-          onNotesChange={setCreateNotes}
+          onNameChange={state.setCreateName}
+          onNotesChange={state.setCreateNotes}
           onSubmit={handleCreateSubmit}
-          submitting={submitting}
+          submitting={state.submitting}
         />
       ) : null}
     </div>

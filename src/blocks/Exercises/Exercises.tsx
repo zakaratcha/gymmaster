@@ -160,52 +160,19 @@ export const Exercises: FC = observer(() => {
     }
   }));
 
-  const {
-    searchQuery,
-    loading,
-    error,
-    createFormOpen,
-    editExercise,
-    formName,
-    formNotes,
-    submitting,
-    formError,
-    archiveTarget,
-    archiveSubmitting,
-    archiveError,
-    filteredExercises,
-    setSearchQuery,
-    setExercises,
-    setLoading,
-    setError,
-    openCreateForm,
-    closeCreateForm,
-    resetForm,
-    openEditForm,
-    closeEditForm,
-    setFormName,
-    setFormNotes,
-    setSubmitting,
-    setFormError,
-    openArchiveDialog,
-    closeArchiveDialog,
-    setArchiveSubmitting,
-    setArchiveError
-  } = state;
-
   const loadExercises = useCallback(async () => {
-    setLoading(true);
-    setError(undefined);
+    state.setLoading(true);
+    state.setError(undefined);
 
     try {
       const loadedExercises = await listExercises();
-      setExercises(loadedExercises);
+      state.setExercises(loadedExercises);
     } catch {
-      setError('Не удалось загрузить упражнения');
+      state.setError('Не удалось загрузить упражнения');
     } finally {
-      setLoading(false);
+      state.setLoading(false);
     }
-  }, [setExercises, setError, setLoading]);
+  }, [state]);
 
   useEffect(() => {
     void loadExercises();
@@ -213,104 +180,87 @@ export const Exercises: FC = observer(() => {
 
   const handleSearchChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      setSearchQuery(event.target.value);
+      state.setSearchQuery(event.target.value);
     },
-    [setSearchQuery]
+    [state]
   );
 
   const handleCreateCancel = useCallback(() => {
-    if (submitting) {
+    if (state.submitting) {
       return;
     }
-    closeCreateForm();
-    resetForm();
-  }, [closeCreateForm, resetForm, submitting]);
+    state.closeCreateForm();
+    state.resetForm();
+  }, [state]);
 
   const handleEditCancel = useCallback(() => {
-    if (submitting) {
+    if (state.submitting) {
       return;
     }
-    closeEditForm();
-    resetForm();
-  }, [closeEditForm, resetForm, submitting]);
+    state.closeEditForm();
+    state.resetForm();
+  }, [state]);
 
   const saveExercise = useCallback(
     async (event: SyntheticEvent<HTMLFormElement>) => {
       event.preventDefault();
-      setFormError(undefined);
+      state.setFormError(undefined);
 
-      const payload = buildUpdatePayload(formName, formNotes);
+      const payload = buildUpdatePayload(state.formName, state.formNotes);
       if (payload.name.length === 0) {
-        setFormError('Укажите название упражнения');
+        state.setFormError('Укажите название упражнения');
         return;
       }
 
-      setSubmitting(true);
+      state.setSubmitting(true);
       try {
         const savedExercise =
-          editExercise === undefined
-            ? await createExercise(buildCreatePayload(formName, formNotes) ?? { name: formName.trim() })
-            : await updateExercise(editExercise.id, payload);
-        setExercises(
-          editExercise === undefined
+          state.editExercise === undefined
+            ? await createExercise(
+                buildCreatePayload(state.formName, state.formNotes) ?? { name: state.formName.trim() }
+              )
+            : await updateExercise(state.editExercise.id, payload);
+        state.setExercises(
+          state.editExercise === undefined
             ? [...state.exercises, savedExercise]
             : state.exercises.map(exercise => (exercise.id === savedExercise.id ? savedExercise : exercise))
         );
-        closeCreateForm();
-        closeEditForm();
-        resetForm();
+        state.closeCreateForm();
+        state.closeEditForm();
+        state.resetForm();
       } catch {
-        setFormError('Не удалось сохранить упражнение');
+        state.setFormError('Не удалось сохранить упражнение');
       } finally {
-        setSubmitting(false);
+        state.setSubmitting(false);
       }
     },
-    [
-      closeCreateForm,
-      closeEditForm,
-      editExercise,
-      formName,
-      formNotes,
-      resetForm,
-      setExercises,
-      setFormError,
-      setSubmitting,
-      state.exercises
-    ]
+    [state]
   );
 
   const handleArchiveConfirm = useCallback(async () => {
-    if (archiveTarget === undefined || archiveSubmitting) {
+    if (state.archiveTarget === undefined || state.archiveSubmitting) {
       return;
     }
 
-    setArchiveError(undefined);
-    setArchiveSubmitting(true);
+    state.setArchiveError(undefined);
+    state.setArchiveSubmitting(true);
     try {
-      await updateExercise(archiveTarget.id, { archived: true });
-      setExercises(state.exercises.filter(exercise => exercise.id !== archiveTarget.id));
-      closeArchiveDialog();
+      await updateExercise(state.archiveTarget.id, { archived: true });
+      state.setExercises(state.exercises.filter(exercise => exercise.id !== state.archiveTarget?.id));
+      state.closeArchiveDialog();
     } catch {
-      setArchiveError('Не удалось архивировать упражнение');
+      state.setArchiveError('Не удалось архивировать упражнение');
     } finally {
-      setArchiveSubmitting(false);
+      state.setArchiveSubmitting(false);
     }
-  }, [
-    archiveTarget,
-    archiveSubmitting,
-    closeArchiveDialog,
-    setArchiveError,
-    setArchiveSubmitting,
-    setExercises,
-    state.exercises
-  ]);
+  }, [state]);
 
   const handleRetry = useCallback(() => {
     void loadExercises();
   }, [loadExercises]);
 
-  const isSearchActive = searchQuery.trim().length > 0;
-  const showLists = !loading && error === undefined;
+  const isSearchActive = state.searchQuery.trim().length > 0;
+  const showLists = !state.loading && state.error === undefined;
 
   return (
     <div className={cnExercises()}>
@@ -324,16 +274,16 @@ export const Exercises: FC = observer(() => {
             className={cnExercises('SearchField')}
             onChange={handleSearchChange}
             placeholder='Поиск по названию…'
-            value={searchQuery}
+            value={state.searchQuery}
           />
         </div>
 
         <div className={cnExercises('Content')}>
-          {loading && <Loading className={cnExercises('Loading')} visible />}
+          {state.loading && <Loading className={cnExercises('Loading')} visible />}
 
-          {error !== undefined && (
+          {state.error !== undefined && (
             <div className={cnExercises('ErrorBlock')}>
-              <p className={cnExercises('Error')}>{error}</p>
+              <p className={cnExercises('Error')}>{state.error}</p>
               <Button className={cnExercises('Retry')} color='secondary' onClick={handleRetry} type='button'>
                 Повторить
               </Button>
@@ -342,10 +292,10 @@ export const Exercises: FC = observer(() => {
 
           {showLists && (
             <ExerciseList
-              exercises={filteredExercises}
+              exercises={state.filteredExercises}
               isSearchActive={isSearchActive}
-              onArchive={openArchiveDialog}
-              onEdit={openEditForm}
+              onArchive={state.openArchiveDialog}
+              onEdit={state.openEditForm}
             />
           )}
         </div>
@@ -355,39 +305,39 @@ export const Exercises: FC = observer(() => {
         ariaLabel='Добавить упражнение'
         className={cnExercises('Fab')}
         icon={<PlusIcon />}
-        onClick={openCreateForm}
+        onClick={state.openCreateForm}
       />
 
-      {createFormOpen && (
+      {state.createFormOpen && (
         <ExerciseFormDialog
-          error={formError}
-          mode={editExercise === undefined ? 'create' : 'edit'}
-          name={formName}
-          notes={formNotes}
-          onCancel={editExercise === undefined ? handleCreateCancel : handleEditCancel}
-          onNameChange={setFormName}
-          onNotesChange={setFormNotes}
+          error={state.formError}
+          mode={state.editExercise === undefined ? 'create' : 'edit'}
+          name={state.formName}
+          notes={state.formNotes}
+          onCancel={state.editExercise === undefined ? handleCreateCancel : handleEditCancel}
+          onNameChange={state.setFormName}
+          onNotesChange={state.setFormNotes}
           onSubmit={saveExercise}
-          submitting={submitting}
+          submitting={state.submitting}
         />
       )}
 
-      {archiveTarget !== undefined && (
+      {state.archiveTarget !== undefined && (
         <Dialog
           ariaLabel='Архивировать упражнение?'
           className={cnExercises('ArchiveDialog')}
-          onCancel={closeArchiveDialog}
+          onCancel={state.closeArchiveDialog}
         >
           <DialogTitle>Архивировать упражнение?</DialogTitle>
           <DialogContent>
-            <p>«{archiveTarget.name}» скроется из справочника, но сохранится в истории.</p>
-            {archiveError !== undefined && <p role='alert'>{archiveError}</p>}
+            <p>«{state.archiveTarget.name}» скроется из справочника, но сохранится в истории.</p>
+            {state.archiveError !== undefined && <p role='alert'>{state.archiveError}</p>}
           </DialogContent>
           <DialogActions>
             <Button
               className={cnExercises('ArchiveCancel')}
-              disabled={archiveSubmitting}
-              onClick={closeArchiveDialog}
+              disabled={state.archiveSubmitting}
+              onClick={state.closeArchiveDialog}
               type='button'
             >
               Отмена
@@ -395,11 +345,11 @@ export const Exercises: FC = observer(() => {
             <Button
               className={cnExercises('ArchiveConfirm')}
               color='primary'
-              disabled={archiveSubmitting}
+              disabled={state.archiveSubmitting}
               onClick={handleArchiveConfirm}
               type='button'
             >
-              {archiveSubmitting ? 'Архивирование…' : 'Архивировать'}
+              {state.archiveSubmitting ? 'Архивирование…' : 'Архивировать'}
             </Button>
           </DialogActions>
         </Dialog>
