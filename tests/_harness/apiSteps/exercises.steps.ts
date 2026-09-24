@@ -5,14 +5,13 @@ import { ApiError } from '../../../src/services/api/api.models';
 import type { CreateExerciseRequest, UpdateExerciseRequest } from '../../../src/services/exercises/exercises.models';
 import { createExercise, createExerciseWithoutAuth } from '../commands/exercises/createExercise';
 import { deleteAllExercises } from '../commands/exercises/deleteAllExercises';
-import { listExercisesAsAdmin, listExercisesWithoutAuth } from '../commands/exercises/listExercises';
 import {
   getExerciseByIdAsAdmin,
   getExerciseByIdForTrainer,
-  getExerciseByIdWithoutAuth,
-  updateExercise,
-  updateExerciseForTrainer
-} from '../commands/exercises/updateExercise';
+  getExerciseByIdWithoutAuth
+} from '../commands/exercises/getExerciseById';
+import { listExercisesAsAdmin, listExercisesWithoutAuth } from '../commands/exercises/listExercises';
+import { updateExercise, updateExerciseForTrainer } from '../commands/exercises/updateExercise';
 import type { ApiWorld } from '../world.api';
 
 const MISSING_EXERCISE_ID = '00000000-0000-0000-0000-000000000000';

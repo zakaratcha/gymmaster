@@ -3,14 +3,14 @@ import type { Page as PlaywrightPage } from 'playwright';
 
 import { Block } from '../../classes/Block';
 
-export class ExerciseFormBlock extends Block {
+export class ExerciseFormDialogBlock extends Block {
   readonly selectors = {
-    root: 'dialog.Dialog',
-    nameInput: '.ExerciseForm [name="name"]',
-    notesInput: '.ExerciseForm [name="notes"]',
-    submitButton: '.ExerciseForm-Submit',
-    cancelButton: '.ExerciseForm-Cancel',
-    error: '.ExerciseForm-Error'
+    root: 'dialog.ExerciseFormDialog',
+    nameInput: '.ExerciseFormDialog [name="name"]',
+    notesInput: '.ExerciseFormDialog [name="notes"]',
+    submitButton: '.ExerciseFormDialog-Submit',
+    cancelButton: '.ExerciseFormDialog-Cancel',
+    error: '.ExerciseFormDialog-Error'
   };
 
   constructor(page: PlaywrightPage) {
@@ -29,11 +29,6 @@ export class ExerciseFormBlock extends Block {
     await expect(this.findBySelector('root')).toHaveAccessibleName('Редактирование упражнения');
   }
 
-  async expectValues(name: string, notes: string): Promise<void> {
-    await expect(this.findBySelector('nameInput')).toHaveValue(name);
-    await expect(this.findBySelector('notesInput')).toHaveValue(notes);
-  }
-
   async fillFields(name: string, notes?: string): Promise<void> {
     await this.findBySelector('nameInput').fill(name);
     await this.findBySelector('notesInput').fill(notes ?? '');
@@ -41,15 +36,5 @@ export class ExerciseFormBlock extends Block {
 
   async submit(): Promise<void> {
     await this.findBySelector('submitButton').click();
-  }
-
-  async cancel(): Promise<void> {
-    await this.findBySelector('cancelButton').click();
-    await this.waitForHidden();
-  }
-
-  async expectError(): Promise<void> {
-    await expect(this.findBySelector('error')).toBeVisible();
-    await expect(this.findBySelector('error')).toHaveText(/\S/);
   }
 }

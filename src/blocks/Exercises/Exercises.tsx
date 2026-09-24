@@ -6,8 +6,11 @@ import { PlusIcon } from '@radix-ui/react-icons';
 import type { CreateExerciseRequest, Exercise } from '../../services/exercises/exercises.models';
 import { createExercise, listExercises, updateExercise } from '../../services/exercises/exercises.service';
 import { Button } from '../Button/Button';
-import { Dialog, DialogActions, DialogContent, DialogTitle } from '../Dialog/Dialog';
-import { ExerciseForm } from '../ExerciseForm/ExerciseForm';
+import { DialogActions } from '../Dialog/Actions/Dialog-Actions';
+import { DialogContent } from '../Dialog/Content/Dialog-Content';
+import { Dialog } from '../Dialog/Dialog';
+import { DialogTitle } from '../Dialog/Title/Dialog-Title';
+import { ExerciseFormDialog } from '../ExerciseFormDialog/ExerciseFormDialog';
 import { ExerciseList } from '../ExerciseList/ExerciseList';
 import { Fab } from '../Fab/Fab';
 import { Input } from '../Input/Input';
@@ -356,7 +359,7 @@ export const Exercises: FC = observer(() => {
       />
 
       {createFormOpen && (
-        <ExerciseForm
+        <ExerciseFormDialog
           error={formError}
           mode={editExercise === undefined ? 'create' : 'edit'}
           name={formName}
@@ -370,7 +373,11 @@ export const Exercises: FC = observer(() => {
       )}
 
       {archiveTarget !== undefined && (
-        <Dialog ariaLabel='Архивировать упражнение?' onCancel={closeArchiveDialog}>
+        <Dialog
+          ariaLabel='Архивировать упражнение?'
+          className={cnExercises('ArchiveDialog')}
+          onCancel={closeArchiveDialog}
+        >
           <DialogTitle>Архивировать упражнение?</DialogTitle>
           <DialogContent>
             <p>«{archiveTarget.name}» скроется из справочника, но сохранится в истории.</p>

@@ -2,15 +2,18 @@ import { type ChangeEvent, type FC, type SyntheticEvent, useCallback } from 'rea
 import { cn } from '@bem-react/classname';
 
 import { Button } from '../Button/Button';
-import { Dialog, DialogActions, DialogContent, DialogTitle } from '../Dialog/Dialog';
+import { DialogActions } from '../Dialog/Actions/Dialog-Actions';
+import { DialogContent } from '../Dialog/Content/Dialog-Content';
+import { Dialog } from '../Dialog/Dialog';
+import { DialogTitle } from '../Dialog/Title/Dialog-Title';
 import { Input } from '../Input/Input';
 import { Textarea } from '../Textarea/Textarea';
 
-import './ExerciseForm.scss';
+import './ExerciseFormDialog.scss';
 
-const cnExerciseForm = cn('ExerciseForm');
+const cnExerciseFormDialog = cn('ExerciseFormDialog');
 
-export type ExerciseFormProps = {
+export type ExerciseFormDialogProps = {
   readonly name: string;
   readonly notes: string;
   readonly submitting: boolean;
@@ -22,7 +25,7 @@ export type ExerciseFormProps = {
   onCancel(): void;
 };
 
-export const ExerciseForm: FC<ExerciseFormProps> = ({
+export const ExerciseFormDialog: FC<ExerciseFormDialogProps> = ({
   name,
   notes,
   submitting,
@@ -43,17 +46,17 @@ export const ExerciseForm: FC<ExerciseFormProps> = ({
   );
 
   return (
-    <Dialog ariaLabel={title} onCancel={onCancel}>
+    <Dialog ariaLabel={title} className={cnExerciseFormDialog()} onCancel={onCancel}>
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>
-        <form className={cnExerciseForm()} id='exercise-form' onSubmit={onSubmit}>
+        <form className={cnExerciseFormDialog('Form')} id='exercise-form' onSubmit={onSubmit}>
           {error !== undefined && (
-            <p className={cnExerciseForm('Error')} role='alert'>
+            <p className={cnExerciseFormDialog('Error')} role='alert'>
               {error}
             </p>
           )}
           <Input
-            className={cnExerciseForm('NameField')}
+            className={cnExerciseFormDialog('NameField')}
             disabled={submitting}
             id='exercise-name'
             label='Название'
@@ -63,7 +66,7 @@ export const ExerciseForm: FC<ExerciseFormProps> = ({
             value={name}
           />
           <Textarea
-            className={cnExerciseForm('NotesField')}
+            className={cnExerciseFormDialog('NotesField')}
             disabled={submitting}
             id='exercise-notes'
             label='Заметки'
@@ -76,11 +79,11 @@ export const ExerciseForm: FC<ExerciseFormProps> = ({
         </form>
       </DialogContent>
       <DialogActions>
-        <Button className={cnExerciseForm('Cancel')} disabled={submitting} onClick={onCancel} type='button'>
+        <Button className={cnExerciseFormDialog('Cancel')} disabled={submitting} onClick={onCancel} type='button'>
           Отмена
         </Button>
         <Button
-          className={cnExerciseForm('Submit')}
+          className={cnExerciseFormDialog('Submit')}
           color='primary'
           disabled={submitting}
           form='exercise-form'

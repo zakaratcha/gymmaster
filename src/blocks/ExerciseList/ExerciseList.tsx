@@ -40,7 +40,7 @@ export const ExerciseList: FC<ExerciseListProps> = ({ exercises, isSearchActive,
   );
 
   return (
-    <section className={cnExerciseList('Section')}>
+    <section className={cnExerciseList()}>
       <h2 className={cnExerciseList('SectionTitle')}>Справочник</h2>
       {exercises.length === 0 ? (
         <p className={cnExerciseList('Empty')}>{isSearchActive ? 'Ничего не найдено' : 'Добавить упражнение'}</p>

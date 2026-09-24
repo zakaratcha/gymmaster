@@ -8,13 +8,6 @@ export class ExercisesBlock extends Block {
     root: '.Exercises',
     title: '.Exercises-Title',
     searchInput: '.Exercises-SearchField .Input-Control',
-    emptyState: '.ExerciseList-Empty',
-    exerciseRow: '.ExerciseList-RowName',
-    exerciseRowButton: '.ExerciseList-Row',
-    archiveButton: '.ExerciseList-ArchiveButton',
-    archiveDialog: 'dialog.Dialog',
-    archiveConfirm: '.Exercises-ArchiveConfirm',
-    archiveCancel: '.Exercises-ArchiveCancel',
     fab: '.Exercises-Fab',
     error: '.Exercises-Error'
   };
@@ -36,53 +29,14 @@ export class ExercisesBlock extends Block {
     return title ?? '';
   }
 
-  async getExerciseNames(): Promise<string[]> {
-    const rows = this.findAllBySelector('exerciseRow');
-    const texts = await rows.allTextContents();
-    return texts.map(text => text.trim());
-  }
-
-  async getEmptyStateText(): Promise<string | null> {
-    const empty = this.findBySelector('emptyState');
-    if (!(await empty.isVisible())) {
-      return null;
-    }
-
-    const text = await empty.textContent();
-    return text?.trim() ?? null;
-  }
-
-  async clickExerciseByName(name: string): Promise<void> {
-    await this.waitForListReady();
-    await this.findBySelector('root')
-      .locator(this.selectors.exerciseRowButton)
-      .filter({ has: this.page.getByText(name, { exact: true }) })
-      .click();
-  }
-
-  async clickArchiveByName(name: string): Promise<void> {
-    await this.waitForListReady();
-    await this.page.getByRole('button', { name: `Архивировать ${name}`, exact: true }).click();
-    await this.findBySelector('archiveDialog').waitFor({ state: 'visible' });
-  }
-
-  async confirmArchive(): Promise<void> {
-    await this.findBySelector('archiveConfirm').click();
-    await this.findBySelector('archiveDialog').waitFor({ state: 'hidden' });
-  }
-
   async waitForListReady(): Promise<void> {
     await this.waitForVisible();
-
     const content = this.findBySelector('root').locator('.Exercises-Content');
     const loading = content.locator('.Exercises-Loading');
     if (await loading.isVisible()) {
       await loading.waitFor({ state: 'hidden' });
     }
-    await content
-      .locator('.ExerciseList-Empty, .ExerciseList-RowName, .Exercises-Error')
-      .first()
-      .waitFor({ state: 'visible' });
+    await content.locator('.ExerciseList').waitFor({ state: 'visible' });
   }
 
   async expectRoot(): Promise<void> {

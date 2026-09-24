@@ -1,0 +1,25 @@
+.ExerciseFormDialog {
+  &-Form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+
+  &-NameField,
+  &-NotesField {
+    width: 100%;
+  }
+
+  &-Error {
+    margin: 0;
+
+    color: var(--color-danger);
+
+    font-size: var(--font-size-sm);
+  }
+
+  &-Cancel,
+  &-Submit {
+    flex: 1;
+  }
+}

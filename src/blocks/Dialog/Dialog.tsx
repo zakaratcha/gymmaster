@@ -5,37 +5,14 @@ import './Dialog.scss';
 
 const cnDialog = cn('Dialog');
 
-type DialogTitleProps = {
-  readonly children: ReactNode;
-};
-
-export const DialogTitle: FC<DialogTitleProps> = ({ children }) => {
-  return <h2 className={cnDialog('Title')}>{children}</h2>;
-};
-
-type DialogContentProps = {
-  readonly children: ReactNode;
-};
-
-export const DialogContent: FC<DialogContentProps> = ({ children }) => {
-  return <div className={cnDialog('Content')}>{children}</div>;
-};
-
-type DialogActionsProps = {
-  readonly children: ReactNode;
-};
-
-export const DialogActions: FC<DialogActionsProps> = ({ children }) => {
-  return <div className={cnDialog('Actions')}>{children}</div>;
-};
-
 type DialogProps = {
   readonly ariaLabel: string;
   readonly children: ReactNode;
+  readonly className?: string;
   onCancel(): void;
 };
 
-export const Dialog: FC<DialogProps> = ({ ariaLabel, children, onCancel }) => {
+export const Dialog: FC<DialogProps> = ({ ariaLabel, children, className, onCancel }) => {
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   const handleCancel = useCallback(
@@ -53,7 +30,7 @@ export const Dialog: FC<DialogProps> = ({ ariaLabel, children, onCancel }) => {
   }, []);
 
   return (
-    <dialog aria-label={ariaLabel} className={cnDialog()} onCancel={handleCancel} ref={dialogRef}>
+    <dialog aria-label={ariaLabel} className={cnDialog(null, [className])} onCancel={handleCancel} ref={dialogRef}>
       {children}
     </dialog>
   );
