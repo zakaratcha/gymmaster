@@ -6,7 +6,7 @@ import { PlusIcon } from '@radix-ui/react-icons';
 import type { CreateExerciseRequest, Exercise } from '../../services/exercises/exercises.models';
 import { createExercise, listExercises, updateExercise } from '../../services/exercises/exercises.service';
 import { Button } from '../Button/Button';
-import { Dialog } from '../Dialog/Dialog';
+import { Dialog, DialogActions, DialogContent, DialogTitle } from '../Dialog/Dialog';
 import { ExerciseForm } from '../ExerciseForm/ExerciseForm';
 import { ExerciseList } from '../ExerciseList/ExerciseList';
 import { Fab } from '../Fab/Fab';
@@ -370,33 +370,32 @@ export const Exercises: FC = observer(() => {
       )}
 
       {archiveTarget !== undefined && (
-        <Dialog
-          actions={
-            <>
-              <Button
-                className={cnExercises('ArchiveCancel')}
-                disabled={archiveSubmitting}
-                onClick={closeArchiveDialog}
-                type='button'
-              >
-                Отмена
-              </Button>
-              <Button
-                className={cnExercises('ArchiveConfirm')}
-                color='primary'
-                disabled={archiveSubmitting}
-                onClick={handleArchiveConfirm}
-                type='button'
-              >
-                {archiveSubmitting ? 'Архивирование…' : 'Архивировать'}
-              </Button>
-            </>
-          }
-          description={`«${archiveTarget.name}» скроется из справочника, но сохранится в истории.`}
-          error={archiveError}
-          onCancel={closeArchiveDialog}
-          title='Архивировать упражнение?'
-        />
+        <Dialog ariaLabel='Архивировать упражнение?' onCancel={closeArchiveDialog}>
+          <DialogTitle>Архивировать упражнение?</DialogTitle>
+          <DialogContent>
+            <p>«{archiveTarget.name}» скроется из справочника, но сохранится в истории.</p>
+            {archiveError !== undefined && <p role='alert'>{archiveError}</p>}
+          </DialogContent>
+          <DialogActions>
+            <Button
+              className={cnExercises('ArchiveCancel')}
+              disabled={archiveSubmitting}
+              onClick={closeArchiveDialog}
+              type='button'
+            >
+              Отмена
+            </Button>
+            <Button
+              className={cnExercises('ArchiveConfirm')}
+              color='primary'
+              disabled={archiveSubmitting}
+              onClick={handleArchiveConfirm}
+              type='button'
+            >
+              {archiveSubmitting ? 'Архивирование…' : 'Архивировать'}
+            </Button>
+          </DialogActions>
+        </Dialog>
       )}
     </div>
   );

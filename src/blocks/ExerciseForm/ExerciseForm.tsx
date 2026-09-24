@@ -2,7 +2,7 @@ import { type ChangeEvent, type FC, type SyntheticEvent, useCallback } from 'rea
 import { cn } from '@bem-react/classname';
 
 import { Button } from '../Button/Button';
-import { Dialog } from '../Dialog/Dialog';
+import { Dialog, DialogActions, DialogContent, DialogTitle } from '../Dialog/Dialog';
 import { Input } from '../Input/Input';
 import { Textarea } from '../Textarea/Textarea';
 
@@ -43,50 +43,52 @@ export const ExerciseForm: FC<ExerciseFormProps> = ({
   );
 
   return (
-    <Dialog
-      actions={
-        <>
-          <Button className={cnExerciseForm('Cancel')} disabled={submitting} onClick={onCancel} type='button'>
-            Отмена
-          </Button>
-          <Button
-            className={cnExerciseForm('Submit')}
-            color='primary'
+    <Dialog ariaLabel={title} onCancel={onCancel}>
+      <DialogTitle>{title}</DialogTitle>
+      <DialogContent>
+        <form className={cnExerciseForm()} id='exercise-form' onSubmit={onSubmit}>
+          {error !== undefined && (
+            <p className={cnExerciseForm('Error')} role='alert'>
+              {error}
+            </p>
+          )}
+          <Input
+            className={cnExerciseForm('NameField')}
             disabled={submitting}
-            form='exercise-form'
-            type='submit'
-          >
-            {submitLabel}
-          </Button>
-        </>
-      }
-      error={error}
-      onCancel={onCancel}
-      title={title}
-    >
-      <form className={cnExerciseForm()} id='exercise-form' onSubmit={onSubmit}>
-        <Input
-          className={cnExerciseForm('NameField')}
+            id='exercise-name'
+            label='Название'
+            name='name'
+            onChange={handleNameChange}
+            placeholder='Например, приседание со штангой'
+            value={name}
+          />
+          <Textarea
+            className={cnExerciseForm('NotesField')}
+            disabled={submitting}
+            id='exercise-notes'
+            label='Заметки'
+            name='notes'
+            onChange={onNotesChange}
+            placeholder='Необязательно'
+            rows={3}
+            value={notes}
+          />
+        </form>
+      </DialogContent>
+      <DialogActions>
+        <Button className={cnExerciseForm('Cancel')} disabled={submitting} onClick={onCancel} type='button'>
+          Отмена
+        </Button>
+        <Button
+          className={cnExerciseForm('Submit')}
+          color='primary'
           disabled={submitting}
-          id='exercise-name'
-          label='Название'
-          name='name'
-          onChange={handleNameChange}
-          placeholder='Например, приседание со штангой'
-          value={name}
-        />
-        <Textarea
-          className={cnExerciseForm('NotesField')}
-          disabled={submitting}
-          id='exercise-notes'
-          label='Заметки'
-          name='notes'
-          onChange={onNotesChange}
-          placeholder='Необязательно'
-          rows={3}
-          value={notes}
-        />
-      </form>
+          form='exercise-form'
+          type='submit'
+        >
+          {submitLabel}
+        </Button>
+      </DialogActions>
     </Dialog>
   );
 };

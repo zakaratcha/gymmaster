@@ -5,16 +5,37 @@ import './Dialog.scss';
 
 const cnDialog = cn('Dialog');
 
+type DialogTitleProps = {
+  readonly children: ReactNode;
+};
+
+export const DialogTitle: FC<DialogTitleProps> = ({ children }) => {
+  return <h2 className={cnDialog('Title')}>{children}</h2>;
+};
+
+type DialogContentProps = {
+  readonly children: ReactNode;
+};
+
+export const DialogContent: FC<DialogContentProps> = ({ children }) => {
+  return <div className={cnDialog('Content')}>{children}</div>;
+};
+
+type DialogActionsProps = {
+  readonly children: ReactNode;
+};
+
+export const DialogActions: FC<DialogActionsProps> = ({ children }) => {
+  return <div className={cnDialog('Actions')}>{children}</div>;
+};
+
 type DialogProps = {
-  readonly title: string;
-  readonly children?: ReactNode;
-  readonly actions: ReactNode;
-  readonly description?: string;
-  readonly error?: string;
+  readonly ariaLabel: string;
+  readonly children: ReactNode;
   onCancel(): void;
 };
 
-export const Dialog: FC<DialogProps> = ({ title, children, actions, description, error, onCancel }) => {
+export const Dialog: FC<DialogProps> = ({ ariaLabel, children, onCancel }) => {
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   const handleCancel = useCallback(
@@ -32,18 +53,8 @@ export const Dialog: FC<DialogProps> = ({ title, children, actions, description,
   }, []);
 
   return (
-    <dialog aria-label={title} className={cnDialog()} onCancel={handleCancel} ref={dialogRef}>
-      <div className={cnDialog('Content')}>
-        <h2 className={cnDialog('Title')}>{title}</h2>
-        {description !== undefined && <p className={cnDialog('Description')}>{description}</p>}
-        {error !== undefined && (
-          <p className={cnDialog('Error')} role='alert'>
-            {error}
-          </p>
-        )}
-        {children}
-      </div>
-      <div className={cnDialog('Actions')}>{actions}</div>
+    <dialog aria-label={ariaLabel} className={cnDialog()} onCancel={handleCancel} ref={dialogRef}>
+      {children}
     </dialog>
   );
 };
