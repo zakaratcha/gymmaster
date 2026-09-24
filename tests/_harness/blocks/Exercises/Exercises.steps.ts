@@ -4,7 +4,7 @@ import { expect } from '@playwright/test';
 import type { CustomWorld } from '../../world';
 import { ExerciseFormDialogBlock } from '../ExerciseFormDialog/ExerciseFormDialog.block';
 import { ExerciseListBlock } from '../ExerciseList/ExerciseList.block';
-import { ExercisesArchiveDialogBlock } from '../ExercisesArchiveDialog/ExercisesArchiveDialog.block';
+import { ExercisesArchiveDialogBlock } from './ArchiveDialog/Exercises-ArchiveDialog.block';
 import { ExercisesBlock } from './Exercises.block';
 
 When('я ищу упражнение {string}', async function (this: CustomWorld, query: string) {

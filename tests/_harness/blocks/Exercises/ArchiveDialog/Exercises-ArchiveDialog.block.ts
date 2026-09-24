@@ -1,6 +1,6 @@
 import type { Page as PlaywrightPage } from 'playwright';
 
-import { Block } from '../../classes/Block';
+import { Block } from '../../../classes/Block';
 
 export class ExercisesArchiveDialogBlock extends Block {
   readonly selectors = {
