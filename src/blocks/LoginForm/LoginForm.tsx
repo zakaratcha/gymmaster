@@ -24,55 +24,54 @@ type LoginFormState = {
 };
 
 export const LoginForm: FC = observer(() => {
-  const { login, password, submitting, error, setLogin, setPassword, setSubmitting, setError } =
-    useLocalObservable<LoginFormState>(() => ({
-      login: '',
-      password: '',
-      submitting: false,
-      setLogin(value) {
-        this.login = value;
-      },
-      setPassword(value) {
-        this.password = value;
-      },
-      setSubmitting(value) {
-        this.submitting = value;
-      },
-      setError(value) {
-        this.error = value;
-      }
-    }));
+  const state = useLocalObservable<LoginFormState>(() => ({
+    login: '',
+    password: '',
+    submitting: false,
+    setLogin(value) {
+      this.login = value;
+    },
+    setPassword(value) {
+      this.password = value;
+    },
+    setSubmitting(value) {
+      this.submitting = value;
+    },
+    setError(value) {
+      this.error = value;
+    }
+  }));
 
   const handleSubmit = useCallback(
     async (event: SyntheticEvent<HTMLFormElement>) => {
       event.preventDefault();
-      setError(undefined);
-      setSubmitting(true);
+      state.setError(undefined);
+      state.setSubmitting(true);
 
       try {
-        const result = await authenticate({ email: login.trim(), password });
+        const result = await authenticate({ email: state.login.trim(), password: state.password });
         if (!result.ok) {
-          setError(result.error);
+          state.setError(result.error);
         }
       } finally {
-        setSubmitting(false);
+        state.setSubmitting(false);
       }
     },
-    [login, password, setError, setSubmitting]
+    [state]
   );
 
   const handleLoginChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      setLogin(event.target.value);
+      state.setLogin(event.target.value);
     },
-    [setLogin]
+    [state]
   );
 
   const handlePasswordChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      setPassword(event.target.value);
+      state.setPassword(event.target.value);
     },
-    [setPassword]
+    [state]
   );
 
   return (
@@ -81,14 +80,14 @@ export const LoginForm: FC = observer(() => {
         <h1 className={cnLoginForm('Title')}>GymMaster</h1>
         <p className={cnLoginForm('Subtitle')}>Кабинет тренера</p>
         <form className={cnLoginForm('Form')} onSubmit={handleSubmit}>
-          <Loading visible={submitting} />
+          <Loading visible={state.submitting} />
           <Input
             className={cnLoginForm('LoginField')}
             id='login'
             label='Логин'
             onChange={handleLoginChange}
             placeholder='Введите логин'
-            value={login}
+            value={state.login}
           />
           <Input
             className={cnLoginForm('PasswordField')}
@@ -97,14 +96,14 @@ export const LoginForm: FC = observer(() => {
             onChange={handlePasswordChange}
             placeholder='Введите пароль'
             type='password'
-            value={password}
+            value={state.password}
           />
-          {error === undefined ? null : (
+          {state.error === undefined ? null : (
             <p className={cnLoginForm('Error')} role='alert'>
-              {error}
+              {state.error}
             </p>
           )}
-          <Button className={cnLoginForm('Submit')} color='primary' disabled={submitting} type='submit'>
+          <Button className={cnLoginForm('Submit')} color='primary' disabled={state.submitting} type='submit'>
             Войти
           </Button>
         </form>

@@ -41,6 +41,26 @@ export const clients = sqliteTable(
   table => [index('idx_clients_trainer_id').on(table.trainerId)]
 );
 
+export const exercises = sqliteTable(
+  'exercises',
+  {
+    id: text('id').primaryKey(),
+    trainerId: text('trainer_id')
+      .notNull()
+      .references(() => trainers.id, { onDelete: 'cascade' }),
+    name: text('name').notNull(),
+    notes: text('notes'),
+    archivedAt: text('archived_at'),
+    createdAt: text('created_at').notNull(),
+    updatedAt: text('updated_at').notNull()
+  },
+  table => [
+    index('idx_exercises_trainer_id').on(table.trainerId),
+    index('idx_exercises_trainer_archived').on(table.trainerId, table.archivedAt)
+  ]
+);
+
 export type TrainerRow = typeof trainers.$inferSelect;
 export type SessionRow = typeof sessions.$inferSelect;
 export type ClientRow = typeof clients.$inferSelect;
+export type ExerciseRow = typeof exercises.$inferSelect;

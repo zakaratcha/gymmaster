@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { eq } from 'drizzle-orm';
 
 import { hashPassword } from '../auth/password.ts';
+import { seedExercises } from '../exercises/exerciseSeed.ts';
 import { getDb, getSqlite } from './client.ts';
 import { trainers } from './schema.ts';
 
@@ -78,8 +79,10 @@ async function seedSecondTrainer(): Promise<void> {
 export async function migrate(): Promise<void> {
   runSqlMigration('0001_init.sql');
   runSqlMigration('0002_clients.sql');
+  runSqlMigration('0003_exercises.sql');
   await seedBootstrapAdmin();
   await seedSecondTrainer();
+  await seedExercises();
 }
 
 async function main(): Promise<void> {

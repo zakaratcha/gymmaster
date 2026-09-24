@@ -10,11 +10,16 @@
     display: flex;
     flex: 1;
     flex-direction: column;
+    gap: var(--space-lg);
 
     width: 100%;
-    max-width: 24rem;
-    margin: 0 auto;
     padding: var(--space-xl);
+    padding-bottom: calc(var(--tap-target) + var(--space-xl));
+  }
+
+  &-Header {
+    display: flex;
+    align-items: center;
   }
 
   &-Title {
@@ -24,5 +29,48 @@
 
     font-size: 1.75rem;
     font-weight: 700;
+  }
+
+  &-Search {
+    width: 100%;
+  }
+
+  &-Content {
+    position: relative;
+
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--space-lg);
+
+    min-height: 8rem;
+  }
+
+  &-Loading {
+    position: absolute;
+    inset: 0;
+  }
+
+  &-ErrorBlock {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: var(--space-md);
+
+    padding: var(--space-lg) 0;
+  }
+
+  &-Error {
+    margin: 0;
+
+    text-align: center;
+
+    color: var(--color-danger);
+
+    font-size: var(--font-size-md);
+  }
+
+  &-Retry {
+    min-width: 8rem;
   }
 }
