@@ -1,4 +1,4 @@
-import { type FC, type SyntheticEvent, useCallback, useEffect, useRef } from 'react';
+import { type FC, type SyntheticEvent, useCallback, useEffect } from 'react';
 import { observer, useLocalObservable } from 'mobx-react-lite';
 import { cn } from '@bem-react/classname';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -42,6 +42,7 @@ type ClientHubState = {
   selectedPlanId: string;
   starting: boolean;
   startingError?: string;
+  deleteDialogOpen: boolean;
   loading: boolean;
   error?: string;
   notesExpanded: boolean;
@@ -68,6 +69,8 @@ type ClientHubState = {
   setSessionsError(value: string | undefined): void;
   openStartDialog(): void;
   closeStartDialog(): void;
+  openDeleteDialog(): void;
+  closeDeleteDialog(): void;
   setSelectedPlanId(value: string): void;
   setStarting(value: boolean): void;
   setStartingError(value: string | undefined): void;
@@ -115,6 +118,7 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
     selectedPlanId: '',
     starting: false,
     startingError: undefined,
+    deleteDialogOpen: false,
     loading: !staticMode,
     notesExpanded: false,
     editOpen: false,
@@ -185,6 +189,15 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
     closeStartDialog() {
       if (!this.starting) {
         this.startDialogOpen = false;
+      }
+    },
+    openDeleteDialog() {
+      this.mutationError = undefined;
+      this.deleteDialogOpen = true;
+    },
+    closeDeleteDialog() {
+      if (!this.submitting) {
+        this.deleteDialogOpen = false;
       }
     },
     setSelectedPlanId(value) {
@@ -337,8 +350,6 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
     }
   }, [id, navigate]);
 
-  const deleteDialogRef = useRef<HTMLDialogElement>(null);
-
   const handleEdit = useCallback(() => {
     state.openEdit();
   }, [state]);
@@ -381,14 +392,11 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
   );
 
   const handleDeleteOpen = useCallback(() => {
-    state.setMutationError(undefined);
-    deleteDialogRef.current?.showModal();
+    state.openDeleteDialog();
   }, [state]);
 
   const handleDeleteCancel = useCallback(() => {
-    if (!state.submitting) {
-      deleteDialogRef.current?.close();
-    }
+    state.closeDeleteDialog();
   }, [state]);
 
   const handleDeleteConfirm = useCallback(async () => {
@@ -403,7 +411,7 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
     state.setSubmitting(true);
     try {
       await deleteClient(state.client.id);
-      deleteDialogRef.current?.close();
+      state.closeDeleteDialog();
       void navigate('/clients', { replace: true });
     } catch {
       state.setMutationError('Не удалось удалить клиента');
@@ -469,14 +477,15 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
           onStart={handleStart}
         />
       )}
-      <ClientHubDeleteDialog
-        client={state.client}
-        dialogRef={deleteDialogRef}
-        error={state.mutationError}
-        submitting={state.submitting}
-        onCancel={handleDeleteCancel}
-        onConfirm={handleDeleteConfirm}
-      />
+      {state.deleteDialogOpen && (
+        <ClientHubDeleteDialog
+          client={state.client}
+          error={state.mutationError}
+          submitting={state.submitting}
+          onCancel={handleDeleteCancel}
+          onConfirm={handleDeleteConfirm}
+        />
+      )}
     </div>
   );
 });
