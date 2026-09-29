@@ -1,4 +1,4 @@
-import { type FC, type SyntheticEvent, useCallback, useEffect } from 'react';
+import { type FC, type SyntheticEvent, useCallback, useEffect, useRef } from 'react';
 import { observer, useLocalObservable } from 'mobx-react-lite';
 import { cn } from '@bem-react/classname';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -60,6 +60,8 @@ type ClientHubState = {
   setSubmitting(value: boolean): void;
   setMutationError(value: string | undefined): void;
   setClient(value: Client | undefined): void;
+  applyUpdatedClient(value: Client): void;
+  closeDeleteDialogAfterRemoval(): void;
   setPlans(value: readonly PlannedWorkout[]): void;
   setPlansLoading(value: boolean): void;
   setPlansError(value: string | undefined): void;
@@ -106,6 +108,7 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
   const staticMode = initialClient !== undefined;
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const loadGenerationRef = useRef(0);
 
   const state = useLocalObservable<ClientHubState>(() => ({
     client: initialClient,
@@ -159,6 +162,13 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
     },
     setClient(value) {
       this.client = value;
+    },
+    applyUpdatedClient(value) {
+      this.client = value;
+      this.editOpen = false;
+    },
+    closeDeleteDialogAfterRemoval() {
+      this.deleteDialogOpen = false;
     },
     setPlans(value) {
       this.plans = value;
@@ -220,84 +230,119 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
     }
   }));
 
-  const loadClient = useCallback(async () => {
-    if (id === undefined || id.length === 0) {
-      state.setError('Клиент не найден');
-      state.setLoading(false);
-      return;
-    }
+  const loadClient = useCallback(
+    async (generation: number) => {
+      if (id === undefined || id.length === 0) {
+        state.setError('Клиент не найден');
+        state.setLoading(false);
+        return;
+      }
 
-    state.setLoading(true);
-    state.setError(undefined);
+      state.setLoading(true);
+      state.setError(undefined);
 
-    try {
-      const loadedClient = await getClientById(id);
-      state.setClient(loadedClient);
-    } catch {
-      state.setError('Не удалось загрузить клиента');
-      state.setClient(undefined);
-    } finally {
-      state.setLoading(false);
-    }
-  }, [id, state]);
+      try {
+        const loadedClient = await getClientById(id);
+        state.setClient(loadedClient);
+      } catch {
+        state.setError('Не удалось загрузить клиента');
+        state.setClient(undefined);
+      } finally {
+        if (loadGenerationRef.current === generation) {
+          state.setLoading(false);
+        }
+      }
+    },
+    [id, state]
+  );
 
-  const loadPlans = useCallback(async () => {
-    if (staticMode || id === undefined || id.length === 0) {
-      state.setPlansLoading(false);
-      return;
-    }
+  const loadPlans = useCallback(
+    async (generation: number) => {
+      if (staticMode || id === undefined || id.length === 0) {
+        state.setPlansLoading(false);
+        return;
+      }
 
-    state.setPlansLoading(true);
-    state.setPlansError(undefined);
-    try {
-      state.setPlans(await listPlans(id));
-    } catch {
-      state.setPlansError('Не удалось загрузить планы');
-    } finally {
-      state.setPlansLoading(false);
-    }
-  }, [id, state, staticMode]);
+      state.setPlansLoading(true);
+      state.setPlansError(undefined);
+      try {
+        const plans = await listPlans(id);
+        if (loadGenerationRef.current === generation) {
+          state.setPlans(plans);
+        }
+      } catch {
+        if (loadGenerationRef.current === generation) {
+          state.setPlansError('Не удалось загрузить планы');
+        }
+      } finally {
+        if (loadGenerationRef.current === generation) {
+          state.setPlansLoading(false);
+        }
+      }
+    },
+    [id, state, staticMode]
+  );
 
-  const loadSessions = useCallback(async () => {
-    if (staticMode || id === undefined || id.length === 0) {
-      state.setSessionsLoading(false);
-      return;
-    }
+  const loadSessions = useCallback(
+    async (generation: number) => {
+      if (staticMode || id === undefined || id.length === 0) {
+        state.setSessionsLoading(false);
+        return;
+      }
 
-    state.setSessionsLoading(true);
-    state.setSessionsError(undefined);
-    try {
-      const [activeSession, latestCompletedSession] = await Promise.all([
-        getActiveWorkoutSession(id),
-        getLatestCompletedWorkoutSession(id)
-      ]);
-      state.setActiveSession(activeSession);
-      state.setLatestCompletedSession(latestCompletedSession);
-    } catch {
-      state.setSessionsError('Не удалось загрузить тренировки');
-    } finally {
-      state.setSessionsLoading(false);
-    }
-  }, [id, state, staticMode]);
+      state.setSessionsLoading(true);
+      state.setSessionsError(undefined);
+      try {
+        const [activeSession, latestCompletedSession] = await Promise.all([
+          getActiveWorkoutSession(id),
+          getLatestCompletedWorkoutSession(id)
+        ]);
+        if (loadGenerationRef.current === generation) {
+          state.setActiveSession(activeSession);
+          state.setLatestCompletedSession(latestCompletedSession);
+        }
+      } catch {
+        if (loadGenerationRef.current === generation) {
+          state.setSessionsError('Не удалось загрузить тренировки');
+        }
+      } finally {
+        if (loadGenerationRef.current === generation) {
+          state.setSessionsLoading(false);
+        }
+      }
+    },
+    [id, state, staticMode]
+  );
 
   useEffect(() => {
-    if (!staticMode) {
-      void loadClient();
-      void loadPlans();
-      void loadSessions();
+    if (staticMode) {
+      return;
     }
+
+    loadGenerationRef.current += 1;
+    const generation = loadGenerationRef.current;
+
+    void loadClient(generation);
+    void loadPlans(generation);
+    void loadSessions(generation);
   }, [loadClient, loadPlans, loadSessions, staticMode]);
 
   const handleRetry = useCallback(() => {
-    void loadClient();
+    loadGenerationRef.current += 1;
+    const generation = loadGenerationRef.current;
+    void loadClient(generation);
   }, [loadClient]);
 
   const handlePlansRetry = useCallback(() => {
-    void loadPlans();
+    loadGenerationRef.current += 1;
+    const generation = loadGenerationRef.current;
+    void loadPlans(generation);
   }, [loadPlans]);
 
   const handleSessionsRetry = useCallback(() => {
-    void loadSessions();
+    loadGenerationRef.current += 1;
+    const generation = loadGenerationRef.current;
+    void loadSessions(generation);
   }, [loadSessions]);
 
   const handleStartOpen = useCallback(() => {
@@ -379,9 +424,7 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
       state.setSubmitting(true);
       try {
         const updated = await updateClient(state.client.id, { name, notes: state.editNotes.trim(), bodyWeightKg });
-        state.setClient(updated);
-        state.setSubmitting(false);
-        state.closeEdit();
+        state.applyUpdatedClient(updated);
       } catch {
         state.setMutationError('Не удалось сохранить клиента');
       } finally {
@@ -411,7 +454,7 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
     state.setSubmitting(true);
     try {
       await deleteClient(state.client.id);
-      state.closeDeleteDialog();
+      state.closeDeleteDialogAfterRemoval();
       void navigate('/clients', { replace: true });
     } catch {
       state.setMutationError('Не удалось удалить клиента');

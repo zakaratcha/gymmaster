@@ -6,6 +6,8 @@ const sessionTimestampFormatter = new Intl.DateTimeFormat('ru-RU', {
   year: 'numeric'
 });
 
+const plannedDatePattern = /^\d{4}-\d{2}-\d{2}$/;
+
 export function formatBodyWeightKg(bodyWeightKg: number | undefined): string {
   if (bodyWeightKg === undefined) {
     return '—';
@@ -15,7 +17,20 @@ export function formatBodyWeightKg(bodyWeightKg: number | undefined): string {
 }
 
 export function formatPlannedDate(value: string): string {
+  if (!plannedDatePattern.test(value)) {
+    return value;
+  }
+
   const [year, month, day] = value.split('-');
+  const parsed = new Date(`${value}T00:00:00`);
+  if (
+    parsed.getFullYear() !== Number(year) ||
+    parsed.getMonth() + 1 !== Number(month) ||
+    parsed.getDate() !== Number(day)
+  ) {
+    return value;
+  }
+
   return `${day}.${month}.${year}`;
 }
 

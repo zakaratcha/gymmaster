@@ -1,11 +1,11 @@
 import { type FC } from 'react';
 import { cn } from '@bem-react/classname';
 
+import { formatSessionTimestamp } from '../../../services/util/format/format';
 import type { WorkoutSession } from '../../../services/workoutSessions/workoutSessions.models';
 import { ClientHubActiveWorkoutInfo } from '../ActiveWorkoutInfo/ClientHub-ActiveWorkoutInfo';
 import { ClientHubActiveWorkoutTag } from '../ActiveWorkoutTag/ClientHub-ActiveWorkoutTag';
 import { ClientHubActiveWorkoutTime } from '../ActiveWorkoutTime/ClientHub-ActiveWorkoutTime';
-import { formatSessionTimestamp } from '../format';
 import { ClientHubOpenWorkout } from '../OpenWorkout/ClientHub-OpenWorkout';
 import { ClientHubSection } from '../Section/ClientHub-Section';
 import { ClientHubSessionsLoading } from '../SessionsLoading/ClientHub-SessionsLoading';
@@ -23,7 +23,7 @@ export const ClientHubActiveWorkout: FC<ClientHubActiveWorkoutProps> = ({ loadin
   return (
     <ClientHubSection title='Тренировка в процессе' type='activeWorkout'>
       {loading && <ClientHubSessionsLoading />}
-      {session !== null && (
+      {!loading && session !== null && (
         <div className={cnClientHubActiveWorkout()}>
           <ClientHubActiveWorkoutInfo>
             <ClientHubActiveWorkoutTag>{session.splitTag}</ClientHubActiveWorkoutTag>

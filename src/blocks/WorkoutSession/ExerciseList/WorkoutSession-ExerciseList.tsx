@@ -1,4 +1,4 @@
-import { type ChangeEvent, type FC, type ReactNode } from 'react';
+import { type ChangeEvent, type FC } from 'react';
 import { cn } from '@bem-react/classname';
 
 import type { Exercise } from '../../../services/exercises/exercises.models';
@@ -8,21 +8,12 @@ import { WorkoutSessionEmpty } from '../Empty/WorkoutSession-Empty';
 import { WorkoutSessionExerciseCard } from '../ExerciseCard/WorkoutSession-ExerciseCard';
 import { WorkoutSessionExerciseSelect } from '../ExerciseSelect/WorkoutSession-ExerciseSelect';
 import { WorkoutSessionExercisesHeader } from '../ExercisesHeader/WorkoutSession-ExercisesHeader';
-import { WorkoutSessionExercisesSection } from '../ExercisesSection/WorkoutSession-ExercisesSection';
 import { WorkoutSessionSectionTitle } from '../SectionTitle/WorkoutSession-SectionTitle';
 import type { DraftExercise, ExerciseAction, SetAction, SetField } from '../types';
 
 import './WorkoutSession-ExerciseList.scss';
 
-const cnWorkoutSessionExerciseListElement = cn('WorkoutSession', 'ExerciseList');
-
-type WorkoutSessionExerciseListElementProps = {
-  readonly children: ReactNode;
-};
-
-export const WorkoutSessionExerciseListElement: FC<WorkoutSessionExerciseListElementProps> = ({ children }) => {
-  return <div className={cnWorkoutSessionExerciseListElement()}>{children}</div>;
-};
+const cnWorkoutSessionExerciseList = cn('WorkoutSession', 'ExerciseList');
 
 type WorkoutSessionExerciseListProps = {
   readonly drafts: readonly DraftExercise[];
@@ -50,7 +41,7 @@ export const WorkoutSessionExerciseList: FC<WorkoutSessionExerciseListProps> = (
   onSetChange
 }) => {
   return (
-    <WorkoutSessionExercisesSection>
+    <section className={cnWorkoutSessionExerciseList()}>
       <WorkoutSessionExercisesHeader>
         <WorkoutSessionSectionTitle>Фактические упражнения</WorkoutSessionSectionTitle>
         {isInProgress && (
@@ -70,21 +61,19 @@ export const WorkoutSessionExerciseList: FC<WorkoutSessionExerciseListProps> = (
 
       {drafts.length === 0 && <WorkoutSessionEmpty>Упражнения не добавлены</WorkoutSessionEmpty>}
 
-      <WorkoutSessionExerciseListElement>
-        {drafts.map((draft, exercisePosition) => (
-          <WorkoutSessionExerciseCard
-            draft={draft}
-            draftCount={drafts.length}
-            exercisePosition={exercisePosition}
-            isInProgress={isInProgress}
-            key={`${draft.exerciseId}-${exercisePosition}`}
-            mutationDisabled={mutationDisabled}
-            onExerciseAction={onExerciseAction}
-            onSetAction={onSetAction}
-            onSetChange={onSetChange}
-          />
-        ))}
-      </WorkoutSessionExerciseListElement>
-    </WorkoutSessionExercisesSection>
+      {drafts.map((draft, exercisePosition) => (
+        <WorkoutSessionExerciseCard
+          draft={draft}
+          draftCount={drafts.length}
+          exercisePosition={exercisePosition}
+          isInProgress={isInProgress}
+          key={`${draft.exerciseId}-${exercisePosition}`}
+          mutationDisabled={mutationDisabled}
+          onExerciseAction={onExerciseAction}
+          onSetAction={onSetAction}
+          onSetChange={onSetChange}
+        />
+      ))}
+    </section>
   );
 };

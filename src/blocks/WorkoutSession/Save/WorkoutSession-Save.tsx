@@ -14,13 +14,7 @@ type WorkoutSessionSaveProps = {
 
 export const WorkoutSessionSave: FC<WorkoutSessionSaveProps> = ({ disabled, saving }) => {
   return (
-    <Button
-      className={cnWorkoutSessionSave()}
-      color='secondary'
-      disabled={disabled}
-      form='workout-session-form'
-      type='submit'
-    >
+    <Button className={cnWorkoutSessionSave()} color='secondary' disabled={disabled} type='submit'>
       {saving ? 'Сохранение…' : 'Сохранить факт'}
     </Button>
   );

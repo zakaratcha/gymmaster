@@ -1,8 +1,8 @@
 import { type FC } from 'react';
 import { cn } from '@bem-react/classname';
 
+import { formatSessionTimestamp, formatWorkoutCount } from '../../../services/util/format/format';
 import type { WorkoutSession } from '../../../services/workoutSessions/workoutSessions.models';
-import { formatSessionTimestamp, formatWorkoutCount } from '../format';
 import { ClientHubLatestWorkoutDate } from '../LatestWorkoutDate/ClientHub-LatestWorkoutDate';
 import { ClientHubLatestWorkoutLink } from '../LatestWorkoutLink/ClientHub-LatestWorkoutLink';
 import { ClientHubLatestWorkoutStats } from '../LatestWorkoutStats/ClientHub-LatestWorkoutStats';
@@ -31,7 +31,7 @@ export const ClientHubLatestWorkout: FC<ClientHubLatestWorkoutProps> = ({ error,
       {!loading && error === undefined && session === null && (
         <ClientHubStubText>Завершённых тренировок пока нет</ClientHubStubText>
       )}
-      {session !== null && (
+      {!loading && error === undefined && session !== null && (
         <div className={cnClientHub('LatestWorkout')}>
           <ClientHubLatestWorkoutDate>
             {formatSessionTimestamp(session.completedAt ?? session.startedAt)}

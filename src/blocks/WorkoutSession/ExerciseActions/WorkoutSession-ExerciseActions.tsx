@@ -1,51 +1,12 @@
-import { type FC, useCallback } from 'react';
+import { type FC } from 'react';
 import { cn } from '@bem-react/classname';
 
-import { Button } from '../../Button/Button';
+import { WorkoutSessionExerciseAction } from '../ExerciseAction/WorkoutSession-ExerciseAction';
 import type { ExerciseAction } from '../types';
 
 import './WorkoutSession-ExerciseActions.scss';
 
 const cnWorkoutSessionExerciseActions = cn('WorkoutSession', 'ExerciseActions');
-
-type WorkoutSessionExerciseActionProps = {
-  readonly action: ExerciseAction;
-  readonly disabled: boolean;
-  readonly exerciseName: string;
-  readonly exercisePosition: number;
-  onAction(action: ExerciseAction, exercisePosition: number): void;
-};
-
-const WorkoutSessionExerciseAction: FC<WorkoutSessionExerciseActionProps> = ({
-  action,
-  disabled,
-  exerciseName,
-  exercisePosition,
-  onAction
-}) => {
-  const handleClick = useCallback(() => {
-    onAction(action, exercisePosition);
-  }, [action, exercisePosition, onAction]);
-
-  const isRemove = action === 'remove';
-  const direction = action === 'up' ? 'вверх' : 'вниз';
-  const ariaLabel = isRemove
-    ? `Удалить упражнение ${exerciseName}`
-    : `Переместить упражнение ${exerciseName} ${direction}`;
-  let content = '↓';
-  if (action === 'up') {
-    content = '↑';
-  }
-  if (isRemove) {
-    content = 'Удалить';
-  }
-
-  return (
-    <Button aria-label={ariaLabel} color={isRemove ? 'secondary' : 'default'} disabled={disabled} onClick={handleClick}>
-      {content}
-    </Button>
-  );
-};
 
 type WorkoutSessionExerciseActionsProps = {
   readonly draftCount: number;

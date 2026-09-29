@@ -1,6 +1,6 @@
 import { type FC } from 'react';
 
-import { truncateNotes } from '../format';
+import { truncateNotes } from '../../../services/util/format/format';
 import { ClientHubNotesToggle } from '../NotesToggle/ClientHub-NotesToggle';
 import { ClientHubSection } from '../Section/ClientHub-Section';
 

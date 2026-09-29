@@ -1,7 +1,7 @@
 import { type FC } from 'react';
 
 import type { PlannedWorkout } from '../../../services/plans/plans.models';
-import { formatPlannedDate } from '../format';
+import { formatPlannedDate } from '../../../services/util/format/format';
 import { ClientHubPlanCount } from '../PlanCount/ClientHub-PlanCount';
 import { ClientHubPlanRow } from '../PlanRow/ClientHub-PlanRow';
 import { ClientHubPlansError } from '../PlansError/ClientHub-PlansError';

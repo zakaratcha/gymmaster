@@ -17,7 +17,12 @@ import type { ApiWorld } from '../world.api';
 const MISSING_EXERCISE_ID = '00000000-0000-0000-0000-000000000000';
 
 function setApiError(this: ApiWorld, error: unknown): void {
-  this.lastError = error instanceof ApiError ? error : undefined;
+  if (error instanceof ApiError) {
+    this.lastError = error;
+    return;
+  }
+
+  throw error;
 }
 
 Given('все упражнения архивированы через API', async function () {
