@@ -1,4 +1,5 @@
 import { type FC } from 'react';
+import { cn } from '@bem-react/classname';
 
 import type { PlannedWorkout } from '../../../services/plans/plans.models';
 import { formatPlannedDate } from '../../../services/util/format/format';
@@ -9,6 +10,8 @@ import { ClientHubPlansLoading } from '../PlansLoading/ClientHub-PlansLoading';
 import { ClientHubSection } from '../Section/ClientHub-Section';
 import { ClientHubStubAction } from '../StubAction/ClientHub-StubAction';
 import { ClientHubStubText } from '../StubText/ClientHub-StubText';
+
+const cnClientHub = cn('ClientHub');
 
 type ClientHubPlanProps = {
   readonly error: string | undefined;
@@ -30,7 +33,7 @@ export const ClientHubPlan: FC<ClientHubPlanProps> = ({
   const nearestPlan = plans[0];
 
   return (
-    <ClientHubSection title='Ближайший план' type='plan'>
+    <ClientHubSection className={cnClientHub('Plan')} title='Ближайший план' type='plan'>
       {loading && <ClientHubPlansLoading />}
       {error !== undefined && <ClientHubPlansError error={error} onRetry={onRetry} />}
       {!loading && error === undefined && plans.length === 0 && (

@@ -17,10 +17,10 @@ type ClientHubBodyWeightProps = {
 
 export const ClientHubBodyWeight: FC<ClientHubBodyWeightProps> = ({ client }) => {
   return (
-    <ClientHubSection type='bodyWeight'>
+    <ClientHubSection className={cnClientHubBodyWeight()} type='bodyWeight'>
       <ClientHubRow>
         <ClientHubSectionLabel>Вес тела</ClientHubSectionLabel>
-        <span className={cnClientHubBodyWeight()}>{formatBodyWeightKg(client.bodyWeightKg)}</span>
+        <span>{formatBodyWeightKg(client.bodyWeightKg)}</span>
       </ClientHubRow>
     </ClientHubSection>
   );

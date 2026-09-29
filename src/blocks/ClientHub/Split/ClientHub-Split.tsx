@@ -1,4 +1,5 @@
 import { type FC } from 'react';
+import { cn } from '@bem-react/classname';
 
 import { ClientHubSection } from '../Section/ClientHub-Section';
 import { ClientHubSoonHint } from '../SoonHint/ClientHub-SoonHint';
@@ -7,9 +8,11 @@ import { ClientHubSplitButton } from '../SplitButton/ClientHub-SplitButton';
 import { ClientHubSplitRow } from '../SplitRow/ClientHub-SplitRow';
 import { ClientHubSplitTags } from '../SplitTags/ClientHub-SplitTags';
 
+const cnClientHub = cn('ClientHub');
+
 export const ClientHubSplit: FC = () => {
   return (
-    <ClientHubSection title='Сплит' type='split'>
+    <ClientHubSection className={cnClientHub('Split')} title='Сплит' type='split'>
       <ClientHubSoonHint>Скоро</ClientHubSoonHint>
       <ClientHubSplitRow>
         <ClientHubSplitTags>ноги · верх · день А</ClientHubSplitTags>

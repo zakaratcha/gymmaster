@@ -1,9 +1,12 @@
 import { type FC } from 'react';
+import { cn } from '@bem-react/classname';
 
 import { ClientHubActionButton } from '../ActionButton/ClientHub-ActionButton';
 import { ClientHubActionHint } from '../ActionHint/ClientHub-ActionHint';
 import { ClientHubActionRow } from '../ActionRow/ClientHub-ActionRow';
 import { ClientHubSection } from '../Section/ClientHub-Section';
+
+const cnClientHub = cn('ClientHub');
 
 type ClientHubActionsProps = {
   readonly active: boolean;
@@ -13,7 +16,7 @@ type ClientHubActionsProps = {
 
 export const ClientHubActions: FC<ClientHubActionsProps> = ({ active, disabled, onStart }) => {
   return (
-    <ClientHubSection title='Действия' type='actions'>
+    <ClientHubSection className={cnClientHub('Actions')} title='Действия' type='actions'>
       {active && <ClientHubActionHint>У клиента уже есть тренировка в процессе</ClientHubActionHint>}
       <ClientHubActionRow>
         <ClientHubActionButton disabled={disabled} onClick={onStart} />

@@ -24,10 +24,10 @@ export class ClientHubBlock extends Block {
     startDialog: 'dialog.ClientHub-StartDialog',
     startDialogError: '.ClientHub-StartError',
     planOption: '.ClientHub-PlanOption',
-    activeWorkout: '.ClientHub-ActiveWorkout',
+    activeWorkout: '.ClientHub-ActiveWorkoutContent',
     activeWorkoutTag: '.ClientHub-ActiveWorkoutTag',
     activeWorkoutOpen: '.ClientHub-OpenWorkout',
-    latestWorkout: '.ClientHub-LatestWorkout',
+    latestWorkout: '.ClientHub-LatestWorkoutContent',
     latestWorkoutTag: '.ClientHub-LatestWorkoutTag',
     latestWorkoutStats: '.ClientHub-LatestWorkoutStats',
     latestWorkoutLink: '.ClientHub-LatestWorkoutLink',
@@ -54,7 +54,7 @@ export class ClientHubBlock extends Block {
   }
 
   async expectBodyWeight(weight: string): Promise<void> {
-    await expect(this.findBySelector('bodyWeight')).toHaveText(weight);
+    await expect(this.findBySelector('bodyWeight')).toContainText(weight);
   }
 
   async expectNotes(notes: string): Promise<void> {
@@ -152,7 +152,7 @@ export class ClientHubBlock extends Block {
     ).toBeVisible();
     await expect(
       this.page.locator(
-        '.ClientHub-LatestWorkout, .ClientHub-Section_type_latestWorkout .ClientHub-StubText, .ClientHub-Section_type_latestWorkout .ClientHub-SessionsError'
+        '.ClientHub-LatestWorkoutContent, .ClientHub-Section_type_latestWorkout .ClientHub-StubText, .ClientHub-Section_type_latestWorkout .ClientHub-SessionsError'
       )
     ).toBeVisible();
   }

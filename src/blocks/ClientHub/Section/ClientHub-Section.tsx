@@ -9,13 +9,14 @@ const cnClientHubSection = cn('ClientHub', 'Section');
 
 type ClientHubSectionProps = {
   readonly children: ReactNode;
+  readonly className?: string;
   readonly title?: string;
   readonly type: 'actions' | 'activeWorkout' | 'bodyWeight' | 'latestWorkout' | 'notes' | 'plan' | 'split';
 };
 
-export const ClientHubSection: FC<ClientHubSectionProps> = ({ children, title, type }) => {
+export const ClientHubSection: FC<ClientHubSectionProps> = ({ children, className, title, type }) => {
   return (
-    <section className={cnClientHubSection({ type })}>
+    <section className={cnClientHubSection({ type }, [className])}>
       {title !== undefined && <ClientHubSectionTitle>{title}</ClientHubSectionTitle>}
       {children}
     </section>

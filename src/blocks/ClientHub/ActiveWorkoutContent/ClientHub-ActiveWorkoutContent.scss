@@ -1,4 +1,4 @@
-.ClientHub-ActiveWorkout {
+.ClientHub-ActiveWorkoutContent {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -6,7 +6,7 @@
 }
 
 @media (width <= 30rem) {
-  .ClientHub-ActiveWorkout {
+  .ClientHub-ActiveWorkoutContent {
     align-items: stretch;
     flex-direction: column;
   }
