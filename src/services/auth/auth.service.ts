@@ -1,4 +1,5 @@
 import { currentUserStore } from '../../stores/currentUser.store';
+import { workoutTabsStore } from '../../stores/workoutTabs.store';
 import { authClient } from './auth.client';
 import type { AuthResult, LoginRequest } from './auth.models';
 
@@ -33,4 +34,5 @@ export async function authenticate(credentials: LoginRequest): Promise<AuthResul
 export async function logout(): Promise<void> {
   await authClient.logout();
   currentUserStore.reset();
+  workoutTabsStore.reset();
 }

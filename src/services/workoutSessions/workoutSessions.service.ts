@@ -1,9 +1,15 @@
 import { workoutSessionsClient } from './workoutSessions.client';
 import type {
+  ActiveWorkoutSession,
   CreateWorkoutSessionRequest,
   UpdateWorkoutSessionRequest,
   WorkoutSession
 } from './workoutSessions.models';
+
+export async function listActiveWorkoutSessions(): Promise<readonly ActiveWorkoutSession[]> {
+  const response = await workoutSessionsClient.getTrainerActive();
+  return response.workoutSessions;
+}
 
 export async function createWorkoutSession(
   clientId: string,

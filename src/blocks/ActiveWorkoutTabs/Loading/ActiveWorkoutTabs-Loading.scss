@@ -1,0 +1,27 @@
+.ActiveWorkoutTabs-Loading {
+  display: flex;
+  flex-shrink: 0;
+  gap: var(--space-sm);
+
+  padding: var(--space-sm) var(--space-md);
+
+  border-bottom: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+
+  span {
+    width: 96px;
+    height: var(--tap-target);
+
+    animation: active-workout-tabs-pulse 1.2s ease-in-out infinite;
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background-color: var(--color-surface-elevated);
+  }
+}
+
+@keyframes active-workout-tabs-pulse {
+  50% {
+    opacity: 0.5;
+  }
+}

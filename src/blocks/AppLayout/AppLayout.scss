@@ -1,0 +1,15 @@
+.AppLayout {
+  display: flex;
+  flex-direction: column;
+
+  height: 100%;
+
+  &-Content {
+    display: flex;
+    overflow: hidden;
+    flex: 1;
+    flex-direction: column;
+
+    min-height: 0;
+  }
+}
