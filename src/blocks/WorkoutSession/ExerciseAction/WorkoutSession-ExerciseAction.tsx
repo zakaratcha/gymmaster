@@ -27,16 +27,16 @@ export const WorkoutSessionExerciseAction: FC<WorkoutSessionExerciseActionProps>
     onAction(action, exercisePosition);
   }, [action, exercisePosition, onAction]);
 
-  const isRemove = action === 'remove';
+  const remove = action === 'remove';
   const direction = action === 'up' ? 'вверх' : 'вниз';
-  const ariaLabel = isRemove
+  const ariaLabel = remove
     ? `Удалить упражнение ${exerciseName}`
     : `Переместить упражнение ${exerciseName} ${direction}`;
   let content = '↓';
   if (action === 'up') {
     content = '↑';
   }
-  if (isRemove) {
+  if (remove) {
     content = 'Удалить';
   }
 
@@ -44,7 +44,7 @@ export const WorkoutSessionExerciseAction: FC<WorkoutSessionExerciseActionProps>
     <Button
       aria-label={ariaLabel}
       className={cnWorkoutSessionExerciseAction()}
-      color={isRemove ? 'secondary' : 'default'}
+      color={remove ? 'secondary' : 'default'}
       disabled={disabled}
       onClick={handleClick}
     >
