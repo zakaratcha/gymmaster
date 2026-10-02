@@ -178,10 +178,7 @@ Given('существует активная тренировка другого
     splitTag: 'чужой',
     exercises: [{ exerciseId: trainerExercise.id, sets: [{ reps: 10, weightKg: 40 }] }]
   });
-  const response = await createWorkoutSessionForTrainer(trainerClient.id, {
-    plannedWorkoutId: trainerPlan.id
-  });
-  this.trainerWorkoutSession = response.workoutSession;
+  await createWorkoutSessionForTrainer(trainerClient.id, { plannedWorkoutId: trainerPlan.id });
 });
 
 Given('существует чужое упражнение для сессии {string}', async function (this: ApiWorld, name: string) {
@@ -535,8 +532,17 @@ Then('список активных тренировок через API соде
 
 Then('список активных тренировок через API не содержит чужую сессию', function (this: ApiWorld) {
   expect(this.lastError).toBeUndefined();
-  expect(this.activeWorkoutSessions?.map(session => session.id)).not.toContain(this.workoutSession?.id);
-  expect(this.activeWorkoutSessions?.map(session => session.clientId)).not.toContain(this.client?.id);
+  if (this.workoutSession === undefined || this.client === undefined) {
+    throw new Error('Нет собственной сессии для проверки изоляции');
+  }
+
+  expect(this.activeWorkoutSessions?.map(session => session.id)).not.toContain(this.workoutSession.id);
+  expect(this.activeWorkoutSessions?.map(session => session.clientId)).not.toContain(this.client.id);
+});
+
+Then('список активных тренировок через API пуст', function (this: ApiWorld) {
+  expect(this.lastError).toBeUndefined();
+  expect(this.activeWorkoutSessions).toEqual([]);
 });
 
 Then('список активных тренировок через API не содержит завершённую сессию', function (this: ApiWorld) {

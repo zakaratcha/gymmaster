@@ -14,7 +14,6 @@ import {
   getActiveWorkoutSession,
   getLatestCompletedWorkoutSession
 } from '../../services/workoutSessions/workoutSessions.service';
-import { workoutTabsStore } from '../../stores/workoutTabs.store';
 import { ClientCreateForm } from '../ClientCreateForm/ClientCreateForm';
 import { ClientHubContent } from './Content/ClientHub-Content';
 import { ClientHubDeleteDialog } from './DeleteDialog/ClientHub-DeleteDialog';
@@ -382,7 +381,6 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
     try {
       const session = await createWorkoutSession(id, { plannedWorkoutId: selectedPlan.id });
       state.setActiveSession(session);
-      void workoutTabsStore.load();
       await navigate(`/workouts/${session.clientId}/${session.id}`);
     } catch (error) {
       state.setStartingError(getStartWorkoutErrorMessage(error));

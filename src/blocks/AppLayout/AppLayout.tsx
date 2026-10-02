@@ -15,7 +15,7 @@ export const AppLayout: FC = observer(() => {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    workoutTabsStore.rememberMainPath(pathname);
+    workoutTabsStore.rememberPath(pathname);
     void workoutTabsStore.load();
   }, [pathname]);
 

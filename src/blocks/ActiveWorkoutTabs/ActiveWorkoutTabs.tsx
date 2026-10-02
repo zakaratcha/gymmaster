@@ -3,8 +3,8 @@ import { cn } from '@bem-react/classname';
 
 import { getFirstName } from '../../services/util/format/format';
 import type { ActiveWorkoutSession } from '../../services/workoutSessions/workoutSessions.models';
+import { TabsSkeleton } from '../TabsSkeleton/TabsSkeleton';
 import { ActiveWorkoutTabsError } from './Error/ActiveWorkoutTabs-Error';
-import { ActiveWorkoutTabsLoading } from './Loading/ActiveWorkoutTabs-Loading';
 import { ActiveWorkoutTabsTab } from './Tab/ActiveWorkoutTabs-Tab';
 
 import './ActiveWorkoutTabs.scss';
@@ -33,7 +33,7 @@ export const ActiveWorkoutTabs: FC<ActiveWorkoutTabsProps> = ({
   }
 
   if (!loaded) {
-    return loading ? <ActiveWorkoutTabsLoading /> : null;
+    return loading ? <TabsSkeleton /> : null;
   }
 
   if (sessions.length === 0) {

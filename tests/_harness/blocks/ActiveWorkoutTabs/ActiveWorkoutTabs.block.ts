@@ -6,6 +6,7 @@ import { Block } from '../../classes/Block';
 export class ActiveWorkoutTabsBlock extends Block {
   readonly selectors = {
     root: '.ActiveWorkoutTabs',
+    skeleton: '.TabsSkeleton',
     tab: '.ActiveWorkoutTabs-Tab',
     activeTab: '.ActiveWorkoutTabs-Tab_active',
     loading: '.ActiveWorkoutTabs-Loading',
@@ -25,7 +26,7 @@ export class ActiveWorkoutTabsBlock extends Block {
   }
 
   override async waitForHidden(): Promise<void> {
-    await expect(this.page.locator('.ActiveWorkoutTabs, .ActiveWorkoutTabs-Loading')).toHaveCount(0);
+    await expect(this.page.locator('.ActiveWorkoutTabs, .TabsSkeleton')).toHaveCount(0);
   }
 
   async tabNames(): Promise<string[]> {

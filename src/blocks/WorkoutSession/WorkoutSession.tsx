@@ -359,7 +359,6 @@ export const WorkoutSession: FC = observer(() => {
 
       const homePath = workoutTabsStore.homePath;
       await completeWorkoutSession(clientId, sessionId);
-      void workoutTabsStore.load();
       await navigate(homePath);
     } catch {
       state.setFormError('Не удалось завершить тренировку');

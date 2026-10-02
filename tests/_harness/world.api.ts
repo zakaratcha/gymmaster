@@ -27,7 +27,6 @@ export class ApiWorld extends World {
   secondaryPlan?: PlannedWorkout;
   trainer?: Trainer;
   trainerClient?: Client;
-  trainerWorkoutSession?: WorkoutSession;
   workoutSession?: WorkoutSession;
   workoutSessions?: readonly WorkoutSession[];
 
