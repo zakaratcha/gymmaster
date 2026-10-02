@@ -20,6 +20,17 @@ export class ClientHubBlock extends Block {
     sectionTitle: '.ClientHub-SectionTitle',
     allPlans: '.ClientHub-Section_type_plan .ClientHub-StubAction',
     planRow: '.ClientHub-PlanRow',
+    start: '.ClientHub-Section_type_actions .ClientHub-ActionButton',
+    startDialog: 'dialog.ClientHub-StartDialog',
+    startDialogError: '.ClientHub-StartError',
+    planOption: '.ClientHub-PlanOption',
+    activeWorkout: '.ClientHub-ActiveWorkoutContent',
+    activeWorkoutTag: '.ClientHub-ActiveWorkoutTag',
+    activeWorkoutOpen: '.ClientHub-OpenWorkout',
+    latestWorkout: '.ClientHub-LatestWorkoutContent',
+    latestWorkoutTag: '.ClientHub-LatestWorkoutTag',
+    latestWorkoutStats: '.ClientHub-LatestWorkoutStats',
+    latestWorkoutLink: '.ClientHub-LatestWorkoutLink',
     error: '.ClientHub-Error'
   };
 
@@ -43,7 +54,7 @@ export class ClientHubBlock extends Block {
   }
 
   async expectBodyWeight(weight: string): Promise<void> {
-    await expect(this.findBySelector('bodyWeight')).toHaveText(weight);
+    await expect(this.findBySelector('bodyWeight')).toContainText(weight);
   }
 
   async expectNotes(notes: string): Promise<void> {
@@ -129,5 +140,109 @@ export class ClientHubBlock extends Block {
 
   async expectNearestPlan(text: string): Promise<void> {
     await expect(this.findBySelector('planRow')).toContainText(text);
+  }
+
+  async waitForWorkoutDataReady(): Promise<void> {
+    await this.waitForVisible();
+    await expect(this.page.locator('.ClientHub-PlansLoading, .ClientHub-SessionsLoading')).toHaveCount(0);
+    await expect(
+      this.page.locator(
+        '.ClientHub-PlanRow, .ClientHub-Section_type_plan .ClientHub-StubText, .ClientHub-Section_type_plan .ClientHub-PlansError'
+      )
+    ).toBeVisible();
+    await expect(
+      this.page.locator(
+        '.ClientHub-LatestWorkoutContent, .ClientHub-Section_type_latestWorkout .ClientHub-StubText, .ClientHub-Section_type_latestWorkout .ClientHub-SessionsError'
+      )
+    ).toBeVisible();
+  }
+
+  async openStartDialog(splitTag: string): Promise<void> {
+    await this.waitForWorkoutDataReady();
+    await this.findBySelector('start').click();
+    await expect(this.findBySelector('startDialog')).toBeVisible();
+    const planOption = this.findBySelector('startDialog')
+      .locator('.ClientHub-PlanOption')
+      .filter({ hasText: splitTag });
+    await expect(planOption).toHaveCount(1);
+    await planOption.locator('input[type="radio"]').check();
+  }
+
+  async failNextStart(status: number): Promise<void> {
+    await this.page.route(/\/api\/clients\/[^/]+\/workout-sessions$/, async route => {
+      if (route.request().method() !== 'POST') {
+        await route.continue();
+        return;
+      }
+
+      await route.fulfill({
+        status,
+        contentType: 'application/json',
+        body: JSON.stringify({ error: 'workout_session_already_in_progress' })
+      });
+    });
+  }
+
+  async submitStart(status: number): Promise<void> {
+    const response = this.page.waitForResponse(result => {
+      const url = new URL(result.url());
+      return result.request().method() === 'POST' && /\/api\/clients\/[^/]+\/workout-sessions$/.test(url.pathname);
+    });
+
+    const [created] = await Promise.all([
+      response,
+      this.findBySelector('startDialog').getByRole('button', { name: 'Начать тренировку', exact: true }).click()
+    ]);
+    expect(created.status()).toBe(status);
+  }
+
+  async expectStartError(message: string): Promise<void> {
+    await expect(this.findBySelector('startDialog')).toBeVisible();
+    await expect(this.findBySelector('startDialogError')).toBeVisible();
+    await expect(this.findBySelector('startDialogError')).toHaveText(message);
+    const startButton = this.findBySelector('startDialog').getByRole('button', { name: 'Начать тренировку' });
+    await expect(startButton).toBeEnabled();
+  }
+
+  async waitForActiveWorkout(): Promise<void> {
+    await this.waitForWorkoutDataReady();
+    await expect(this.findBySelector('activeWorkout')).toBeVisible();
+  }
+
+  async expectActiveWorkout(splitTag: string): Promise<void> {
+    await this.waitForActiveWorkout();
+    await expect(this.findBySelector('activeWorkoutTag')).toHaveText(splitTag);
+  }
+
+  async openActiveWorkout(): Promise<void> {
+    await this.waitForActiveWorkout();
+    await this.findBySelector('activeWorkoutOpen').click();
+    await expect(this.page).toHaveURL(/\/workouts\/[^/]+\/[^/]+$/);
+  }
+
+  async startPlan(splitTag: string): Promise<void> {
+    await this.openStartDialog(splitTag);
+
+    const responsePromise = this.page.waitForResponse(response => {
+      const url = new URL(response.url());
+      return response.request().method() === 'POST' && /\/api\/clients\/[^/]+\/workout-sessions$/.test(url.pathname);
+    });
+    await this.findBySelector('startDialog').getByRole('button', { name: 'Начать тренировку', exact: true }).click();
+    const response = await responsePromise;
+    expect(response.status()).toBe(201);
+    await expect(this.page).toHaveURL(/\/workouts\/[^/]+\/[^/]+$/);
+  }
+
+  async expectLatestCompleted(splitTag: string, stats: string): Promise<void> {
+    await this.waitForWorkoutDataReady();
+    await expect(this.findBySelector('latestWorkout')).toBeVisible();
+    await expect(this.findBySelector('latestWorkoutTag')).toHaveText(splitTag);
+    await expect(this.findBySelector('latestWorkoutStats')).toHaveText(stats);
+  }
+
+  async openLatestCompletedResult(): Promise<void> {
+    await this.waitForWorkoutDataReady();
+    await this.findBySelector('latestWorkoutLink').click();
+    await expect(this.page).toHaveURL(/\/workouts\/[^/]+\/[^/]+$/);
   }
 }

@@ -26,16 +26,41 @@ import {
 import type { ApiWorld } from '../world.api';
 
 function setApiError(this: ApiWorld, error: unknown): void {
-  this.lastError = error instanceof ApiError ? error : undefined;
+  if (error instanceof ApiError) {
+    this.lastError = error;
+    return;
+  }
+
+  throw error;
+}
+
+function substituteIdIfPresent(value: string, placeholder: string, id: string | undefined): string {
+  if (!value.includes(placeholder)) {
+    return value;
+  }
+
+  if (id === undefined) {
+    throw new Error(`Подстановка ${placeholder} недоступна: объект не создан в предыстории сценария`);
+  }
+
+  return value.replaceAll(placeholder, id);
 }
 
 function substituteIds(this: ApiWorld, value: string): string {
-  return value
-    .replaceAll('<clientId>', this.client?.id ?? '')
-    .replaceAll('<exerciseId>', this.exercise?.id ?? '')
-    .replaceAll('<firstExerciseId>', this.exercises?.[0]?.id ?? '')
-    .replaceAll('<secondExerciseId>', this.exercises?.[1]?.id ?? '')
-    .replaceAll('<foreignExerciseId>', this.foreignExercise?.id ?? '');
+  const placeholders: readonly (readonly [string, string | undefined])[] = [
+    ['<clientId>', this.client?.id],
+    ['<exerciseId>', this.exercise?.id],
+    ['<firstExerciseId>', this.exercises?.[0]?.id],
+    ['<secondExerciseId>', this.exercises?.[1]?.id],
+    ['<foreignExerciseId>', this.foreignExercise?.id]
+  ];
+
+  let result = value;
+  for (const [placeholder, id] of placeholders) {
+    result = substituteIdIfPresent(result, placeholder, id);
+  }
+
+  return result;
 }
 
 function requireClient(this: ApiWorld): string {

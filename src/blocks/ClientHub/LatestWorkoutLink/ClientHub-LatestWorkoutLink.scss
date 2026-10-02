@@ -1,0 +1,15 @@
+.ClientHub-LatestWorkoutLink {
+  min-height: var(--tap-target);
+  padding: var(--space-sm) 0;
+
+  text-decoration: none;
+
+  color: var(--color-accent);
+
+  font-size: var(--font-size-md);
+  font-weight: 600;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

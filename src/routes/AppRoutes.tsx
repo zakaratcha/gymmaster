@@ -9,12 +9,14 @@ import { PlannedWorkoutList } from '../blocks/PlannedWorkoutList/PlannedWorkoutL
 import { Profile } from '../blocks/Profile/Profile';
 import { Shell } from '../blocks/Shell/Shell';
 import { Workouts } from '../blocks/Workouts/Workouts';
+import { WorkoutSession } from '../blocks/WorkoutSession/WorkoutSession';
 
 export const AppRoutes: FC = () => {
   return (
     <Routes>
       <Route path='/' element={<Navigate replace to='/clients' />} />
       <Route path='/workouts' element={<Workouts />} />
+      <Route path='/workouts/:clientId/:sessionId' element={<WorkoutSession />} />
       <Route element={<Shell />}>
         <Route path='/clients' element={<Clients />} />
         <Route path='/clients/:id' element={<ClientHub />} />

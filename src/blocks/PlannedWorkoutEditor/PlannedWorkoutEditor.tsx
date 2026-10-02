@@ -510,7 +510,7 @@ export const PlannedWorkoutEditor: FC = observer(() => {
         )}
 
         {!state.loading && state.error === undefined && (
-          <form className={cnPlannedWorkoutEditor('Form')} id='plan-editor-form' onSubmit={handleSubmit}>
+          <form className={cnPlannedWorkoutEditor('Form')} id='plan-editor-form' noValidate onSubmit={handleSubmit}>
             <Input
               className={cnPlannedWorkoutEditor('Field')}
               id='planned-date'
