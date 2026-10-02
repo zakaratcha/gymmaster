@@ -1,5 +1,6 @@
 import { workoutSessionsClient } from '../../../../src/services/workoutSessions/workoutSessions.client';
 import type {
+  ActiveWorkoutSessionsResponse,
   CreateWorkoutSessionRequest,
   UpdateWorkoutSessionRequest,
   WorkoutSessionActiveResponse,
@@ -78,6 +79,18 @@ export async function getLatestCompletedWorkoutSessionWithoutAuth(
     workoutSessionsClient.getLatestCompleted,
     clientId
   );
+}
+
+export async function listActiveWorkoutSessions(): Promise<ActiveWorkoutSessionsResponse> {
+  return await requestAsAdmin<ActiveWorkoutSessionsResponse, []>(workoutSessionsClient.getTrainerActive);
+}
+
+export async function listActiveWorkoutSessionsForTrainer(): Promise<ActiveWorkoutSessionsResponse> {
+  return await requestAsTrainer<ActiveWorkoutSessionsResponse, []>(workoutSessionsClient.getTrainerActive);
+}
+
+export async function listActiveWorkoutSessionsWithoutAuth(): Promise<ActiveWorkoutSessionsResponse> {
+  return await requestWithoutAuth<ActiveWorkoutSessionsResponse, []>(workoutSessionsClient.getTrainerActive);
 }
 
 export async function getWorkoutSession(clientId: string, sessionId: string): Promise<WorkoutSessionResponse> {

@@ -1,8 +1,9 @@
 .Shell {
   display: flex;
+  flex: 1;
   flex-direction: column;
 
-  height: 100%;
+  min-height: 0;
 
   background-color: var(--color-bg);
 

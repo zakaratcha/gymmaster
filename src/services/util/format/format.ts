@@ -8,6 +8,11 @@ const sessionTimestampFormatter = new Intl.DateTimeFormat('ru-RU', {
 
 const plannedDatePattern = /^\d{4}-\d{2}-\d{2}$/;
 
+export function getFirstName(name: string): string {
+  const [firstName] = name.trim().split(/\s+/);
+  return firstName ?? name;
+}
+
 export function formatBodyWeightKg(bodyWeightKg: number | undefined): string {
   if (bodyWeightKg === undefined) {
     return '—';

@@ -2,7 +2,6 @@ import { expect } from '@playwright/test';
 import type { Page as PlaywrightPage } from 'playwright';
 
 import { Block } from '../../classes/Block';
-import { ClientHubBlock } from '../ClientHub/ClientHub.block';
 
 export class WorkoutSessionBlock extends Block {
   readonly selectors = {
@@ -176,8 +175,7 @@ export class WorkoutSessionBlock extends Block {
     ]);
     expect(savedResponse.status()).toBe(200);
     expect(completedResponse.status()).toBe(200);
-    await expect(this.page).toHaveURL(/\/clients\/[^/]+$/);
-    await new ClientHubBlock(this.page).waitForWorkoutDataReady();
+    await expect(this.page).not.toHaveURL(/\/workouts\/[^/]+\/[^/]+$/);
   }
 
   async reload(): Promise<void> {

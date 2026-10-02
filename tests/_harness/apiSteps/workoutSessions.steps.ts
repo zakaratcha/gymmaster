@@ -9,7 +9,7 @@ import type {
 import { createClient, createClientForTrainer } from '../commands/clients/createClient';
 import { createExercise, createExerciseForTrainer } from '../commands/exercises/createExercise';
 import { updateExercise } from '../commands/exercises/updateExercise';
-import { createPlan } from '../commands/plans/plans';
+import { createPlan, createPlanForTrainer } from '../commands/plans/plans';
 import {
   completeWorkoutSession,
   completeWorkoutSessionForTrainer,
@@ -26,6 +26,9 @@ import {
   getWorkoutSession,
   getWorkoutSessionForTrainer,
   getWorkoutSessionWithoutAuth,
+  listActiveWorkoutSessions,
+  listActiveWorkoutSessionsForTrainer,
+  listActiveWorkoutSessionsWithoutAuth,
   updateWorkoutSession,
   updateWorkoutSessionForTrainer,
   updateWorkoutSessionWithoutAuth
@@ -33,6 +36,7 @@ import {
 import type { ApiWorld } from '../world.api';
 
 const INVALID_ID = '00000000-0000-0000-0000-000000000000';
+const STARTED_AT_RESOLUTION_MS = 10;
 
 function setApiError(this: ApiWorld, error: unknown): void {
   if (error instanceof ApiError) {
@@ -163,6 +167,20 @@ Given('существует клиент другого тренера', async f
   this.trainerClient = await createClientForTrainer({ name: 'Второй тренер' });
 });
 
+Given('существует активная тренировка другого тренера', async function (this: ApiWorld) {
+  const trainerClient = this.trainerClient ?? (await createClientForTrainer({ name: 'Второй тренер' }));
+  this.trainerClient = trainerClient;
+
+  const trainerExercise = await createExerciseForTrainer({ name: 'Жим второго тренера' });
+
+  const trainerPlan = await createPlanForTrainer(trainerClient.id, {
+    plannedDate: '2099-12-31',
+    splitTag: 'чужой',
+    exercises: [{ exerciseId: trainerExercise.id, sets: [{ reps: 10, weightKg: 40 }] }]
+  });
+  await createWorkoutSessionForTrainer(trainerClient.id, { plannedWorkoutId: trainerPlan.id });
+});
+
 Given('существует чужое упражнение для сессии {string}', async function (this: ApiWorld, name: string) {
   this.foreignExercise = await createExerciseForTrainer({ name });
 });
@@ -201,6 +219,11 @@ When('я начинаю тренировку через API для второг�
   if (this.secondaryClient === undefined || this.secondaryPlan === undefined) {
     throw new Error('Нет второго клиента и плана');
   }
+
+  // Пауза нужна, чтобы startedAt второй сессии отличался от первой: без неё порядок в списке недетерминирован.
+  await new Promise(resolve => {
+    setTimeout(resolve, STARTED_AT_RESOLUTION_MS);
+  });
 
   try {
     saveWorkoutSession.call(
@@ -263,6 +286,36 @@ When('я запрашиваю активную тренировку через A
   try {
     const response = await getActiveWorkoutSession(requireClient.call(this));
     this.activeWorkoutSession = response.workoutSession;
+    this.lastError = undefined;
+  } catch (error) {
+    setApiError.call(this, error);
+  }
+});
+
+When('я запрашиваю список активных тренировок через API', async function (this: ApiWorld) {
+  try {
+    const response = await listActiveWorkoutSessions();
+    this.activeWorkoutSessions = response.workoutSessions;
+    this.lastError = undefined;
+  } catch (error) {
+    setApiError.call(this, error);
+  }
+});
+
+When('я запрашиваю список активных тренировок через API от имени другого тренера', async function (this: ApiWorld) {
+  try {
+    const response = await listActiveWorkoutSessionsForTrainer();
+    this.activeWorkoutSessions = response.workoutSessions;
+    this.lastError = undefined;
+  } catch (error) {
+    setApiError.call(this, error);
+  }
+});
+
+When('я запрашиваю список активных тренировок через API без авторизации', async function (this: ApiWorld) {
+  try {
+    const response = await listActiveWorkoutSessionsWithoutAuth();
+    this.activeWorkoutSessions = response.workoutSessions;
     this.lastError = undefined;
   } catch (error) {
     setApiError.call(this, error);
@@ -445,6 +498,56 @@ Then('активная тренировка является созданной'
 Then('активной тренировки нет', function (this: ApiWorld) {
   expect(this.lastError).toBeUndefined();
   expect(this.activeWorkoutSession).toBeNull();
+});
+
+Then('список активных тренировок через API содержит обе сессии по времени старта', function (this: ApiWorld) {
+  expect(this.lastError).toBeUndefined();
+  expect(this.activeWorkoutSessions?.map(session => session.clientId)).toEqual([
+    this.client?.id,
+    this.secondaryClient?.id
+  ]);
+  expect(this.activeWorkoutSessions).toEqual([
+    expect.objectContaining({
+      id: this.workoutSessions?.[0]?.id,
+      clientId: this.client?.id,
+      clientName: this.client?.name,
+      splitTag: this.plan?.splitTag,
+      startedAt: this.workoutSessions?.[0]?.startedAt
+    }),
+    expect.objectContaining({
+      id: this.workoutSessions?.[1]?.id,
+      clientId: this.secondaryClient?.id,
+      clientName: this.secondaryClient?.name,
+      splitTag: this.secondaryPlan?.splitTag,
+      startedAt: this.workoutSessions?.[1]?.startedAt
+    })
+  ]);
+});
+
+Then('список активных тренировок через API содержит только свою сессию', function (this: ApiWorld) {
+  expect(this.lastError).toBeUndefined();
+  expect(this.activeWorkoutSessions?.map(session => session.id)).toEqual([this.workoutSession?.id]);
+  expect(this.activeWorkoutSessions?.map(session => session.clientId)).toEqual([this.client?.id]);
+});
+
+Then('список активных тренировок через API не содержит чужую сессию', function (this: ApiWorld) {
+  expect(this.lastError).toBeUndefined();
+  if (this.workoutSession === undefined || this.client === undefined) {
+    throw new Error('Нет собственной сессии для проверки изоляции');
+  }
+
+  expect(this.activeWorkoutSessions?.map(session => session.id)).not.toContain(this.workoutSession.id);
+  expect(this.activeWorkoutSessions?.map(session => session.clientId)).not.toContain(this.client.id);
+});
+
+Then('список активных тренировок через API пуст', function (this: ApiWorld) {
+  expect(this.lastError).toBeUndefined();
+  expect(this.activeWorkoutSessions).toEqual([]);
+});
+
+Then('список активных тренировок через API не содержит завершённую сессию', function (this: ApiWorld) {
+  expect(this.lastError).toBeUndefined();
+  expect(this.activeWorkoutSessions).toEqual([]);
 });
 
 Then('последняя завершённая тренировка является созданной', function (this: ApiWorld) {

@@ -65,7 +65,7 @@ When('я начинаю тренировку с плана {string}', async func
 });
 
 When('я возвращаюсь к карточке клиента', async function (this: CustomWorld) {
-  await this.page.getByRole('link', { name: 'Назад к карточке клиента' }).click();
+  await this.page.getByRole('link', { name: 'Вернуться в кабинет' }).click();
   await new ClientHubBlock(this.page).waitForReady();
 });
 

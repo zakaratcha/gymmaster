@@ -1,0 +1,24 @@
+.ActiveWorkoutTabs-Error {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: var(--space-md);
+
+  padding: var(--space-sm) var(--space-md);
+
+  color: var(--color-text-muted);
+  border-bottom: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+
+  font-size: var(--font-size-sm);
+
+  p {
+    overflow: hidden;
+    flex: 1;
+
+    margin: 0;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}
