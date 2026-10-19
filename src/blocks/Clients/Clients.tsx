@@ -12,6 +12,7 @@ import {
   pushRecentClientId,
   resolveRecentClientIds
 } from '../../services/clients/clients.service';
+import { getFirstName } from '../../services/util/format/format';
 import { Button } from '../Button/Button';
 import { ClientCreateForm } from '../ClientCreateForm/ClientCreateForm';
 import { Fab } from '../Fab/Fab';
@@ -56,11 +57,6 @@ type ClientsState = {
   get filteredClients(): Client[];
   get recentClients(): Client[];
 };
-
-function getFirstName(name: string): string {
-  const [firstName] = name.trim().split(/\s+/);
-  return firstName ?? name;
-}
 
 function matchesSearch(name: string, query: string): boolean {
   return name.toLowerCase().includes(query.toLowerCase());

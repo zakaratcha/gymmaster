@@ -43,6 +43,18 @@ export type WorkoutSessionActiveResponse = {
   readonly workoutSession: WorkoutSession | null;
 };
 
+export type ActiveWorkoutSession = {
+  readonly id: string;
+  readonly clientId: string;
+  readonly clientName: string;
+  readonly splitTag: string;
+  readonly startedAt: string;
+};
+
+export type ActiveWorkoutSessionsResponse = {
+  readonly workoutSessions: readonly ActiveWorkoutSession[];
+};
+
 export type WorkoutSessionLatestCompletedResponse = {
   readonly workoutSession: WorkoutSession | null;
 };

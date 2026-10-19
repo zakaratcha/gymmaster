@@ -4,11 +4,13 @@ import { authRouter } from './auth/authRoutes.ts';
 import { clientsRouter } from './clients/clientsRoutes.ts';
 import { exercisesRouter } from './exercises/exercisesRoutes.ts';
 import { plansRouter } from './plans/plansRoutes.ts';
+import { activeWorkoutSessionsRouter } from './workoutSessions/activeWorkoutSessionsRoutes.ts';
 import { workoutSessionsRouter } from './workoutSessions/workoutSessionsRoutes.ts';
 
 export const apiRouter: Router = express.Router();
 
 apiRouter.use(authRouter);
+apiRouter.use('/workout-sessions', activeWorkoutSessionsRouter);
 apiRouter.use('/clients/:clientId/workout-sessions', workoutSessionsRouter);
 apiRouter.use('/clients/:clientId/plans', plansRouter);
 apiRouter.use('/clients', clientsRouter);

@@ -3,6 +3,7 @@ import { boundClass } from 'autobind-decorator';
 import { api } from '../api/api.service';
 import { ApiClient } from '../api/ApiClient';
 import type {
+  ActiveWorkoutSessionsResponse,
   CreateWorkoutSessionRequest,
   UpdateWorkoutSessionRequest,
   WorkoutSessionActiveResponse,
@@ -24,6 +25,16 @@ class WorkoutSessionsClient extends ApiClient {
 
   private getWorkoutSessionUrl(clientId: string, sessionId: string): string {
     return `${this.getWorkoutSessionsUrl(clientId)}/${encodeURIComponent(sessionId)}`;
+  }
+
+  private getTrainerWorkoutSessionsUrl(): string {
+    return `${this.getApiUrl()}/workout-sessions`;
+  }
+
+  async getTrainerActive(): Promise<ActiveWorkoutSessionsResponse> {
+    return await api.get<ActiveWorkoutSessionsResponse>(`${this.getTrainerWorkoutSessionsUrl()}/active`, {
+      cache: { disabled: true }
+    });
   }
 
   async create(clientId: string, payload: CreateWorkoutSessionRequest): Promise<WorkoutSessionResponse> {

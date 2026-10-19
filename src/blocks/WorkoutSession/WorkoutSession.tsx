@@ -16,6 +16,7 @@ import {
   getWorkoutSession,
   updateWorkoutSession
 } from '../../services/workoutSessions/workoutSessions.service';
+import { workoutTabsStore } from '../../stores/workoutTabs.store';
 import { WorkoutSessionActions } from './Actions/WorkoutSession-Actions';
 import { WorkoutSessionErrorBlock } from './ErrorBlock/WorkoutSession-ErrorBlock';
 import { WorkoutSessionExerciseList } from './ExerciseList/WorkoutSession-ExerciseList';
@@ -356,8 +357,9 @@ export const WorkoutSession: FC = observer(() => {
         return;
       }
 
+      const homePath = workoutTabsStore.homePath;
       await completeWorkoutSession(clientId, sessionId);
-      await navigate(`/clients/${clientId}`);
+      await navigate(homePath);
     } catch {
       state.setFormError('Не удалось завершить тренировку');
     } finally {
@@ -373,7 +375,7 @@ export const WorkoutSession: FC = observer(() => {
   return (
     <div className={cnWorkoutSession()}>
       <WorkoutSessionMain>
-        <WorkoutSessionHeader clientId={clientId} />
+        <WorkoutSessionHeader backTo={workoutTabsStore.homePath} />
 
         {state.loading && <WorkoutSessionLoading />}
 

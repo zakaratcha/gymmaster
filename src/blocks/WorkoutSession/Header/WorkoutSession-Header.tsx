@@ -9,13 +9,13 @@ import './WorkoutSession-Header.scss';
 const cnWorkoutSessionHeader = cn('WorkoutSession', 'Header');
 
 type WorkoutSessionHeaderProps = {
-  readonly clientId: string | undefined;
+  readonly backTo: string;
 };
 
-export const WorkoutSessionHeader: FC<WorkoutSessionHeaderProps> = ({ clientId }) => {
+export const WorkoutSessionHeader: FC<WorkoutSessionHeaderProps> = ({ backTo }) => {
   return (
     <header className={cnWorkoutSessionHeader()}>
-      <WorkoutSessionBack clientId={clientId} />
+      <WorkoutSessionBack to={backTo} />
       <WorkoutSessionTitle />
     </header>
   );

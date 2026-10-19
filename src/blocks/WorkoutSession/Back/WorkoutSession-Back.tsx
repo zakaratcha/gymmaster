@@ -7,16 +7,12 @@ import './WorkoutSession-Back.scss';
 const cnWorkoutSessionBack = cn('WorkoutSession', 'Back');
 
 type WorkoutSessionBackProps = {
-  readonly clientId: string | undefined;
+  readonly to: string;
 };
 
-export const WorkoutSessionBack: FC<WorkoutSessionBackProps> = ({ clientId }) => {
+export const WorkoutSessionBack: FC<WorkoutSessionBackProps> = ({ to }) => {
   return (
-    <Link
-      aria-label='Назад к карточке клиента'
-      className={cnWorkoutSessionBack()}
-      to={clientId === undefined ? '/clients' : `/clients/${clientId}`}
-    >
+    <Link aria-label='Вернуться в кабинет' className={cnWorkoutSessionBack()} to={to}>
       ←
     </Link>
   );

@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { and, asc, desc, eq, inArray } from 'drizzle-orm';
 
 import type {
+  ActiveWorkoutSessionsResponse,
   WorkoutSession,
   WorkoutSessionActiveResponse,
   WorkoutSessionExercise,
@@ -297,6 +298,31 @@ function isActiveSessionUniqueError(error: unknown): boolean {
     (error.message.includes('workout_sessions.trainer_id') ||
       error.message.includes('uq_workout_sessions_trainer_client_active'))
   );
+}
+
+export async function listActiveWorkoutSessions(auth: AuthContext): Promise<ActiveWorkoutSessionsResponse> {
+  const rows = await getDb()
+    .select({
+      id: workoutSessions.id,
+      clientId: workoutSessions.clientId,
+      clientName: clients.name,
+      splitTag: workoutSessions.splitTag,
+      startedAt: workoutSessions.startedAt
+    })
+    .from(workoutSessions)
+    .innerJoin(clients, and(eq(clients.id, workoutSessions.clientId), eq(clients.trainerId, auth.trainerId)))
+    .where(and(eq(workoutSessions.trainerId, auth.trainerId), eq(workoutSessions.status, 'in_progress')))
+    .orderBy(asc(workoutSessions.startedAt), asc(workoutSessions.createdAt), asc(workoutSessions.id));
+
+  return {
+    workoutSessions: rows.map(row => ({
+      id: row.id,
+      clientId: row.clientId,
+      clientName: row.clientName,
+      splitTag: row.splitTag,
+      startedAt: row.startedAt
+    }))
+  };
 }
 
 export async function getActiveWorkoutSession(
