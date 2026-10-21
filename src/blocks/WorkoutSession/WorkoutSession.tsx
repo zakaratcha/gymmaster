@@ -17,6 +17,7 @@ import {
   updateWorkoutSession
 } from '../../services/workoutSessions/workoutSessions.service';
 import { workoutTabsStore } from '../../stores/workoutTabs.store';
+import { WorkoutComparison } from '../WorkoutComparison/WorkoutComparison';
 import { WorkoutSessionActions } from './Actions/WorkoutSession-Actions';
 import { WorkoutSessionErrorBlock } from './ErrorBlock/WorkoutSession-ErrorBlock';
 import { WorkoutSessionExerciseList } from './ExerciseList/WorkoutSession-ExerciseList';
@@ -384,34 +385,36 @@ export const WorkoutSession: FC = observer(() => {
         {!state.loading && state.error === undefined && session !== undefined && client !== undefined && (
           <>
             <WorkoutSessionMeta client={client} session={session} />
-            <WorkoutSessionForm
-              actions={
-                isInProgress && (
+            {isInProgress ? (
+              <WorkoutSessionForm
+                actions={
                   <WorkoutSessionActions
                     completing={state.completing}
                     disabled={mutationDisabled}
                     saving={state.saving}
                     onComplete={handleComplete}
                   />
-                )
-              }
-              formError={state.formError}
-              saveSuccess={state.saveSuccess}
-              onSubmit={handleSave}
-            >
-              <WorkoutSessionExerciseList
-                drafts={state.drafts}
-                exercises={state.exercises}
-                isInProgress={isInProgress}
-                mutationDisabled={mutationDisabled}
-                selectedExerciseId={state.selectedExerciseId}
-                onAddExercise={handleAddExercise}
-                onExerciseAction={handleExerciseAction}
-                onExerciseChange={handleExerciseChange}
-                onSetAction={handleSetAction}
-                onSetChange={handleSetChange}
-              />
-            </WorkoutSessionForm>
+                }
+                formError={state.formError}
+                saveSuccess={state.saveSuccess}
+                onSubmit={handleSave}
+              >
+                <WorkoutSessionExerciseList
+                  drafts={state.drafts}
+                  exercises={state.exercises}
+                  isInProgress={isInProgress}
+                  mutationDisabled={mutationDisabled}
+                  selectedExerciseId={state.selectedExerciseId}
+                  onAddExercise={handleAddExercise}
+                  onExerciseAction={handleExerciseAction}
+                  onExerciseChange={handleExerciseChange}
+                  onSetAction={handleSetAction}
+                  onSetChange={handleSetChange}
+                />
+              </WorkoutSessionForm>
+            ) : (
+              <WorkoutComparison plan={session.plan} session={session} />
+            )}
           </>
         )}
       </WorkoutSessionMain>

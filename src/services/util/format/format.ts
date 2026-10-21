@@ -44,6 +44,31 @@ export function formatSessionTimestamp(value: string): string {
   return Number.isNaN(date.getTime()) ? value : sessionTimestampFormatter.format(date);
 }
 
+export function formatWeightKg(value: number): string {
+  return `${Number(value.toFixed(2))}`;
+}
+
+export function formatVolumeKg(value: number): string {
+  return `${Number(value.toFixed(1))}`;
+}
+
+export function formatSetsText(sets: readonly { readonly reps: number; readonly weightKg: number }[]): string {
+  if (sets.length === 0) {
+    return '—';
+  }
+
+  const parts = sets.map(set => `${set.reps}×${formatWeightKg(set.weightKg)}`);
+  return `${parts.join(' · ')} кг`;
+}
+
+export function formatVolumeDeltaKg(value: number): string {
+  if (value === 0) {
+    return '0 кг';
+  }
+
+  return `${value > 0 ? '+' : '-'}${formatVolumeKg(Math.abs(value))} кг`;
+}
+
 export function formatWorkoutCount(value: number, singular: string, paucal: string, plural: string): string {
   const lastTwoDigits = value % 100;
   const lastDigit = value % 10;
