@@ -4,12 +4,11 @@ import { cn } from '@bem-react/classname';
 import { formatVolumeDeltaKg, formatVolumeKg } from '../../../services/util/format/format';
 import type { WorkoutComparisonRow as RowModel } from '../../../services/workoutSessions/workoutComparison';
 import { WorkoutComparisonLine } from '../Line/WorkoutComparison-Line';
-import { WorkoutComparisonStatus } from '../Status/WorkoutComparison-Status';
+import { WorkoutComparisonRowHeader } from '../RowHeader/WorkoutComparison-RowHeader';
 
 import './WorkoutComparison-Row.scss';
 
 const cnWorkoutComparisonRow = cn('WorkoutComparison', 'Row');
-const cnWorkoutComparisonRowHeader = cn('WorkoutComparison', 'RowHeader');
 
 type WorkoutComparisonRowProps = {
   readonly row: RowModel;
@@ -18,10 +17,7 @@ type WorkoutComparisonRowProps = {
 export const WorkoutComparisonRow: FC<WorkoutComparisonRowProps> = ({ row }) => {
   return (
     <article className={cnWorkoutComparisonRow()}>
-      <header className={cnWorkoutComparisonRowHeader()}>
-        <strong>{row.exerciseName}</strong>
-        <WorkoutComparisonStatus status={row.status} />
-      </header>
+      <WorkoutComparisonRowHeader exerciseName={row.exerciseName} status={row.status} />
       <WorkoutComparisonLine label='план' value={row.planText} />
       <WorkoutComparisonLine label='факт' value={row.factText} />
       <WorkoutComparisonLine

@@ -4,17 +4,3 @@
   gap: var(--space-sm);
   grid-template-columns: minmax(4.5rem, auto) 1fr;
 }
-
-.WorkoutComparison-LineLabel {
-  color: var(--color-text-muted);
-
-  font-size: var(--font-size-sm);
-}
-
-.WorkoutComparison-LineValue {
-  color: var(--color-text);
-
-  font-size: var(--font-size-sm);
-
-  overflow-wrap: anywhere;
-}

@@ -9,14 +9,3 @@
   border-radius: var(--radius-md);
   background-color: var(--color-surface);
 }
-
-.WorkoutComparison-RowHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-sm);
-
-  margin-bottom: var(--space-xs);
-
-  font-size: var(--font-size-md);
-}
