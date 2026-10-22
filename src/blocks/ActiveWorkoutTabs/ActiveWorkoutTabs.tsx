@@ -1,7 +1,7 @@
 import { type FC } from 'react';
 import { cn } from '@bem-react/classname';
 
-import { getFirstName } from '../../services/util/format/format';
+import { getFirstName } from '../../services/util/format.utils';
 import type { ActiveWorkoutSession } from '../../services/workoutSessions/workoutSessions.models';
 import { TabsSkeleton } from '../TabsSkeleton/TabsSkeleton';
 import { ActiveWorkoutTabsError } from './Error/ActiveWorkoutTabs-Error';

@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { and, asc, desc, eq, inArray } from 'drizzle-orm';
 
+import type { PlannedWorkout } from '../../services/plans/plans.models.ts';
 import type {
   ActiveWorkoutSessionsResponse,
   WorkoutSession,
@@ -12,38 +13,13 @@ import type {
 } from '../../services/workoutSessions/workoutSessions.models.ts';
 import type { AuthContext } from '../auth/authContext.ts';
 import { getDb, getSqlite } from '../db/client.ts';
-import type {
-  ExerciseRow,
-  PlannedExerciseRow,
-  PlannedSetRow,
-  PlannedWorkoutRow,
-  SessionExerciseRow,
-  SessionSetRow,
-  WorkoutSessionRow
-} from '../db/schema.ts';
-import {
-  clients,
-  exercises,
-  plannedExercises,
-  plannedSets,
-  plannedWorkouts,
-  sessionExercises,
-  sessionSets,
-  workoutSessions
-} from '../db/schema.ts';
+import type { SessionExerciseRow, SessionSetRow, WorkoutSessionRow } from '../db/schema.ts';
+import { clients, exercises, sessionExercises, sessionSets, workoutSessions } from '../db/schema.ts';
+import { getPlanById } from '../plans/plansService.ts';
 import {
   type ValidatedCreateWorkoutSessionInput,
   type ValidatedUpdateWorkoutSessionInput
 } from './workoutSessionsMapper.ts';
-
-type PlanSnapshot = {
-  readonly splitTag: string;
-  readonly exercises: readonly {
-    readonly exerciseId: string;
-    readonly exerciseName: string;
-    readonly sets: readonly WorkoutSessionSet[];
-  }[];
-};
 
 export class WorkoutSessionInputError extends Error {}
 
@@ -63,7 +39,8 @@ function toPublicWorkoutSession(
   row: WorkoutSessionRow,
   sessionExerciseRows: readonly SessionExerciseRow[],
   sessionSetRows: readonly SessionSetRow[],
-  exerciseNames: ReadonlyMap<string, string>
+  exerciseNames: ReadonlyMap<string, string>,
+  plan: PlannedWorkout | null
 ): WorkoutSession {
   const setsByExercise = new Map<string, WorkoutSessionSet[]>();
   for (const setRow of sessionSetRows) {
@@ -93,7 +70,8 @@ function toPublicWorkoutSession(
     status: row.status,
     startedAt: row.startedAt,
     ...(row.completedAt === null ? {} : { completedAt: row.completedAt }),
-    exercises: sessionExercises
+    exercises: sessionExercises,
+    plan
   };
 }
 
@@ -153,76 +131,14 @@ async function getWorkoutSessionRowByStatus(
   return rows[0];
 }
 
-async function getPlanRow(
+async function loadPlan(
   auth: AuthContext,
   clientId: string,
   plannedWorkoutId: string
-): Promise<PlannedWorkoutRow | undefined> {
-  const rows = await getDb()
-    .select()
-    .from(plannedWorkouts)
-    .where(
-      and(
-        eq(plannedWorkouts.id, plannedWorkoutId),
-        eq(plannedWorkouts.clientId, clientId),
-        eq(plannedWorkouts.trainerId, auth.trainerId)
-      )
-    )
-    .limit(1);
+): Promise<PlannedWorkout | undefined> {
+  const response = await getPlanById(auth, clientId, plannedWorkoutId);
 
-  return rows[0];
-}
-
-async function loadPlanSnapshot(auth: AuthContext, planRow: PlannedWorkoutRow): Promise<PlanSnapshot> {
-  const db = getDb();
-  const plannedExerciseRows = await db
-    .select()
-    .from(plannedExercises)
-    .where(and(eq(plannedExercises.trainerId, auth.trainerId), eq(plannedExercises.plannedWorkoutId, planRow.id)))
-    .orderBy(asc(plannedExercises.position));
-
-  const plannedExerciseIds = plannedExerciseRows.map(row => row.id);
-  const plannedSetRows: PlannedSetRow[] =
-    plannedExerciseIds.length === 0
-      ? []
-      : await db
-          .select()
-          .from(plannedSets)
-          .where(
-            and(eq(plannedSets.trainerId, auth.trainerId), inArray(plannedSets.plannedExerciseId, plannedExerciseIds))
-          )
-          .orderBy(asc(plannedSets.position));
-
-  const exerciseIds = [...new Set(plannedExerciseRows.map(row => row.exerciseId))];
-  const exerciseRows: ExerciseRow[] =
-    exerciseIds.length === 0
-      ? []
-      : await db
-          .select()
-          .from(exercises)
-          .where(and(eq(exercises.trainerId, auth.trainerId), inArray(exercises.id, exerciseIds)));
-  const exerciseNames = new Map(exerciseRows.map(row => [row.id, row.name]));
-  const setsByExercise = new Map<string, WorkoutSessionSet[]>();
-  for (const setRow of plannedSetRows) {
-    const sets = setsByExercise.get(setRow.plannedExerciseId) ?? [];
-    sets.push({ reps: setRow.reps, weightKg: setRow.weightKg });
-    setsByExercise.set(setRow.plannedExerciseId, sets);
-  }
-
-  const snapshotExercises = plannedExerciseRows.map((plannedExerciseRow: PlannedExerciseRow) => {
-    const exerciseName = exerciseNames.get(plannedExerciseRow.exerciseId);
-    if (exerciseName === undefined) {
-      throw new Error('Failed to load planned exercise');
-    }
-
-    return {
-      exerciseId: plannedExerciseRow.exerciseId,
-      exerciseName,
-      sets: setsByExercise.get(plannedExerciseRow.id) ?? []
-    };
-  });
-
-  return { splitTag: planRow.splitTag, exercises: snapshotExercises };
+  return response?.plan;
 }
 
 async function loadWorkoutSession(auth: AuthContext, row: WorkoutSessionRow): Promise<WorkoutSession> {
@@ -255,7 +171,10 @@ async function loadWorkoutSession(auth: AuthContext, row: WorkoutSessionRow): Pr
           .where(and(eq(exercises.trainerId, auth.trainerId), inArray(exercises.id, exerciseIds)));
   const exerciseNames = new Map(exerciseRows.map(row => [row.id, row.name]));
 
-  return toPublicWorkoutSession(row, sessionExerciseRows, sessionSetRows, exerciseNames);
+  const plan =
+    row.plannedWorkoutId === null ? null : ((await loadPlan(auth, row.clientId, row.plannedWorkoutId)) ?? null);
+
+  return toPublicWorkoutSession(row, sessionExerciseRows, sessionSetRows, exerciseNames, plan);
 }
 
 async function assertExercisesAvailable(
@@ -371,12 +290,17 @@ export async function createWorkoutSession(
     return undefined;
   }
 
-  const planRow = await getPlanRow(auth, clientId, input.plannedWorkoutId);
-  if (planRow === undefined) {
+  const plan =
+    input.plannedWorkoutId === undefined ? undefined : await loadPlan(auth, clientId, input.plannedWorkoutId);
+  if (input.plannedWorkoutId !== undefined && plan === undefined) {
     return undefined;
   }
 
-  const planSnapshot = await loadPlanSnapshot(auth, planRow);
+  const splitTag = plan?.splitTag ?? input.splitTag;
+  if (splitTag === undefined) {
+    throw new WorkoutSessionInputError('Укажите план тренировки или тег типа дня');
+  }
+
   const activeRow = await getWorkoutSessionRowByStatus(auth, clientId, 'in_progress');
   if (activeRow !== undefined) {
     throw new WorkoutSessionAlreadyInProgressError();
@@ -393,8 +317,8 @@ export async function createWorkoutSession(
           id,
           trainerId: auth.trainerId,
           clientId,
-          plannedWorkoutId: input.plannedWorkoutId,
-          splitTag: planSnapshot.splitTag,
+          plannedWorkoutId: plan?.id ?? null,
+          splitTag,
           status: 'in_progress',
           startedAt: now,
           completedAt: null,
@@ -403,7 +327,7 @@ export async function createWorkoutSession(
         })
         .run();
 
-      planSnapshot.exercises.forEach((exercise, exercisePosition) => {
+      (plan?.exercises ?? []).forEach((exercise, exercisePosition) => {
         const sessionExerciseId = randomUUID();
         db.insert(sessionExercises)
           .values({

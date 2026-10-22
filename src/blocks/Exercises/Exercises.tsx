@@ -259,7 +259,7 @@ export const Exercises: FC = observer(() => {
     void loadExercises();
   }, [loadExercises]);
 
-  const isSearchActive = state.searchQuery.trim().length > 0;
+  const searchActive = state.searchQuery.trim().length > 0;
   const showLists = !state.loading && state.error === undefined;
 
   return (
@@ -293,7 +293,7 @@ export const Exercises: FC = observer(() => {
           {showLists && (
             <ExerciseList
               exercises={state.filteredExercises}
-              isSearchActive={isSearchActive}
+              searchActive={searchActive}
               onArchive={state.openArchiveDialog}
               onEdit={state.openEditForm}
             />

@@ -4,8 +4,10 @@ import { expect } from '@playwright/test';
 import { findClientByName } from '../../commands/clients/findClientByName';
 import { listExercisesAsAdmin } from '../../commands/exercises/listExercises';
 import { createPlan } from '../../commands/plans/plans';
+import { completeWorkoutSession, createWorkoutSession } from '../../commands/workoutSessions/workoutSessions';
 import type { CustomWorld } from '../../world';
 import { ClientHubBlock } from '../ClientHub/ClientHub.block';
+import { WorkoutComparisonBlock } from '../WorkoutComparison/WorkoutComparison.block';
 import { WorkoutSessionBlock } from './WorkoutSession.block';
 
 async function requireExerciseId(exerciseName: string): Promise<string> {
@@ -56,6 +58,15 @@ Given(
         { exerciseId: await requireExerciseId(secondExercise), sets: [{ reps: 10, weightKg: 50 }] }
       ]
     });
+  }
+);
+
+Given(
+  'для клиента {string} создана тренировка без плана с тегом {string}',
+  async function (this: CustomWorld, clientName: string, splitTag: string) {
+    const client = await findClientByName(clientName);
+    const created = await createWorkoutSession(client.id, { splitTag });
+    await completeWorkoutSession(client.id, created.workoutSession.id);
   }
 );
 
@@ -208,9 +219,9 @@ Then(
 );
 
 Then(
-  'завершённая тренировка содержит подход {int} с повторами {int} и весом {float}',
-  async function (this: CustomWorld, setPosition: number, reps: number, weightKg: number) {
-    await new WorkoutSessionBlock(this.page).expectCompletedSet(0, setPosition - 1, reps, weightKg);
+  'завершённая тренировка содержит в факте подход с повторами {int} и весом {float}',
+  async function (this: CustomWorld, reps: number, weightKg: number) {
+    await new WorkoutComparisonBlock(this.page).expectFactContains(reps, weightKg);
   }
 );
 

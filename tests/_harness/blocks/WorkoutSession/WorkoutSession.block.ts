@@ -27,7 +27,10 @@ export class WorkoutSessionBlock extends Block {
 
   async waitForReady(): Promise<void> {
     await this.waitForVisible();
-    await this.page.locator('.WorkoutSession-Form, .WorkoutSession-ErrorBlock').first().waitFor({ state: 'visible' });
+    await this.page
+      .locator('.WorkoutSession-Form, .WorkoutSession-ErrorBlock, .WorkoutComparison')
+      .first()
+      .waitFor({ state: 'visible' });
   }
 
   async fillSet(exercisePosition: number, setPosition: number, reps: string, weightKg: string): Promise<void> {
@@ -186,20 +189,5 @@ export class WorkoutSessionBlock extends Block {
   async expectCompleted(): Promise<void> {
     await this.waitForReady();
     await expect(this.findBySelector('status')).toHaveText('Завершена');
-  }
-
-  async expectCompletedSet(
-    exercisePosition: number,
-    setPosition: number,
-    reps: number,
-    weightKg: number
-  ): Promise<void> {
-    const values = this.findBySelector('exerciseCard')
-      .nth(exercisePosition)
-      .locator('.WorkoutSession-SetRow')
-      .nth(setPosition)
-      .locator('.WorkoutSession-SetValue');
-    await expect(values.nth(0)).toHaveText(`${reps} повт.`);
-    await expect(values.nth(1)).toHaveText(`${weightKg} кг`);
   }
 }
