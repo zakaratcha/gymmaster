@@ -13,7 +13,7 @@ export function getFirstName(name: string): string {
   return firstName ?? name;
 }
 
-export function formatBodyWeightKg(bodyWeightKg: number | undefined): string {
+export function formatBodyWeightKg(bodyWeightKg?: number): string {
   if (bodyWeightKg === undefined) {
     return '—';
   }

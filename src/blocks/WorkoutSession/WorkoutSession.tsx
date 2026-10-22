@@ -370,7 +370,7 @@ export const WorkoutSession: FC = observer(() => {
 
   const session = state.session;
   const client = state.client;
-  const isInProgress = session?.status === 'in_progress';
+  const inProgress = session?.status === 'in_progress';
   const mutationDisabled = state.saving || state.completing;
 
   return (
@@ -385,7 +385,7 @@ export const WorkoutSession: FC = observer(() => {
         {!state.loading && state.error === undefined && session !== undefined && client !== undefined && (
           <>
             <WorkoutSessionMeta client={client} session={session} />
-            {isInProgress ? (
+            {inProgress ? (
               <WorkoutSessionForm
                 actions={
                   <WorkoutSessionActions
@@ -402,7 +402,7 @@ export const WorkoutSession: FC = observer(() => {
                 <WorkoutSessionExerciseList
                   drafts={state.drafts}
                   exercises={state.exercises}
-                  isInProgress={isInProgress}
+                  inProgress={inProgress}
                   mutationDisabled={mutationDisabled}
                   selectedExerciseId={state.selectedExerciseId}
                   onAddExercise={handleAddExercise}

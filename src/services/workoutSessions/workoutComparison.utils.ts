@@ -1,30 +1,7 @@
-import type { PlannedWorkout } from '../plans/plans.models';
-import { formatSetsText } from '../util/format/format';
-import type { WorkoutSession, WorkoutSessionExercise } from './workoutSessions.models';
-
-export type WorkoutComparisonStatus = 'matched' | 'deviated' | 'not_done' | 'extra';
-
-export type WorkoutComparisonRow = {
-  readonly exerciseId: string;
-  readonly exerciseName: string;
-  readonly planText: string;
-  readonly factText: string;
-  readonly status: WorkoutComparisonStatus;
-  readonly planVolumeKg: number;
-  readonly factVolumeKg: number;
-};
-
-export type WorkoutComparisonTotals = {
-  readonly exerciseCount: number;
-  readonly setCount: number;
-  readonly volumeKg: number;
-};
-
-export type WorkoutComparison = {
-  readonly rows: readonly WorkoutComparisonRow[];
-  readonly planTotals: WorkoutComparisonTotals;
-  readonly factTotals: WorkoutComparisonTotals;
-};
+import type { PlannedWorkout } from '../plans/plans.models.ts';
+import { formatSetsText } from '../util/format.utils.ts';
+import type { WorkoutComparison, WorkoutComparisonRow, WorkoutComparisonTotals } from './workoutComparison.models.ts';
+import type { WorkoutSession, WorkoutSessionExercise } from './workoutSessions.models.ts';
 
 type ComparableSet = {
   readonly reps: number;
@@ -110,11 +87,19 @@ function buildExtraRow(factExercise: WorkoutSessionExercise): WorkoutComparisonR
 }
 
 export function buildWorkoutComparison(plan: PlannedWorkout | null, session: WorkoutSession): WorkoutComparison {
+  if (plan === null) {
+    return {
+      rows: [],
+      planTotals: { exerciseCount: 0, setCount: 0, volumeKg: 0 },
+      factTotals: { exerciseCount: 0, setCount: 0, volumeKg: 0 }
+    };
+  }
+
   const factExercises = session.exercises;
   const usedFactIndexes = new Set<number>();
   const rows: WorkoutComparisonRow[] = [];
 
-  for (const planExercise of plan?.exercises ?? []) {
+  for (const planExercise of plan.exercises) {
     const factIndex = findFactExerciseIndex(factExercises, usedFactIndexes, planExercise.exerciseId);
     if (factIndex === -1) {
       rows.push(buildPlanRow(planExercise));
@@ -133,7 +118,7 @@ export function buildWorkoutComparison(plan: PlannedWorkout | null, session: Wor
 
   return {
     rows,
-    planTotals: calculateTotals(plan?.exercises ?? []),
+    planTotals: calculateTotals(plan.exercises),
     factTotals: calculateTotals(factExercises)
   };
 }

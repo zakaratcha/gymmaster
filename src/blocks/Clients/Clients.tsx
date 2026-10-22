@@ -12,7 +12,7 @@ import {
   pushRecentClientId,
   resolveRecentClientIds
 } from '../../services/clients/clients.service';
-import { getFirstName } from '../../services/util/format/format';
+import { getFirstName } from '../../services/util/format.utils';
 import { Button } from '../Button/Button';
 import { ClientCreateForm } from '../ClientCreateForm/ClientCreateForm';
 import { Fab } from '../Fab/Fab';
@@ -108,13 +108,13 @@ function buildCreatePayload(name: string, notes: string, bodyWeightKg: string): 
 
 export const Clients: FC<ClientsProps> = observer(({ initialClients, initialRecentIds }) => {
   const navigate = useNavigate();
-  const isStaticMode = initialClients !== undefined;
+  const staticMode = initialClients !== undefined;
 
   const state = useLocalObservable<ClientsState>(() => ({
     searchQuery: '',
     clients: initialClients ?? [],
     recentClientIds: initialRecentIds ?? [],
-    loading: !isStaticMode,
+    loading: !staticMode,
     createFormOpen: false,
     createName: '',
     createNotes: '',
@@ -189,10 +189,10 @@ export const Clients: FC<ClientsProps> = observer(({ initialClients, initialRece
   }, [state]);
 
   useEffect(() => {
-    if (!isStaticMode) {
+    if (!staticMode) {
       void loadClients();
     }
-  }, [isStaticMode, loadClients]);
+  }, [staticMode, loadClients]);
 
   const handleSearchChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -256,7 +256,7 @@ export const Clients: FC<ClientsProps> = observer(({ initialClients, initialRece
     [navigate, state]
   );
 
-  const isSearchActive = state.searchQuery.trim().length > 0;
+  const searchActive = state.searchQuery.trim().length > 0;
   const showRecent = !state.loading && state.error === undefined && state.recentClients.length > 0;
   const showEmpty = !state.loading && state.error === undefined && state.filteredClients.length === 0;
   const showLists = !state.loading && state.error === undefined;
@@ -313,7 +313,7 @@ export const Clients: FC<ClientsProps> = observer(({ initialClients, initialRece
               <section className={cnClients('Section', { type: 'all' })}>
                 <h2 className={cnClients('SectionTitle')}>Все клиенты</h2>
                 {showEmpty ? (
-                  <p className={cnClients('Empty')}>{isSearchActive ? 'Ничего не найдено' : 'Добавить клиента'}</p>
+                  <p className={cnClients('Empty')}>{searchActive ? 'Ничего не найдено' : 'Добавить клиента'}</p>
                 ) : (
                   <ul className={cnClients('List')}>
                     {state.filteredClients.map(client => (

@@ -1,7 +1,7 @@
 import { type FC } from 'react';
 import { cn } from '@bem-react/classname';
 
-import type { WorkoutComparisonStatus as WorkoutComparisonStatusValue } from '../../../services/workoutSessions/workoutComparison';
+import type { WorkoutComparisonStatus as WorkoutComparisonStatusValue } from '../../../services/workoutSessions/workoutComparison.models';
 import { WorkoutComparisonStatus } from '../Status/WorkoutComparison-Status';
 
 import './WorkoutComparison-RowHeader.scss';

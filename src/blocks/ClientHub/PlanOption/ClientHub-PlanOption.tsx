@@ -2,7 +2,7 @@ import { type FC, useCallback } from 'react';
 import { cn } from '@bem-react/classname';
 
 import type { PlannedWorkout } from '../../../services/plans/plans.models';
-import { formatPlannedDate, formatWorkoutCount } from '../../../services/util/format/format';
+import { formatPlannedDate, formatWorkoutCount } from '../../../services/util/format.utils';
 import { Radio } from '../../Radio/Radio';
 import { ClientHubPlanOptionText } from '../PlanOptionText/ClientHub-PlanOptionText';
 

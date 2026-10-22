@@ -1,8 +1,11 @@
 import { type FC } from 'react';
 import { cn } from '@bem-react/classname';
 
-import { formatVolumeDeltaKg, formatVolumeKg, formatWorkoutCount } from '../../../services/util/format/format';
-import type { WorkoutComparison, WorkoutComparisonTotals } from '../../../services/workoutSessions/workoutComparison';
+import { formatVolumeDeltaKg, formatVolumeKg, formatWorkoutCount } from '../../../services/util/format.utils';
+import type {
+  WorkoutComparison,
+  WorkoutComparisonTotals
+} from '../../../services/workoutSessions/workoutComparison.models';
 import { WorkoutComparisonLine } from '../Line/WorkoutComparison-Line';
 
 import './WorkoutComparison-Summary.scss';

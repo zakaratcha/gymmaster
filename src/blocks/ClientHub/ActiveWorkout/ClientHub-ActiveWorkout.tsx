@@ -1,7 +1,7 @@
 import { type FC } from 'react';
 import { cn } from '@bem-react/classname';
 
-import { formatSessionTimestamp } from '../../../services/util/format/format';
+import { formatSessionTimestamp } from '../../../services/util/format.utils';
 import type { WorkoutSession } from '../../../services/workoutSessions/workoutSessions.models';
 import { ClientHubActiveWorkoutContent } from '../ActiveWorkoutContent/ClientHub-ActiveWorkoutContent';
 import { ClientHubActiveWorkoutInfo } from '../ActiveWorkoutInfo/ClientHub-ActiveWorkoutInfo';

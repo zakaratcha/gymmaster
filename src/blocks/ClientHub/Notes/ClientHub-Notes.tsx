@@ -1,7 +1,7 @@
 import { type FC } from 'react';
 import { cn } from '@bem-react/classname';
 
-import { truncateNotes } from '../../../services/util/format/format';
+import { truncateNotes } from '../../../services/util/format.utils';
 import { ClientHubNotesToggle } from '../NotesToggle/ClientHub-NotesToggle';
 import { ClientHubSection } from '../Section/ClientHub-Section';
 

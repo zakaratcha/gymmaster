@@ -92,10 +92,10 @@ async function main(): Promise<void> {
   console.info(`Database migrated: ${getSqlite().name}`);
 }
 
-const isDirectRun =
+const directRun =
   process.argv[1] !== undefined && path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url));
 
-if (isDirectRun) {
+if (directRun) {
   void main().catch((error: unknown) => {
     console.error(error);
     process.exit(1);

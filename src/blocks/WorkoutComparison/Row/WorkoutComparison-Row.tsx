@@ -1,8 +1,8 @@
 import { type FC } from 'react';
 import { cn } from '@bem-react/classname';
 
-import { formatVolumeDeltaKg, formatVolumeKg } from '../../../services/util/format/format';
-import type { WorkoutComparisonRow as RowModel } from '../../../services/workoutSessions/workoutComparison';
+import { formatVolumeDeltaKg, formatVolumeKg } from '../../../services/util/format.utils';
+import type { WorkoutComparisonRow as RowModel } from '../../../services/workoutSessions/workoutComparison.models';
 import { WorkoutComparisonLine } from '../Line/WorkoutComparison-Line';
 import { WorkoutComparisonRowHeader } from '../RowHeader/WorkoutComparison-RowHeader';
 

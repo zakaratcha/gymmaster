@@ -1,7 +1,7 @@
 import { type FC } from 'react';
 import { cn } from '@bem-react/classname';
 
-import type { WorkoutComparisonRow as RowModel } from '../../../services/workoutSessions/workoutComparison';
+import type { WorkoutComparisonRow as RowModel } from '../../../services/workoutSessions/workoutComparison.models';
 import { WorkoutComparisonRow } from '../Row/WorkoutComparison-Row';
 
 import './WorkoutComparison-List.scss';
