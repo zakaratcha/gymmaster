@@ -15,8 +15,8 @@ type WorkoutComparisonListProps = {
 export const WorkoutComparisonList: FC<WorkoutComparisonListProps> = ({ rows }) => {
   return (
     <section className={cnWorkoutComparisonList()}>
-      {rows.map(row => (
-        <WorkoutComparisonRow key={row.exerciseId} row={row} />
+      {rows.map((row, index) => (
+        <WorkoutComparisonRow key={`${row.exerciseId}-${index}`} row={row} />
       ))}
     </section>
   );

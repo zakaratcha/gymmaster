@@ -40,9 +40,25 @@ function calculateTotals(exercises: readonly ComparableExercise[]): WorkoutCompa
 function findFactExerciseIndex(
   factExercises: readonly WorkoutSessionExercise[],
   usedIndexes: ReadonlySet<number>,
-  exerciseId: string
+  planExercise: PlannedWorkout['exercises'][number]
 ): number {
-  return factExercises.findIndex((exercise, index) => exercise.exerciseId === exerciseId && !usedIndexes.has(index));
+  let firstUnusedIndex = -1;
+
+  for (const [index, factExercise] of factExercises.entries()) {
+    if (usedIndexes.has(index) || factExercise.exerciseId !== planExercise.exerciseId) {
+      continue;
+    }
+
+    if (areSetsEqual(planExercise.sets, factExercise.sets)) {
+      return index;
+    }
+
+    if (firstUnusedIndex === -1) {
+      firstUnusedIndex = index;
+    }
+  }
+
+  return firstUnusedIndex;
 }
 
 function buildPlanRow(
@@ -100,7 +116,7 @@ export function buildWorkoutComparison(plan: PlannedWorkout | null, session: Wor
   const rows: WorkoutComparisonRow[] = [];
 
   for (const planExercise of plan.exercises) {
-    const factIndex = findFactExerciseIndex(factExercises, usedFactIndexes, planExercise.exerciseId);
+    const factIndex = findFactExerciseIndex(factExercises, usedFactIndexes, planExercise);
     if (factIndex === -1) {
       rows.push(buildPlanRow(planExercise));
       continue;

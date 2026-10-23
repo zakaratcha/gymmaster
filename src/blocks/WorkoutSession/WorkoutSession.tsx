@@ -372,6 +372,20 @@ export const WorkoutSession: FC = observer(() => {
   const client = state.client;
   const inProgress = session?.status === 'in_progress';
   const mutationDisabled = state.saving || state.completing;
+  const factList = (
+    <WorkoutSessionExerciseList
+      drafts={state.drafts}
+      exercises={state.exercises}
+      inProgress={inProgress}
+      mutationDisabled={mutationDisabled}
+      selectedExerciseId={state.selectedExerciseId}
+      onAddExercise={handleAddExercise}
+      onExerciseAction={handleExerciseAction}
+      onExerciseChange={handleExerciseChange}
+      onSetAction={handleSetAction}
+      onSetChange={handleSetChange}
+    />
+  );
 
   return (
     <div className={cnWorkoutSession()}>
@@ -399,21 +413,13 @@ export const WorkoutSession: FC = observer(() => {
                 saveSuccess={state.saveSuccess}
                 onSubmit={handleSave}
               >
-                <WorkoutSessionExerciseList
-                  drafts={state.drafts}
-                  exercises={state.exercises}
-                  inProgress={inProgress}
-                  mutationDisabled={mutationDisabled}
-                  selectedExerciseId={state.selectedExerciseId}
-                  onAddExercise={handleAddExercise}
-                  onExerciseAction={handleExerciseAction}
-                  onExerciseChange={handleExerciseChange}
-                  onSetAction={handleSetAction}
-                  onSetChange={handleSetChange}
-                />
+                {factList}
               </WorkoutSessionForm>
             ) : (
-              <WorkoutComparison plan={session.plan} session={session} />
+              <>
+                <WorkoutComparison plan={session.plan} session={session} />
+                {session.plan === null && factList}
+              </>
             )}
           </>
         )}

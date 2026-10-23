@@ -62,11 +62,12 @@ export function formatSetsText(sets: readonly { readonly reps: number; readonly 
 }
 
 export function formatVolumeDeltaKg(value: number): string {
-  if (value === 0) {
+  const rounded = Number(value.toFixed(1));
+  if (rounded === 0) {
     return '0 кг';
   }
 
-  return `${value > 0 ? '+' : '-'}${formatVolumeKg(Math.abs(value))} кг`;
+  return `${rounded > 0 ? '+' : '-'}${formatVolumeKg(Math.abs(rounded))} кг`;
 }
 
 export function formatWorkoutCount(value: number, singular: string, paucal: string, plural: string): string {

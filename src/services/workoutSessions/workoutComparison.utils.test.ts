@@ -103,4 +103,67 @@ describe('buildWorkoutComparison', () => {
     expect(comparison.rows).toEqual([]);
     expect(comparison.planTotals).toEqual({ exerciseCount: 0, setCount: 0, volumeKg: 0 });
   });
+
+  it('сопоставляет план с совпавшим фактом, даже если раньше стоит другое вхождение', () => {
+    const comparison = buildWorkoutComparison(
+      {
+        ...plan,
+        exercises: [{ exerciseId: 'squat', exerciseName: 'Присед', sets: [{ reps: 8, weightKg: 80 }] }]
+      },
+      {
+        ...session,
+        exercises: [
+          { exerciseId: 'squat', exerciseName: 'Присед', sets: [{ reps: 10, weightKg: 20 }] },
+          { exerciseId: 'squat', exerciseName: 'Присед', sets: [{ reps: 8, weightKg: 80 }] }
+        ]
+      }
+    );
+
+    expect(comparison.rows.map(row => row.status)).toEqual(['matched', 'extra']);
+    expect(comparison.rows.map(row => row.factText)).toEqual(['8×80 кг', '10×20 кг']);
+  });
+
+  it('разводит два одинаковых упражнения плана по своим фактам', () => {
+    const comparison = buildWorkoutComparison(
+      {
+        ...plan,
+        exercises: [
+          { exerciseId: 'squat', exerciseName: 'Присед', sets: [{ reps: 8, weightKg: 60 }] },
+          { exerciseId: 'squat', exerciseName: 'Присед', sets: [{ reps: 5, weightKg: 100 }] }
+        ]
+      },
+      {
+        ...session,
+        exercises: [
+          { exerciseId: 'squat', exerciseName: 'Присед', sets: [{ reps: 5, weightKg: 100 }] },
+          { exerciseId: 'squat', exerciseName: 'Присед', sets: [{ reps: 8, weightKg: 60 }] }
+        ]
+      }
+    );
+
+    expect(comparison.rows.map(row => row.status)).toEqual(['matched', 'matched']);
+    expect(comparison.rows.map(row => row.factText)).toEqual(['8×60 кг', '5×100 кг']);
+  });
+
+  it('без точного совпадения берёт первое свободное вхождение того же упражнения', () => {
+    const comparison = buildWorkoutComparison(
+      {
+        ...plan,
+        exercises: [
+          { exerciseId: 'squat', exerciseName: 'Присед', sets: [{ reps: 8, weightKg: 80 }] },
+          { exerciseId: 'squat', exerciseName: 'Присед', sets: [{ reps: 5, weightKg: 100 }] }
+        ]
+      },
+      {
+        ...session,
+        exercises: [
+          { exerciseId: 'squat', exerciseName: 'Присед', sets: [{ reps: 10, weightKg: 20 }] },
+          { exerciseId: 'squat', exerciseName: 'Присед', sets: [{ reps: 3, weightKg: 40 }] }
+        ]
+      }
+    );
+
+    expect(comparison.rows.map(row => row.status)).toEqual(['deviated', 'deviated']);
+    expect(comparison.rows.map(row => row.factText)).toEqual(['10×20 кг', '3×40 кг']);
+  });
 });

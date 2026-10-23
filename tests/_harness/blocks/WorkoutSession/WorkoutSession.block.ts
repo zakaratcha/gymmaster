@@ -190,4 +190,12 @@ export class WorkoutSessionBlock extends Block {
     await this.waitForReady();
     await expect(this.findBySelector('status')).toHaveText('Завершена');
   }
+
+  async expectReadonlyFact(exerciseName: string, reps: number, weightKg: number): Promise<void> {
+    const card = this.findBySelector('exerciseCard').filter({ hasText: exerciseName });
+    await expect(card).toHaveCount(1);
+    const values = card.locator('.WorkoutSession-SetValue');
+    await expect(values.nth(0)).toHaveText(`${reps} повт.`);
+    await expect(values.nth(1)).toHaveText(`${weightKg} кг`);
+  }
 }

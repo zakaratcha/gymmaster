@@ -64,6 +64,17 @@ describe('formatVolumeDeltaKg', () => {
   it('показывает ноль без знака', () => {
     expect(formatVolumeDeltaKg(0)).toBe('0 кг');
   });
+
+  it('не ставит знак, если после округления дельта нулевая', () => {
+    expect(formatVolumeDeltaKg(0.04)).toBe('0 кг');
+    expect(formatVolumeDeltaKg(-0.04)).toBe('0 кг');
+    expect(formatVolumeDeltaKg(0.1 + 0.2 - 0.3)).toBe('0 кг');
+  });
+
+  it('округляет малую дельту до одного знака', () => {
+    expect(formatVolumeDeltaKg(0.05)).toBe('+0.1 кг');
+    expect(formatVolumeDeltaKg(-0.05)).toBe('-0.1 кг');
+  });
 });
 
 describe('formatWorkoutCount', () => {

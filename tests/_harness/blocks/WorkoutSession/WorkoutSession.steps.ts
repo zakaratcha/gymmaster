@@ -4,7 +4,11 @@ import { expect } from '@playwright/test';
 import { findClientByName } from '../../commands/clients/findClientByName';
 import { listExercisesAsAdmin } from '../../commands/exercises/listExercises';
 import { createPlan } from '../../commands/plans/plans';
-import { completeWorkoutSession, createWorkoutSession } from '../../commands/workoutSessions/workoutSessions';
+import {
+  completeWorkoutSession,
+  createWorkoutSession,
+  updateWorkoutSession
+} from '../../commands/workoutSessions/workoutSessions';
 import type { CustomWorld } from '../../world';
 import { ClientHubBlock } from '../ClientHub/ClientHub.block';
 import { WorkoutComparisonBlock } from '../WorkoutComparison/WorkoutComparison.block';
@@ -62,10 +66,13 @@ Given(
 );
 
 Given(
-  'для клиента {string} создана тренировка без плана с тегом {string}',
-  async function (this: CustomWorld, clientName: string, splitTag: string) {
+  'для клиента {string} создана завершённая тренировка без плана с тегом {string}, упражнением {string}, повторами {int} и весом {float}',
+  async function (clientName: string, splitTag: string, exerciseName: string, reps: number, weightKg: number) {
     const client = await findClientByName(clientName);
     const created = await createWorkoutSession(client.id, { splitTag });
+    await updateWorkoutSession(client.id, created.workoutSession.id, {
+      exercises: [{ exerciseId: await requireExerciseId(exerciseName), sets: [{ reps, weightKg }] }]
+    });
     await completeWorkoutSession(client.id, created.workoutSession.id);
   }
 );
@@ -222,6 +229,13 @@ Then(
   'завершённая тренировка содержит в факте подход с повторами {int} и весом {float}',
   async function (this: CustomWorld, reps: number, weightKg: number) {
     await new WorkoutComparisonBlock(this.page).expectFactContains(reps, weightKg);
+  }
+);
+
+Then(
+  'завершённая тренировка без плана показывает упражнение {string} с повторами {int} и весом {float}',
+  async function (this: CustomWorld, exerciseName: string, reps: number, weightKg: number) {
+    await new WorkoutSessionBlock(this.page).expectReadonlyFact(exerciseName, reps, weightKg);
   }
 );
 
