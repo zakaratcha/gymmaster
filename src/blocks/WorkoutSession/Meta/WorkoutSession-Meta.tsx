@@ -2,7 +2,7 @@ import { type FC } from 'react';
 import { cn } from '@bem-react/classname';
 
 import type { Client } from '../../../services/clients/clients.models';
-import { formatSessionTimestamp } from '../../../services/util/format/format';
+import { formatSessionTimestamp } from '../../../services/util/format.utils';
 import type { WorkoutSession as WorkoutSessionModel } from '../../../services/workoutSessions/workoutSessions.models';
 import { WorkoutSessionClient } from '../Client/WorkoutSession-Client';
 import { WorkoutSessionCompletedAt } from '../CompletedAt/WorkoutSession-CompletedAt';
@@ -22,7 +22,7 @@ type WorkoutSessionMetaProps = {
 };
 
 export const WorkoutSessionMeta: FC<WorkoutSessionMetaProps> = ({ client, session }) => {
-  const isInProgress = session.status === 'in_progress';
+  const inProgress = session.status === 'in_progress';
 
   return (
     <section className={cnWorkoutSessionMeta()}>
@@ -37,7 +37,7 @@ export const WorkoutSessionMeta: FC<WorkoutSessionMetaProps> = ({ client, sessio
       <WorkoutSessionMetaRow>
         <WorkoutSessionMetaLabel>Статус</WorkoutSessionMetaLabel>
         <WorkoutSessionStatus completed={session.status === 'completed'}>
-          {isInProgress ? 'В процессе' : 'Завершена'}
+          {inProgress ? 'В процессе' : 'Завершена'}
         </WorkoutSessionStatus>
       </WorkoutSessionMetaRow>
       <WorkoutSessionMetaRow>

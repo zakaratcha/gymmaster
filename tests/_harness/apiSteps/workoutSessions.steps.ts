@@ -206,6 +206,15 @@ When('я начинаю тренировку через API', async function (th
   }
 });
 
+When('я начинаю тренировку через API без плана с тегом {string}', async function (this: ApiWorld, splitTag: string) {
+  try {
+    const response = await createWorkoutSession(requireClient.call(this), { splitTag });
+    saveWorkoutSession.call(this, response);
+  } catch (error) {
+    setApiError.call(this, error);
+  }
+});
+
 When('я начинаю тренировку через API с телом JSON:', async function (this: ApiWorld, json: string) {
   try {
     const payload = JSON.parse(substituteIds.call(this, json)) as CreateWorkoutSessionRequest;
@@ -488,6 +497,38 @@ Then('созданная тренировка прочитана', function (thi
   expect(this.lastError).toBeUndefined();
   expect(this.workoutSession?.id).toBe(this.workoutSessions?.[0]?.id);
   expect(this.workoutSession?.exercises).toEqual(this.plan?.exercises);
+});
+
+Then('прочитанная тренировка содержит план', function (this: ApiWorld) {
+  expect(this.lastError).toBeUndefined();
+  expect(this.workoutSession?.plan).toEqual(this.plan);
+});
+
+Then('прочитанная тренировка содержит изменённый план', function (this: ApiWorld) {
+  expect(this.lastError).toBeUndefined();
+  expect(this.workoutSession?.plan).toEqual(this.plan);
+  expect(this.workoutSession?.plan?.exercises).toEqual([
+    expect.objectContaining({
+      exerciseId: this.exercises?.[0]?.id,
+      sets: [{ reps: 12, weightKg: 90 }]
+    })
+  ]);
+});
+
+Then('прочитанная тренировка без плана', function (this: ApiWorld) {
+  expect(this.lastError).toBeUndefined();
+  expect(this.workoutSession?.plan).toBeNull();
+});
+
+Then('созданная тренировка без плана имеет тег {string}', function (this: ApiWorld, splitTag: string) {
+  expect(this.lastError).toBeUndefined();
+  expect(this.workoutSession?.splitTag).toBe(splitTag);
+  expect(this.workoutSession?.plannedWorkoutId).toBeUndefined();
+});
+
+Then('созданная тренировка без плана не содержит упражнений', function (this: ApiWorld) {
+  expect(this.lastError).toBeUndefined();
+  expect(this.workoutSession?.exercises).toEqual([]);
 });
 
 Then('активная тренировка является созданной', function (this: ApiWorld) {

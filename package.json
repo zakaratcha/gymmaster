@@ -12,6 +12,8 @@
     "start": "node dist/server/index.js",
     "db:migrate": "tsx src/server/db/migrate.ts",
     "playwright:install": "playwright install chromium",
+    "test": "vitest run --config vitest.unit.config.ts",
+    "test:watch": "vitest --config vitest.unit.config.ts",
     "typecheck": "npm run typecheck:client && npm run typecheck:storybook && npm run typecheck:server && npm run typecheck:e2e",
     "typecheck:client": "tsc --noEmit -p tsconfig.app.json",
     "typecheck:storybook": "tsc --noEmit -p tsconfig.storybook.json",

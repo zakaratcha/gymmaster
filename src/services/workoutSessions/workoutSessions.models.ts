@@ -1,3 +1,5 @@
+import type { PlannedWorkout } from '../plans/plans.models.ts';
+
 export type WorkoutSessionStatus = 'in_progress' | 'completed';
 
 export type WorkoutSessionSet = {
@@ -20,6 +22,7 @@ export type WorkoutSession = {
   readonly startedAt: string;
   readonly completedAt?: string;
   readonly exercises: readonly WorkoutSessionExercise[];
+  readonly plan: PlannedWorkout | null;
 };
 
 export type WorkoutSessionExerciseInput = {
@@ -28,7 +31,8 @@ export type WorkoutSessionExerciseInput = {
 };
 
 export type CreateWorkoutSessionRequest = {
-  readonly plannedWorkoutId: string;
+  readonly plannedWorkoutId?: string;
+  readonly splitTag?: string;
 };
 
 export type UpdateWorkoutSessionRequest = {

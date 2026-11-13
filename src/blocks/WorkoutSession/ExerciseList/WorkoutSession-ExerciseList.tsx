@@ -18,7 +18,7 @@ const cnWorkoutSessionExerciseList = cn('WorkoutSession', 'ExerciseList');
 type WorkoutSessionExerciseListProps = {
   readonly drafts: readonly DraftExercise[];
   readonly exercises: readonly Exercise[];
-  readonly isInProgress: boolean;
+  readonly inProgress: boolean;
   readonly mutationDisabled: boolean;
   readonly selectedExerciseId: string;
   onAddExercise(): void;
@@ -31,7 +31,7 @@ type WorkoutSessionExerciseListProps = {
 export const WorkoutSessionExerciseList: FC<WorkoutSessionExerciseListProps> = ({
   drafts,
   exercises,
-  isInProgress,
+  inProgress,
   mutationDisabled,
   selectedExerciseId,
   onAddExercise,
@@ -44,7 +44,7 @@ export const WorkoutSessionExerciseList: FC<WorkoutSessionExerciseListProps> = (
     <section className={cnWorkoutSessionExerciseList()}>
       <WorkoutSessionExercisesHeader>
         <WorkoutSessionSectionTitle>Фактические упражнения</WorkoutSessionSectionTitle>
-        {isInProgress && (
+        {inProgress && (
           <WorkoutSessionAddExercise>
             <WorkoutSessionExerciseSelect
               disabled={exercises.length === 0 || mutationDisabled}
@@ -66,7 +66,7 @@ export const WorkoutSessionExerciseList: FC<WorkoutSessionExerciseListProps> = (
           draft={draft}
           draftCount={drafts.length}
           exercisePosition={exercisePosition}
-          isInProgress={isInProgress}
+          inProgress={inProgress}
           key={`${draft.exerciseId}-${exercisePosition}`}
           mutationDisabled={mutationDisabled}
           onExerciseAction={onExerciseAction}

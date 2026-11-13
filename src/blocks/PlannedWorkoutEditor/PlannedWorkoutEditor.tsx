@@ -147,21 +147,21 @@ const PlannedExerciseAction: FC<PlannedExerciseActionProps> = ({
     onAction(action, exercisePosition);
   }, [action, exercisePosition, onAction]);
 
-  const isRemove = action === 'remove';
+  const removing = action === 'remove';
   const direction = action === 'up' ? 'вверх' : 'вниз';
-  const ariaLabel = isRemove
+  const ariaLabel = removing
     ? `Удалить упражнение ${exerciseName}`
     : `Переместить упражнение ${exerciseName} ${direction}`;
   let content = '↓';
   if (action === 'up') {
     content = '↑';
   }
-  if (isRemove) {
+  if (removing) {
     content = 'Удалить';
   }
 
   return (
-    <Button aria-label={ariaLabel} color={isRemove ? 'secondary' : 'default'} disabled={disabled} onClick={handleClick}>
+    <Button aria-label={ariaLabel} color={removing ? 'secondary' : 'default'} disabled={disabled} onClick={handleClick}>
       {content}
     </Button>
   );
@@ -231,7 +231,7 @@ const PlannedSetInput: FC<PlannedSetInputProps> = ({ exercisePosition, field, se
 export const PlannedWorkoutEditor: FC = observer(() => {
   const navigate = useNavigate();
   const { id: clientId, planId } = useParams<{ id: string; planId: string }>();
-  const isEditing = planId !== undefined && planId !== 'new';
+  const editing = planId !== undefined && planId !== 'new';
   const state = useLocalObservable<PlannedWorkoutEditorState>(() => ({
     plannedDate: formatDateInput(new Date()),
     splitTag: '',
@@ -363,7 +363,7 @@ export const PlannedWorkoutEditor: FC = observer(() => {
       state.setExercises(exercises);
       state.setSelectedExerciseId(exercises[0]?.id ?? '');
 
-      if (isEditing && planId !== undefined) {
+      if (editing && planId !== undefined) {
         const plan = await getPlanById(clientId, planId);
         state.setPlan(plan);
         state.setPlannedDate(plan.plannedDate);
@@ -375,7 +375,7 @@ export const PlannedWorkoutEditor: FC = observer(() => {
     } finally {
       state.setLoading(false);
     }
-  }, [clientId, isEditing, planId, state]);
+  }, [clientId, editing, planId, state]);
 
   useEffect(() => {
     void loadEditor();
@@ -463,7 +463,7 @@ export const PlannedWorkoutEditor: FC = observer(() => {
       state.setFormError(undefined);
       state.setSubmitting(true);
       try {
-        await (isEditing && planId !== undefined
+        await (editing && planId !== undefined
           ? updatePlan(clientId, planId, result.payload)
           : createPlan(clientId, result.payload));
         void navigate(`/clients/${clientId}/plans`);
@@ -473,7 +473,7 @@ export const PlannedWorkoutEditor: FC = observer(() => {
         state.setSubmitting(false);
       }
     },
-    [clientId, isEditing, navigate, planId, state]
+    [clientId, editing, navigate, planId, state]
   );
 
   return (
@@ -487,7 +487,7 @@ export const PlannedWorkoutEditor: FC = observer(() => {
           >
             ←
           </Link>
-          <h1 className={cnPlannedWorkoutEditor('Title')}>{isEditing ? 'План тренировки' : 'Новый план'}</h1>
+          <h1 className={cnPlannedWorkoutEditor('Title')}>{editing ? 'План тренировки' : 'Новый план'}</h1>
           <Button
             className={cnPlannedWorkoutEditor('Save')}
             disabled={state.loading}

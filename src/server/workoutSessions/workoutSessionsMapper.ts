@@ -27,6 +27,18 @@ function parseRequiredString(value: unknown, fieldName: string): ValidationResul
   return { ok: true, value: value.trim() };
 }
 
+function parseOptionalString(value: unknown, fieldName: string): ValidationResult<string | undefined> {
+  if (value === undefined) {
+    return { ok: true, value: undefined };
+  }
+
+  if (typeof value !== 'string' || value.trim().length === 0) {
+    return { ok: false, error: `Поле ${fieldName} должно быть непустой строкой` };
+  }
+
+  return { ok: true, value: value.trim() };
+}
+
 function parseSet(value: unknown): ValidationResult<WorkoutSessionSet> {
   if (typeof value !== 'object' || value === null || isArray(value)) {
     return { ok: false, error: 'Некорректный подход' };
@@ -96,12 +108,29 @@ export function validateCreateWorkoutSessionInput(body: unknown): ValidationResu
     return { ok: false, error: 'Некорректное тело запроса' };
   }
 
-  const plannedWorkoutId = parseRequiredString(readRecordField(body, 'plannedWorkoutId'), 'plannedWorkoutId');
+  const plannedWorkoutId = parseOptionalString(readRecordField(body, 'plannedWorkoutId'), 'plannedWorkoutId');
   if (!plannedWorkoutId.ok) {
     return plannedWorkoutId;
   }
 
-  return { ok: true, value: { plannedWorkoutId: plannedWorkoutId.value } };
+  const splitTag = parseOptionalString(readRecordField(body, 'splitTag'), 'splitTag');
+  if (!splitTag.ok) {
+    return splitTag;
+  }
+
+  if (plannedWorkoutId.value !== undefined && splitTag.value !== undefined) {
+    return { ok: false, error: 'Укажите либо план тренировки, либо тег типа дня' };
+  }
+
+  if (plannedWorkoutId.value !== undefined) {
+    return { ok: true, value: { plannedWorkoutId: plannedWorkoutId.value } };
+  }
+
+  if (splitTag.value === undefined) {
+    return { ok: false, error: 'Укажите план тренировки или тег типа дня' };
+  }
+
+  return { ok: true, value: { splitTag: splitTag.value } };
 }
 
 export function validateUpdateWorkoutSessionInput(body: unknown): ValidationResult<ValidatedUpdateWorkoutSessionInput> {

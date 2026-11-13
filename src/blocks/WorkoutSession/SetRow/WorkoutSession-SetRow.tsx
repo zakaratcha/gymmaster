@@ -15,7 +15,7 @@ const cnWorkoutSessionSetRow = cn('WorkoutSession', 'SetRow');
 type WorkoutSessionSetRowProps = {
   readonly disabled: boolean;
   readonly exercisePosition: number;
-  readonly isInProgress: boolean;
+  readonly inProgress: boolean;
   readonly set: DraftSet;
   readonly setPosition: number;
   onAction(action: SetAction, exercisePosition: number, setPosition?: number): void;
@@ -25,7 +25,7 @@ type WorkoutSessionSetRowProps = {
 export const WorkoutSessionSetRow: FC<WorkoutSessionSetRowProps> = ({
   disabled,
   exercisePosition,
-  isInProgress,
+  inProgress,
   set,
   setPosition,
   onAction,
@@ -34,7 +34,7 @@ export const WorkoutSessionSetRow: FC<WorkoutSessionSetRowProps> = ({
   return (
     <div className={cnWorkoutSessionSetRow()}>
       <WorkoutSessionSetLabel>{setPosition + 1}</WorkoutSessionSetLabel>
-      {isInProgress ? (
+      {inProgress ? (
         <>
           <WorkoutSessionSetInput
             disabled={disabled}

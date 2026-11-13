@@ -10,12 +10,12 @@ const cnExerciseList = cn('ExerciseList');
 
 type ExerciseListProps = {
   readonly exercises: readonly Exercise[];
-  readonly isSearchActive: boolean;
+  readonly searchActive: boolean;
   onEdit(exercise: Exercise): void;
   onArchive(exercise: Exercise): void;
 };
 
-export const ExerciseList: FC<ExerciseListProps> = ({ exercises, isSearchActive, onEdit, onArchive }) => {
+export const ExerciseList: FC<ExerciseListProps> = ({ exercises, searchActive, onEdit, onArchive }) => {
   const handleRowClick = useCallback(
     (event: SyntheticEvent<HTMLButtonElement>) => {
       const exerciseId = event.currentTarget.dataset.exerciseId;
@@ -43,7 +43,7 @@ export const ExerciseList: FC<ExerciseListProps> = ({ exercises, isSearchActive,
     <section className={cnExerciseList()}>
       <h2 className={cnExerciseList('SectionTitle')}>Справочник</h2>
       {exercises.length === 0 ? (
-        <p className={cnExerciseList('Empty')}>{isSearchActive ? 'Ничего не найдено' : 'Добавить упражнение'}</p>
+        <p className={cnExerciseList('Empty')}>{searchActive ? 'Ничего не найдено' : 'Добавить упражнение'}</p>
       ) : (
         <ul className={cnExerciseList('List')}>
           {exercises.map(exercise => (
