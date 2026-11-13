@@ -145,6 +145,28 @@ describe('buildWorkoutComparison', () => {
     expect(comparison.rows.map(row => row.factText)).toEqual(['8×60 кг', '5×100 кг']);
   });
 
+  it('не отдаёт точное совпадение ранней строке без своей пары', () => {
+    const comparison = buildWorkoutComparison(
+      {
+        ...plan,
+        exercises: [
+          { exerciseId: 'squat', exerciseName: 'Присед', sets: [{ reps: 8, weightKg: 60 }] },
+          { exerciseId: 'squat', exerciseName: 'Присед', sets: [{ reps: 5, weightKg: 100 }] }
+        ]
+      },
+      {
+        ...session,
+        exercises: [
+          { exerciseId: 'squat', exerciseName: 'Присед', sets: [{ reps: 5, weightKg: 100 }] },
+          { exerciseId: 'squat', exerciseName: 'Присед', sets: [{ reps: 10, weightKg: 20 }] }
+        ]
+      }
+    );
+
+    expect(comparison.rows.map(row => row.status)).toEqual(['deviated', 'matched']);
+    expect(comparison.rows.map(row => row.factText)).toEqual(['10×20 кг', '5×100 кг']);
+  });
+
   it('без точного совпадения берёт первое свободное вхождение того же упражнения', () => {
     const comparison = buildWorkoutComparison(
       {

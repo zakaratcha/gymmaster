@@ -226,9 +226,9 @@ Then(
 );
 
 Then(
-  'завершённая тренировка содержит в факте подход с повторами {int} и весом {float}',
-  async function (this: CustomWorld, reps: number, weightKg: number) {
-    await new WorkoutComparisonBlock(this.page).expectFactContains(reps, weightKg);
+  'завершённая тренировка содержит в факте подход {int} с повторами {int} и весом {float}',
+  async function (this: CustomWorld, setPosition: number, reps: number, weightKg: number) {
+    await new WorkoutComparisonBlock(this.page).expectFactSet(setPosition - 1, reps, weightKg);
   }
 );
 

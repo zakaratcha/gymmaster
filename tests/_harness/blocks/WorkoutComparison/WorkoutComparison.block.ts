@@ -58,8 +58,17 @@ export class WorkoutComparisonBlock extends Block {
     await expect(this.findBySelector('empty')).toBeVisible();
   }
 
-  async expectFactContains(reps: number, weightKg: number): Promise<void> {
-    const factLine = this.findBySelector('row').first().locator('.WorkoutComparison-Line').nth(1);
-    await expect(factLine).toContainText(`${reps}×${weightKg}`);
+  async expectFactSet(setPosition: number, reps: number, weightKg: number): Promise<void> {
+    const factValue = this.findBySelector('row')
+      .first()
+      .locator('.WorkoutComparison-Line')
+      .nth(1)
+      .locator('.WorkoutComparison-LineValue');
+    await expect(factValue).toBeVisible();
+
+    const content = await factValue.textContent();
+    const text = content?.trim() ?? '';
+    const sets = text.endsWith(' кг') ? text.slice(0, -' кг'.length).split(' · ') : [];
+    expect(sets[setPosition], text).toBe(`${reps}×${weightKg}`);
   }
 }

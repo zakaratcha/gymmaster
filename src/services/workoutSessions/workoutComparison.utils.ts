@@ -37,28 +37,45 @@ function calculateTotals(exercises: readonly ComparableExercise[]): WorkoutCompa
   };
 }
 
-function findFactExerciseIndex(
+function isSameUnusedExercise(
+  factExercise: WorkoutSessionExercise,
+  index: number,
+  usedIndexes: ReadonlySet<number>,
+  planExercise: PlannedWorkout['exercises'][number]
+): boolean {
+  return !usedIndexes.has(index) && factExercise.exerciseId === planExercise.exerciseId;
+}
+
+function findExactFactExerciseIndex(
   factExercises: readonly WorkoutSessionExercise[],
   usedIndexes: ReadonlySet<number>,
   planExercise: PlannedWorkout['exercises'][number]
 ): number {
-  let firstUnusedIndex = -1;
-
   for (const [index, factExercise] of factExercises.entries()) {
-    if (usedIndexes.has(index) || factExercise.exerciseId !== planExercise.exerciseId) {
+    if (!isSameUnusedExercise(factExercise, index, usedIndexes, planExercise)) {
       continue;
     }
 
     if (areSetsEqual(planExercise.sets, factExercise.sets)) {
       return index;
     }
+  }
 
-    if (firstUnusedIndex === -1) {
-      firstUnusedIndex = index;
+  return -1;
+}
+
+function findFirstUnusedFactExerciseIndex(
+  factExercises: readonly WorkoutSessionExercise[],
+  usedIndexes: ReadonlySet<number>,
+  planExercise: PlannedWorkout['exercises'][number]
+): number {
+  for (const [index, factExercise] of factExercises.entries()) {
+    if (isSameUnusedExercise(factExercise, index, usedIndexes, planExercise)) {
+      return index;
     }
   }
 
-  return firstUnusedIndex;
+  return -1;
 }
 
 function buildPlanRow(
@@ -113,16 +130,34 @@ export function buildWorkoutComparison(plan: PlannedWorkout | null, session: Wor
 
   const factExercises = session.exercises;
   const usedFactIndexes = new Set<number>();
+  const factIndexByPlanIndex = plan.exercises.map(() => -1);
+
+  for (const [planIndex, planExercise] of plan.exercises.entries()) {
+    const factIndex = findExactFactExerciseIndex(factExercises, usedFactIndexes, planExercise);
+    if (factIndex === -1) {
+      continue;
+    }
+
+    usedFactIndexes.add(factIndex);
+    factIndexByPlanIndex[planIndex] = factIndex;
+  }
+
   const rows: WorkoutComparisonRow[] = [];
 
-  for (const planExercise of plan.exercises) {
-    const factIndex = findFactExerciseIndex(factExercises, usedFactIndexes, planExercise);
+  for (const [planIndex, planExercise] of plan.exercises.entries()) {
+    let factIndex = factIndexByPlanIndex[planIndex] ?? -1;
+    if (factIndex === -1) {
+      factIndex = findFirstUnusedFactExerciseIndex(factExercises, usedFactIndexes, planExercise);
+      if (factIndex !== -1) {
+        usedFactIndexes.add(factIndex);
+      }
+    }
+
     if (factIndex === -1) {
       rows.push(buildPlanRow(planExercise));
       continue;
     }
 
-    usedFactIndexes.add(factIndex);
     rows.push(buildPlanRow(planExercise, factExercises[factIndex]));
   }
 
