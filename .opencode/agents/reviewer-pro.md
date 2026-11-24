@@ -1,0 +1,1 @@
+../../.agents/agents/opencode/reviewer-pro.md

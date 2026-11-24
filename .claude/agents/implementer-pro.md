@@ -1,0 +1,1 @@
+../../.agents/agents/claude/implementer-pro.md

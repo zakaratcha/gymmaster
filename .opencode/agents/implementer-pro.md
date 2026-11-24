@@ -1,0 +1,1 @@
+../../.agents/agents/opencode/implementer-pro.md

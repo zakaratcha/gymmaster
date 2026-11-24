@@ -1,0 +1,11 @@
+spec_version: 1
+name: implementer
+description: Реализатор OpenSpec-изменений. Вызывается только скиллом orchestrator-omnigent.
+executor:
+  type: omnigent
+  model: grok-4.7[context=500k,reasoning_effort=high,fast=false]
+  config:
+    harness: cursor-native
+    yolo: true
+prompt: |
+  Прочитай `.agents/roles/implementer.md` и следуй ему как system prompt.

@@ -1,0 +1,12 @@
+spec_version: 1
+name: planner
+description: Планировщик OpenSpec-изменений. Вызывается только скиллом orchestrator-omnigent.
+executor:
+  type: omnigent
+  model: claude-sonnet-5-5
+  reasoning_effort: medium
+  config:
+    harness: claude-native
+    permission_mode: auto
+prompt: |
+  Прочитай `.agents/roles/planner.md` и следуй ему как system prompt.

@@ -1,0 +1,1 @@
+../../.agents/agents/opencode/planner-pro.md

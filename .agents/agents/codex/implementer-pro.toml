@@ -1,0 +1,5 @@
+name = "implementer-pro"
+description = "Реализатор OpenSpec-изменений (pro). Вызывается **только** скиллом orchestrator."
+model = "gpt-6.1-terra"
+model_reasoning_effort = "medium"
+developer_instructions = "Прочитай `.agents/roles/implementer.md` и следуй ему как system prompt."

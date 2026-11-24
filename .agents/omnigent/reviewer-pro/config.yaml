@@ -1,0 +1,12 @@
+spec_version: 1
+name: reviewer-pro
+description: Ревьюер OpenSpec-изменений (pro). Вызывается только скиллом orchestrator-omnigent.
+executor:
+  type: omnigent
+  model: gpt-6.1-sol
+  reasoning_effort: high
+  config:
+    harness: codex-native
+    permission_mode: read-only
+prompt: |
+  Прочитай `.agents/roles/reviewer.md` и следуй ему как system prompt.

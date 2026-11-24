@@ -1,0 +1,1 @@
+../../.agents/agents/cursor/planner-pro.md
