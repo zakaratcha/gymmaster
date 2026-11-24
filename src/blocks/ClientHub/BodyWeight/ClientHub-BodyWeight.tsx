@@ -2,7 +2,7 @@ import { type FC } from 'react';
 import { cn } from '@bem-react/classname';
 
 import type { Client } from '../../../services/clients/clients.models';
-import { formatBodyWeightKg } from '../../../services/util/format/format';
+import { formatBodyWeightKg } from '../../../services/util/format.utils';
 import { ClientHubRow } from '../Row/ClientHub-Row';
 import { ClientHubSection } from '../Section/ClientHub-Section';
 import { ClientHubSectionLabel } from '../SectionLabel/ClientHub-SectionLabel';

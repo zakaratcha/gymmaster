@@ -1,0 +1,29 @@
+---
+description: Файл компонента экспортирует только разметку и типы
+alwaysApply: true
+---
+
+# Экспорты файла компонента
+
+Файл блока, элемента или модификатора (`src/blocks/BlockName/BlockName.tsx`, `src/blocks/BlockName/Element/BlockName-Element.tsx`, `src/blocks/BlockName/_modName/BlockName_modName_modVal.tsx`) экспортирует ровно один компонент и типы.
+
+Компонент — `FC`, функция с `JSX`/`ReactNode`, обёртки `observer` / `forwardRef` / `memo`. Второй экспорт разметки — свой файл. JSX элементов внутри этого компонента наружу не отдавать.
+
+Типы — `type` и `interface`, в том числе пропсы. Их может быть несколько.
+
+Не экспортировать функции без разметки, константы, enum и `cn()`. Неэкспортируемый хелпер в том же файле оставлять можно.
+
+`cn('Block')` и `cn('Block', 'Element')` вызывать в каждом файле, которому нужен класс. Общий `cn*` не экспортировать.
+
+Функция, которая нужна другому блоку или коду вне `src/blocks`, кладётся вне `src/blocks` — в `src/services`. Если функция с `JSX`/`ReactNode` — это компонент, см. правило про блок и элемент.
+
+`*.stories.tsx` и тесты — не файлы компонента.
+
+```ts
+// файл компонента: одна разметка и типы
+export const Block: FC<BlockProps> = ({ title }) => <section>{title}</section>;
+
+export type BlockProps = {
+  readonly title: string;
+};
+```

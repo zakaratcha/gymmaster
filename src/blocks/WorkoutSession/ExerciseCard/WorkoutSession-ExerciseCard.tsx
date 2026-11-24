@@ -16,7 +16,7 @@ type WorkoutSessionExerciseCardProps = {
   readonly draft: DraftExercise;
   readonly draftCount: number;
   readonly exercisePosition: number;
-  readonly isInProgress: boolean;
+  readonly inProgress: boolean;
   readonly mutationDisabled: boolean;
   onExerciseAction(action: ExerciseAction, exercisePosition: number): void;
   onSetAction(action: SetAction, exercisePosition: number, setPosition?: number): void;
@@ -27,7 +27,7 @@ export const WorkoutSessionExerciseCard: FC<WorkoutSessionExerciseCardProps> = (
   draft,
   draftCount,
   exercisePosition,
-  isInProgress,
+  inProgress,
   mutationDisabled,
   onExerciseAction,
   onSetAction,
@@ -43,7 +43,7 @@ export const WorkoutSessionExerciseCard: FC<WorkoutSessionExerciseCardProps> = (
         <strong>
           {exercisePosition + 1}. {draft.exerciseName}
         </strong>
-        {isInProgress && (
+        {inProgress && (
           <WorkoutSessionExerciseActions
             draftCount={draftCount}
             exerciseName={draft.exerciseName}
@@ -59,7 +59,7 @@ export const WorkoutSessionExerciseCard: FC<WorkoutSessionExerciseCardProps> = (
           <WorkoutSessionSetRow
             disabled={mutationDisabled}
             exercisePosition={exercisePosition}
-            isInProgress={isInProgress}
+            inProgress={inProgress}
             key={setPosition}
             onAction={onSetAction}
             onChange={onSetChange}
@@ -68,7 +68,7 @@ export const WorkoutSessionExerciseCard: FC<WorkoutSessionExerciseCardProps> = (
           />
         ))}
       </WorkoutSessionSetList>
-      {isInProgress && (
+      {inProgress && (
         <WorkoutSessionAddSet disabled={mutationDisabled} exercisePosition={exercisePosition} onAdd={handleAddSet} />
       )}
     </article>

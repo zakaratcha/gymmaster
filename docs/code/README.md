@@ -9,6 +9,20 @@
 | `blocks/`   | Компоненты по **БЭМ** и в **React-договорённости имён**: папка **PascalCase** = файл **Block.tsx** и SCSS **Block.scss**. |
 | `services/` | Клиентские обращения к API, адаптеры данных без разметки.                                                                 |
 
+## Слои `services/`
+
+Домен — папка, часть — по суффиксу (см. правило `service-layers`):
+
+| Суффикс           | Что внутри                                                                      |
+| ----------------- | ------------------------------------------------------------------------------- |
+| `*.service.ts`    | Бизнес-логика для компонентов и сторов; без разметки и без прямых HTTP-вызовов. |
+| `*.client.ts`     | URL и вызовы API; ответ сервера не преобразуется.                               |
+| `*.models.ts`     | Типы, интерфейсы, константы.                                                    |
+| `*.typeguards.ts` | Тайпгарды домена.                                                               |
+| `*.utils.ts`      | Чистые функции; покрываются `*.utils.test.ts`.                                  |
+
+Общий транспорт — `services/api/`: `api.service.ts` (вызовы) и `ApiClient` (базовый класс клиентов). Общие утилиты — `services/util/`: `format.utils.ts`, `typeGuards/isArray.ts` (один гард на файл).
+
 ## Структура `tests/`
 
 | Каталог                 | Роль                                                                                                                                                  |
@@ -56,6 +70,12 @@
 **Пример.** Сценарий [auth.feature](../../tests/e2e/auth/auth.feature): главная страница ([Main.page.ts](../../tests/_harness/pages/Main/Main.page.ts), шаги [Main.steps.ts](../../tests/_harness/pages/Main/Main.steps.ts)), блоки формы входа и профиля ([LoginForm.block.ts](../../tests/_harness/blocks/LoginForm/LoginForm.block.ts), [Profile.block.ts](../../tests/_harness/blocks/Profile/Profile.block.ts) и соответствующие `*.steps.ts`).
 
 Зависимости в **`package.json`** задаются **точными** версиями без `^`/`~`; в репозитории хранится **`package-lock.json`**.
+
+### Юнит-тесты
+
+- **`npm test`** — [Vitest](https://vitest.dev/) в окружении node; конфиг [vitest.unit.config.ts](../../vitest.unit.config.ts), файлы `src/**/*.test.ts`.
+- Покрываются чистые функции слоя `utils`: `*.utils.ts` → `*.utils.test.ts` рядом.
+- **`npm run test:watch`** — те же тесты в watch-режиме.
 
 ## Общая спека продукта
 
