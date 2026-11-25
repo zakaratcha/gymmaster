@@ -8,6 +8,7 @@ import type {
   UpdateWorkoutSessionRequest,
   WorkoutSessionActiveResponse,
   WorkoutSessionLatestCompletedResponse,
+  WorkoutSessionPreviousResponse,
   WorkoutSessionResponse
 } from './workoutSessions.models';
 
@@ -58,6 +59,12 @@ class WorkoutSessionsClient extends ApiClient {
 
   async getById(clientId: string, sessionId: string): Promise<WorkoutSessionResponse> {
     return await api.get<WorkoutSessionResponse>(this.getWorkoutSessionUrl(clientId, sessionId), {
+      cache: { disabled: true }
+    });
+  }
+
+  async getPrevious(clientId: string, sessionId: string): Promise<WorkoutSessionPreviousResponse> {
+    return await api.get<WorkoutSessionPreviousResponse>(`${this.getWorkoutSessionUrl(clientId, sessionId)}/previous`, {
       cache: { disabled: true }
     });
   }

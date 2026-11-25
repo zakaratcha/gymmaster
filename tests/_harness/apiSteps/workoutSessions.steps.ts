@@ -23,6 +23,8 @@ import {
   getLatestCompletedWorkoutSession,
   getLatestCompletedWorkoutSessionForTrainer,
   getLatestCompletedWorkoutSessionWithoutAuth,
+  getPreviousWorkoutSession,
+  getPreviousWorkoutSessionWithoutAuth,
   getWorkoutSession,
   getWorkoutSessionForTrainer,
   getWorkoutSessionWithoutAuth,
@@ -178,7 +180,8 @@ Given('существует активная тренировка другого
     splitTag: 'чужой',
     exercises: [{ exerciseId: trainerExercise.id, sets: [{ reps: 10, weightKg: 40 }] }]
   });
-  await createWorkoutSessionForTrainer(trainerClient.id, { plannedWorkoutId: trainerPlan.id });
+  const created = await createWorkoutSessionForTrainer(trainerClient.id, { plannedWorkoutId: trainerPlan.id });
+  this.trainerWorkoutSession = created.workoutSession;
 });
 
 Given('существует чужое упражнение для сессии {string}', async function (this: ApiWorld, name: string) {
@@ -353,6 +356,16 @@ When('я обновляю тренировку через API с телом JSON
 });
 
 When('я завершаю тренировку через API', async function (this: ApiWorld) {
+  const currentId = this.workoutSession?.id;
+  const hasEarlierCompleted = (this.workoutSessions ?? []).some(
+    session => session.status === 'completed' && session.id !== currentId
+  );
+  if (hasEarlierCompleted) {
+    await new Promise(resolve => {
+      setTimeout(resolve, STARTED_AT_RESOLUTION_MS);
+    });
+  }
+
   try {
     const response = await completeWorkoutSession(requireClient.call(this), requireSessionId.call(this));
     const completedSession = response.workoutSession;
@@ -653,4 +666,109 @@ Then('после завершения создана новая трениров
   expect(completedSession?.status).toBe('completed');
   expect(newSession?.status).toBe('in_progress');
   expect(newSession?.id).not.toBe(completedSession?.id);
+});
+
+When(
+  'я начинаю тренировку через API для второго клиента без плана с тегом {string}',
+  async function (this: ApiWorld, splitTag: string) {
+    if (this.secondaryClient === undefined) {
+      throw new Error('Нет второго клиента');
+    }
+
+    try {
+      saveWorkoutSession.call(this, await createWorkoutSession(this.secondaryClient.id, { splitTag }));
+    } catch (error) {
+      setApiError.call(this, error);
+    }
+  }
+);
+
+When('я запрашиваю прошлую аналогичную тренировку через API', async function (this: ApiWorld) {
+  try {
+    const response = await getPreviousWorkoutSession(requireClient.call(this), requireSessionId.call(this));
+    this.previousWorkoutSession = response.workoutSession;
+    this.lastError = undefined;
+  } catch (error) {
+    setApiError.call(this, error);
+  }
+});
+
+When(
+  'я запрашиваю прошлую аналогичную тренировку через API для сессии {int}',
+  async function (this: ApiWorld, position: number) {
+    const session = this.workoutSessions?.[position - 1];
+    if (session === undefined) {
+      throw new Error(`Нет сессии ${position}`);
+    }
+
+    try {
+      const response = await getPreviousWorkoutSession(session.clientId, session.id);
+      this.previousWorkoutSession = response.workoutSession;
+      this.lastError = undefined;
+    } catch (error) {
+      setApiError.call(this, error);
+    }
+  }
+);
+
+When(
+  'я запрашиваю прошлую аналогичную тренировку через API для тренировки другого тренера',
+  async function (this: ApiWorld) {
+    if (this.trainerClient === undefined || this.trainerWorkoutSession === undefined) {
+      throw new Error('Нет тренировки другого тренера');
+    }
+
+    try {
+      const response = await getPreviousWorkoutSession(this.trainerClient.id, this.trainerWorkoutSession.id);
+      this.previousWorkoutSession = response.workoutSession;
+      this.lastError = undefined;
+    } catch (error) {
+      setApiError.call(this, error);
+    }
+  }
+);
+
+When(
+  'я запрашиваю прошлую аналогичную тренировку через API для несуществующей сессии',
+  async function (this: ApiWorld) {
+    try {
+      const response = await getPreviousWorkoutSession(requireClient.call(this), INVALID_ID);
+      this.previousWorkoutSession = response.workoutSession;
+      this.lastError = undefined;
+    } catch (error) {
+      setApiError.call(this, error);
+    }
+  }
+);
+
+When('я запрашиваю прошлую аналогичную тренировку через API без авторизации', async function (this: ApiWorld) {
+  try {
+    const response = await getPreviousWorkoutSessionWithoutAuth(requireClient.call(this), requireSessionId.call(this));
+    this.previousWorkoutSession = response.workoutSession;
+    this.lastError = undefined;
+  } catch (error) {
+    setApiError.call(this, error);
+  }
+});
+
+Then('прошлая аналогичная тренировка — сессия {int}', function (this: ApiWorld, position: number) {
+  const expected = this.workoutSessions?.[position - 1];
+  if (expected === undefined) {
+    throw new Error(`Нет сессии ${position}`);
+  }
+
+  expect(this.lastError).toBeUndefined();
+  expect(this.previousWorkoutSession).toMatchObject({
+    id: expected.id,
+    clientId: expected.clientId,
+    splitTag: expected.splitTag,
+    status: 'completed',
+    completedAt: expected.completedAt,
+    exercises: expected.exercises
+  });
+});
+
+Then('прошлой аналогичной тренировки нет', function (this: ApiWorld) {
+  expect(this.lastError).toBeUndefined();
+  expect(this.previousWorkoutSession).toBeNull();
 });

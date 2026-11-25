@@ -13,6 +13,7 @@ import type {
 } from '../../services/workoutSessions/workoutSessions.models';
 import {
   completeWorkoutSession,
+  getPreviousWorkoutSession,
   getWorkoutSession,
   updateWorkoutSession
 } from '../../services/workoutSessions/workoutSessions.service';
@@ -26,6 +27,7 @@ import { WorkoutSessionHeader } from './Header/WorkoutSession-Header';
 import { WorkoutSessionLoading } from './Loading/WorkoutSession-Loading';
 import { WorkoutSessionMain } from './Main/WorkoutSession-Main';
 import { WorkoutSessionMeta } from './Meta/WorkoutSession-Meta';
+import { WorkoutSessionPrevious } from './Previous/WorkoutSession-Previous';
 import type { DraftExercise, DraftSet, ExerciseAction, SetAction, SetField } from './types';
 
 import './WorkoutSession.scss';
@@ -35,6 +37,7 @@ const cnWorkoutSession = cn('WorkoutSession');
 type WorkoutSessionState = {
   client?: Client;
   session?: WorkoutSessionModel;
+  previousSession: WorkoutSessionModel | null;
   exercises: readonly Exercise[];
   drafts: DraftExercise[];
   selectedExerciseId: string;
@@ -46,6 +49,7 @@ type WorkoutSessionState = {
   completing: boolean;
   setClient(value: Client): void;
   setSession(value: WorkoutSessionModel): void;
+  setPreviousSession(value: WorkoutSessionModel | null): void;
   setExercises(value: readonly Exercise[]): void;
   setSelectedExerciseId(value: string): void;
   setLoading(value: boolean): void;
@@ -65,6 +69,14 @@ type WorkoutSessionState = {
 type ValidationResult =
   | { readonly ok: true; readonly payload: UpdateWorkoutSessionRequest }
   | { readonly ok: false; readonly error: string };
+
+async function readPreviousWorkoutSession(clientId: string, sessionId: string): Promise<WorkoutSessionModel | null> {
+  try {
+    return await getPreviousWorkoutSession(clientId, sessionId);
+  } catch {
+    return null;
+  }
+}
 
 function toDraftExercises(session: WorkoutSessionModel): DraftExercise[] {
   return session.exercises.map(exercise => ({
@@ -103,6 +115,7 @@ export const WorkoutSession: FC = observer(() => {
   const navigate = useNavigate();
   const { clientId, sessionId } = useParams<{ clientId: string; sessionId: string }>();
   const state = useLocalObservable<WorkoutSessionState>(() => ({
+    previousSession: null,
     exercises: [],
     drafts: [],
     selectedExerciseId: '',
@@ -116,6 +129,9 @@ export const WorkoutSession: FC = observer(() => {
     setSession(value) {
       this.session = value;
       this.drafts = toDraftExercises(value);
+    },
+    setPreviousSession(value) {
+      this.previousSession = value;
     },
     setExercises(value) {
       this.exercises = value;
@@ -230,16 +246,19 @@ export const WorkoutSession: FC = observer(() => {
     state.setFormError(undefined);
     state.setSaveSuccess(false);
     try {
-      const [session, exercises, client] = await Promise.all([
+      const [session, exercises, client, previousSession] = await Promise.all([
         getWorkoutSession(clientId, sessionId),
         listExercises(),
-        getClientById(clientId)
+        getClientById(clientId),
+        readPreviousWorkoutSession(clientId, sessionId)
       ]);
       state.setSession(session);
+      state.setPreviousSession(previousSession);
       state.setExercises(exercises);
       state.setSelectedExerciseId(exercises[0]?.id ?? '');
       state.setClient(client);
     } catch {
+      state.setPreviousSession(null);
       state.setError('Не удалось загрузить тренировку');
     } finally {
       state.setLoading(false);
@@ -419,6 +438,9 @@ export const WorkoutSession: FC = observer(() => {
               <>
                 <WorkoutComparison plan={session.plan} session={session} />
                 {session.plan === null && factList}
+                {state.previousSession !== null && clientId !== undefined && sessionId !== undefined && (
+                  <WorkoutSessionPrevious clientId={clientId} previous={state.previousSession} sessionId={sessionId} />
+                )}
               </>
             )}
           </>

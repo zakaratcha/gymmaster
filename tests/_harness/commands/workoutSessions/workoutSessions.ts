@@ -5,6 +5,7 @@ import type {
   UpdateWorkoutSessionRequest,
   WorkoutSessionActiveResponse,
   WorkoutSessionLatestCompletedResponse,
+  WorkoutSessionPreviousResponse,
   WorkoutSessionResponse
 } from '../../../../src/services/workoutSessions/workoutSessions.models';
 import { requestAsAdmin, requestAsTrainer, requestWithoutAuth } from '../requestAs';
@@ -118,6 +119,28 @@ export async function getWorkoutSessionWithoutAuth(
 ): Promise<WorkoutSessionResponse> {
   return await requestWithoutAuth<WorkoutSessionResponse, [string, string]>(
     workoutSessionsClient.getById,
+    clientId,
+    sessionId
+  );
+}
+
+export async function getPreviousWorkoutSession(
+  clientId: string,
+  sessionId: string
+): Promise<WorkoutSessionPreviousResponse> {
+  return await requestAsAdmin<WorkoutSessionPreviousResponse, [string, string]>(
+    workoutSessionsClient.getPrevious,
+    clientId,
+    sessionId
+  );
+}
+
+export async function getPreviousWorkoutSessionWithoutAuth(
+  clientId: string,
+  sessionId: string
+): Promise<WorkoutSessionPreviousResponse> {
+  return await requestWithoutAuth<WorkoutSessionPreviousResponse, [string, string]>(
+    workoutSessionsClient.getPrevious,
     clientId,
     sessionId
   );

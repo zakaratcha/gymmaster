@@ -11,6 +11,7 @@ import {
 } from '../../commands/workoutSessions/workoutSessions';
 import type { CustomWorld } from '../../world';
 import { ClientHubBlock } from '../ClientHub/ClientHub.block';
+import { PreviousWorkoutComparisonBlock } from '../PreviousWorkoutComparison/PreviousWorkoutComparison.block';
 import { WorkoutComparisonBlock } from '../WorkoutComparison/WorkoutComparison.block';
 import { WorkoutSessionBlock } from './WorkoutSession.block';
 
@@ -241,4 +242,20 @@ Then(
 
 Then('тренировка отображается как завершённая', async function (this: CustomWorld) {
   await new WorkoutSessionBlock(this.page).expectCompleted();
+});
+
+Then(
+  'на экране тренировки есть переход к сравнению с прошлой {string}',
+  async function (this: CustomWorld, splitTag: string) {
+    await new WorkoutSessionBlock(this.page).expectPreviousTransition(splitTag);
+  }
+);
+
+Then('на экране тренировки нет перехода к сравнению с прошлой', async function (this: CustomWorld) {
+  await new WorkoutSessionBlock(this.page).expectNoPreviousTransition();
+});
+
+When('я открываю сравнение с прошлой тренировкой {string}', async function (this: CustomWorld, splitTag: string) {
+  await new WorkoutSessionBlock(this.page).openPrevious(splitTag);
+  await new PreviousWorkoutComparisonBlock(this.page).waitForReady();
 });

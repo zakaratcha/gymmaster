@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   formatBodyWeightKg,
   formatPlannedDate,
+  formatSessionDate,
   formatSetsText,
   formatVolumeDeltaKg,
   formatVolumeKg,
@@ -102,6 +103,24 @@ describe('formatBodyWeightKg', () => {
 
   it('добавляет килограммы', () => {
     expect(formatBodyWeightKg(72)).toBe('72 кг');
+  });
+});
+
+describe('formatSessionDate', () => {
+  it('переводит момент в локальную дату без времени', () => {
+    const value = '2026-05-07T11:00:00.000Z';
+    const expected = new Intl.DateTimeFormat('ru-RU', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    }).format(new Date(value));
+
+    expect(formatSessionDate(value)).toBe(expected);
+    expect(formatSessionDate(value)).toMatch(/^\d{2}\.\d{2}\.\d{4}$/);
+  });
+
+  it('оставляет как есть некорректную строку', () => {
+    expect(formatSessionDate('не дата')).toBe('не дата');
   });
 });
 

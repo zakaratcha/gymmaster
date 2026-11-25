@@ -4,7 +4,8 @@ import type { ActiveWorkoutSession } from '../services/workoutSessions/workoutSe
 import { listActiveWorkoutSessions } from '../services/workoutSessions/workoutSessions.service';
 
 const DEFAULT_HOME_PATH = '/clients';
-const WORKOUT_PATH_PATTERN = /^\/workouts\/([^/]+)\/[^/]+\/?$/;
+// Сессия и экран сравнения с прошлой не подменяют путь основного интерфейса.
+const WORKOUT_PATH_PATTERN = /^\/workouts\/([^/]+)\/[^/]+(?:\/previous)?\/?$/;
 
 class WorkoutTabsStore {
   @observable sessions: readonly ActiveWorkoutSession[] = [];

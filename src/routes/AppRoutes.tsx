@@ -7,6 +7,7 @@ import { Clients } from '../blocks/Clients/Clients';
 import { Exercises } from '../blocks/Exercises/Exercises';
 import { PlannedWorkoutEditor } from '../blocks/PlannedWorkoutEditor/PlannedWorkoutEditor';
 import { PlannedWorkoutList } from '../blocks/PlannedWorkoutList/PlannedWorkoutList';
+import { PreviousWorkoutComparison } from '../blocks/PreviousWorkoutComparison/PreviousWorkoutComparison';
 import { Profile } from '../blocks/Profile/Profile';
 import { Shell } from '../blocks/Shell/Shell';
 import { Workouts } from '../blocks/Workouts/Workouts';
@@ -18,6 +19,7 @@ export const AppRoutes: FC = () => {
       <Route element={<AppLayout />}>
         <Route path='/' element={<Navigate replace to='/clients' />} />
         <Route path='/workouts' element={<Workouts />} />
+        <Route path='/workouts/:clientId/:sessionId/previous' element={<PreviousWorkoutComparison />} />
         <Route path='/workouts/:clientId/:sessionId' element={<WorkoutSession />} />
         <Route element={<Shell />}>
           <Route path='/clients' element={<Clients />} />

@@ -6,6 +6,12 @@ const sessionTimestampFormatter = new Intl.DateTimeFormat('ru-RU', {
   year: 'numeric'
 });
 
+const sessionDateFormatter = new Intl.DateTimeFormat('ru-RU', {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric'
+});
+
 const plannedDatePattern = /^\d{4}-\d{2}-\d{2}$/;
 
 export function getFirstName(name: string): string {
@@ -42,6 +48,11 @@ export function formatPlannedDate(value: string): string {
 export function formatSessionTimestamp(value: string): string {
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? value : sessionTimestampFormatter.format(date);
+}
+
+export function formatSessionDate(value: string): string {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? value : sessionDateFormatter.format(date);
 }
 
 export function formatWeightKg(value: number): string {

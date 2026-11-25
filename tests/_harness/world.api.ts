@@ -23,10 +23,12 @@ export class ApiWorld extends World {
   latestCompletedSession?: WorkoutSession | null;
   plan?: PlannedWorkout;
   plans?: readonly PlannedWorkout[];
+  previousWorkoutSession?: WorkoutSession | null;
   secondaryClient?: Client;
   secondaryPlan?: PlannedWorkout;
   trainer?: Trainer;
   trainerClient?: Client;
+  trainerWorkoutSession?: WorkoutSession;
   workoutSession?: WorkoutSession;
   workoutSessions?: readonly WorkoutSession[];
 

@@ -1,0 +1,15 @@
+.PreviousWorkoutComparison-Row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+
+  padding: var(--space-md);
+
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+
+  strong {
+    font-size: var(--font-size-md);
+  }
+}

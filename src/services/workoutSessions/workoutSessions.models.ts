@@ -62,3 +62,7 @@ export type ActiveWorkoutSessionsResponse = {
 export type WorkoutSessionLatestCompletedResponse = {
   readonly workoutSession: WorkoutSession | null;
 };
+
+export type WorkoutSessionPreviousResponse = {
+  readonly workoutSession: WorkoutSession | null;
+};

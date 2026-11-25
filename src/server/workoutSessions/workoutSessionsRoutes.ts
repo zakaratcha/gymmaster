@@ -7,6 +7,7 @@ import {
   createWorkoutSession,
   getActiveWorkoutSession,
   getLatestCompletedWorkoutSession,
+  getPreviousWorkoutSession,
   getWorkoutSessionById,
   updateWorkoutSession,
   WorkoutSessionAlreadyInProgressError,
@@ -126,6 +127,24 @@ workoutSessionsRouter.get('/:sessionId', async (req, res) => {
   }
 
   const result = await getWorkoutSessionById(req.auth!, clientId, sessionId);
+  if (result === undefined) {
+    res.status(404).json({ error: 'not_found' });
+    return;
+  }
+
+  res.json(result);
+});
+
+workoutSessionsRouter.get('/:sessionId/previous', async (req, res) => {
+  const { clientId: clientIdParam, sessionId: sessionIdParam } = readParams(req);
+  const clientId = readClientId(clientIdParam);
+  const sessionId = readSessionId(sessionIdParam);
+  if (clientId === undefined || sessionId === undefined) {
+    res.status(400).json({ error: 'Некорректный id' });
+    return;
+  }
+
+  const result = await getPreviousWorkoutSession(req.auth!, clientId, sessionId);
   if (result === undefined) {
     res.status(404).json({ error: 'not_found' });
     return;

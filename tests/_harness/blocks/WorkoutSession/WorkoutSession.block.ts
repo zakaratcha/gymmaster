@@ -18,7 +18,8 @@ export class WorkoutSessionBlock extends Block {
     setRow: '.WorkoutSession-SetRow',
     setValue: '.WorkoutSession-SetValue',
     save: '.WorkoutSession-Save',
-    complete: '.WorkoutSession-Complete'
+    complete: '.WorkoutSession-Complete',
+    previous: '.WorkoutSession-Previous'
   } as const;
 
   constructor(page: PlaywrightPage) {
@@ -197,5 +198,23 @@ export class WorkoutSessionBlock extends Block {
     const values = card.locator('.WorkoutSession-SetValue');
     await expect(values.nth(0)).toHaveText(`${reps} повт.`);
     await expect(values.nth(1)).toHaveText(`${weightKg} кг`);
+  }
+
+  async expectPreviousTransition(splitTag: string): Promise<void> {
+    const previous = this.findBySelector('previous');
+    await expect(previous).toBeVisible();
+    await expect(previous).toContainText(`С прошлой „${splitTag}“`);
+    await expect(previous).toContainText(/\(\d{2}\.\d{2}\.\d{4}\)/);
+    await expect(previous.getByRole('link', { name: 'Подробнее', exact: true })).toBeVisible();
+  }
+
+  async expectNoPreviousTransition(): Promise<void> {
+    await expect(this.findBySelector('previous')).toHaveCount(0);
+  }
+
+  async openPrevious(splitTag: string): Promise<void> {
+    await this.expectPreviousTransition(splitTag);
+    await this.findBySelector('previous').getByRole('link', { name: 'Подробнее', exact: true }).click();
+    await expect(this.page).toHaveURL(/\/workouts\/[^/]+\/[^/]+\/previous$/);
   }
 }

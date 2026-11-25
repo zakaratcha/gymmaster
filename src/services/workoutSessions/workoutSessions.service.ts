@@ -34,6 +34,11 @@ export async function getWorkoutSession(clientId: string, sessionId: string): Pr
   return response.workoutSession;
 }
 
+export async function getPreviousWorkoutSession(clientId: string, sessionId: string): Promise<WorkoutSession | null> {
+  const response = await workoutSessionsClient.getPrevious(clientId, sessionId);
+  return response.workoutSession;
+}
+
 export async function updateWorkoutSession(
   clientId: string,
   sessionId: string,

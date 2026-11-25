@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { and, asc, desc, eq, inArray } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, lt, ne } from 'drizzle-orm';
 
 import type { PlannedWorkout } from '../../services/plans/plans.models.ts';
 import type {
@@ -8,6 +8,7 @@ import type {
   WorkoutSessionActiveResponse,
   WorkoutSessionExercise,
   WorkoutSessionLatestCompletedResponse,
+  WorkoutSessionPreviousResponse,
   WorkoutSessionResponse,
   WorkoutSessionSet
 } from '../../services/workoutSessions/workoutSessions.models.ts';
@@ -122,6 +123,36 @@ async function getWorkoutSessionRowByStatus(
     )
     .orderBy(
       status === 'completed' ? desc(workoutSessions.completedAt) : desc(workoutSessions.startedAt),
+      desc(workoutSessions.startedAt),
+      desc(workoutSessions.createdAt),
+      desc(workoutSessions.id)
+    )
+    .limit(1);
+
+  return rows[0];
+}
+
+async function findPreviousWorkoutSessionRow(
+  auth: AuthContext,
+  current: WorkoutSessionRow,
+  completedAt: string
+): Promise<WorkoutSessionRow | undefined> {
+  // completedAt пишется через toISOString(): лексикографический порядок совпадает с хронологическим.
+  const rows = await getDb()
+    .select()
+    .from(workoutSessions)
+    .where(
+      and(
+        eq(workoutSessions.trainerId, auth.trainerId),
+        eq(workoutSessions.clientId, current.clientId),
+        eq(workoutSessions.status, 'completed'),
+        eq(workoutSessions.splitTag, current.splitTag),
+        lt(workoutSessions.completedAt, completedAt),
+        ne(workoutSessions.id, current.id)
+      )
+    )
+    .orderBy(
+      desc(workoutSessions.completedAt),
       desc(workoutSessions.startedAt),
       desc(workoutSessions.createdAt),
       desc(workoutSessions.id)
@@ -279,6 +310,24 @@ export async function getWorkoutSessionById(
   }
 
   return { workoutSession: await loadWorkoutSession(auth, row) };
+}
+
+export async function getPreviousWorkoutSession(
+  auth: AuthContext,
+  clientId: string,
+  sessionId: string
+): Promise<WorkoutSessionPreviousResponse | undefined> {
+  const current = await getWorkoutSessionRow(auth, clientId, sessionId);
+  if (current === undefined) {
+    return undefined;
+  }
+
+  if (current.status !== 'completed' || current.completedAt === null) {
+    return { workoutSession: null };
+  }
+
+  const previous = await findPreviousWorkoutSessionRow(auth, current, current.completedAt);
+  return { workoutSession: previous === undefined ? null : await loadWorkoutSession(auth, previous) };
 }
 
 export async function createWorkoutSession(
