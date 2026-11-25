@@ -11,7 +11,7 @@ type ClientHubSectionProps = {
   readonly children: ReactNode;
   readonly className?: string;
   readonly title?: string;
-  readonly type: 'actions' | 'activeWorkout' | 'bodyWeight' | 'latestWorkout' | 'notes' | 'plan' | 'split';
+  readonly type: 'actions' | 'activeWorkout' | 'bodyWeight' | 'history' | 'latestWorkout' | 'notes' | 'plan' | 'split';
 };
 
 export const ClientHubSection: FC<ClientHubSectionProps> = ({ children, className, title, type }) => {

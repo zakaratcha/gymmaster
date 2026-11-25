@@ -9,6 +9,7 @@ import { ClientHubActiveWorkout } from '../ActiveWorkout/ClientHub-ActiveWorkout
 import { ClientHubBodyWeight } from '../BodyWeight/ClientHub-BodyWeight';
 import { ClientHubDelete } from '../Delete/ClientHub-Delete';
 import { ClientHubErrorBlock } from '../ErrorBlock/ClientHub-ErrorBlock';
+import { ClientHubHistory } from '../History/ClientHub-History';
 import { ClientHubLatestWorkout } from '../LatestWorkout/ClientHub-LatestWorkout';
 import { ClientHubLoading } from '../Loading/ClientHub-Loading';
 import { ClientHubNotes } from '../Notes/ClientHub-Notes';
@@ -35,6 +36,7 @@ type ClientHubContentProps = {
   readonly staticMode: boolean;
   onAllPlans(): void;
   onDelete(): void;
+  onHistoryOpen(): void;
   onPlansRetry(): void;
   onRetry(): void;
   onSessionsRetry(): void;
@@ -58,6 +60,7 @@ export const ClientHubContent: FC<ClientHubContentProps> = ({
   staticMode,
   onAllPlans,
   onDelete,
+  onHistoryOpen,
   onPlansRetry,
   onRetry,
   onSessionsRetry,
@@ -103,6 +106,7 @@ export const ClientHubContent: FC<ClientHubContentProps> = ({
             session={latestCompletedSession}
             onRetry={onSessionsRetry}
           />
+          <ClientHubHistory onOpen={onHistoryOpen} />
           <ClientHubSplit />
         </>
       )}

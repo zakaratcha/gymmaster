@@ -240,6 +240,29 @@ export class ClientHubBlock extends Block {
     await expect(this.findBySelector('latestWorkoutStats')).toHaveText(stats);
   }
 
+  async openExerciseHistoryDialog(): Promise<void> {
+    await this.waitForReady();
+    await this.page.getByRole('button', { name: 'История упражнения…', exact: true }).click();
+    const dialog = this.page.getByRole('dialog', { name: 'Выбор упражнения' });
+    await expect(dialog).toBeVisible();
+    await expect(dialog.locator('.ClientHub-ExerciseHistoryLoading')).toHaveCount(0);
+  }
+
+  async chooseExerciseHistory(exerciseName: string): Promise<void> {
+    const dialog = this.page.getByRole('dialog', { name: 'Выбор упражнения' });
+    await dialog.getByRole('button', { name: exerciseName, exact: true }).first().click();
+  }
+
+  async expectExerciseHistoryChoice(exerciseName: string): Promise<void> {
+    const dialog = this.page.getByRole('dialog', { name: 'Выбор упражнения' });
+    await expect(dialog.getByRole('button', { name: exerciseName, exact: true }).first()).toBeVisible();
+  }
+
+  async expectExerciseHistoryChoiceAbsent(exerciseName: string): Promise<void> {
+    const dialog = this.page.getByRole('dialog', { name: 'Выбор упражнения' });
+    await expect(dialog.getByRole('button', { name: exerciseName, exact: true })).toHaveCount(0);
+  }
+
   async openLatestCompletedResult(): Promise<void> {
     await this.waitForWorkoutDataReady();
     await this.findBySelector('latestWorkoutLink').click();

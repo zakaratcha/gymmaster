@@ -4,6 +4,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { AppLayout } from '../blocks/AppLayout/AppLayout';
 import { ClientHub } from '../blocks/ClientHub/ClientHub';
 import { Clients } from '../blocks/Clients/Clients';
+import { ExerciseHistoryScreen } from '../blocks/ExerciseHistoryScreen/ExerciseHistoryScreen';
 import { Exercises } from '../blocks/Exercises/Exercises';
 import { PlannedWorkoutEditor } from '../blocks/PlannedWorkoutEditor/PlannedWorkoutEditor';
 import { PlannedWorkoutList } from '../blocks/PlannedWorkoutList/PlannedWorkoutList';
@@ -23,6 +24,7 @@ export const AppRoutes: FC = () => {
         <Route path='/workouts/:clientId/:sessionId' element={<WorkoutSession />} />
         <Route element={<Shell />}>
           <Route path='/clients' element={<Clients />} />
+          <Route path='/clients/:id/exercises/:exerciseId/history' element={<ExerciseHistoryScreen />} />
           <Route path='/clients/:id' element={<ClientHub />} />
           <Route path='/clients/:id/plans' element={<PlannedWorkoutList />} />
           <Route path='/clients/:id/plans/new' element={<PlannedWorkoutEditor />} />

@@ -7,4 +7,12 @@
   margin-bottom: var(--space-xs);
 
   font-size: var(--font-size-md);
+
+  a {
+    text-decoration: underline;
+
+    color: inherit;
+
+    font-weight: 700;
+  }
 }

@@ -11,13 +11,19 @@ import './WorkoutComparison-Row.scss';
 const cnWorkoutComparisonRow = cn('WorkoutComparison', 'Row');
 
 type WorkoutComparisonRowProps = {
+  readonly clientId?: string;
   readonly row: RowModel;
 };
 
-export const WorkoutComparisonRow: FC<WorkoutComparisonRowProps> = ({ row }) => {
+export const WorkoutComparisonRow: FC<WorkoutComparisonRowProps> = ({ clientId, row }) => {
   return (
     <article className={cnWorkoutComparisonRow()}>
-      <WorkoutComparisonRowHeader exerciseName={row.exerciseName} status={row.status} />
+      <WorkoutComparisonRowHeader
+        clientId={clientId}
+        exerciseId={row.exerciseId}
+        exerciseName={row.exerciseName}
+        status={row.status}
+      />
       <WorkoutComparisonLine label='план' value={row.planText} />
       <WorkoutComparisonLine label='факт' value={row.factText} />
       <WorkoutComparisonLine

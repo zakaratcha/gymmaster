@@ -63,6 +63,25 @@ export function formatVolumeKg(value: number): string {
   return `${Number(value.toFixed(1))}`;
 }
 
+export function formatSetGroupsText(sets: readonly { readonly reps: number; readonly weightKg: number }[]): string {
+  if (sets.length === 0) {
+    return '—';
+  }
+
+  const groups: { count: number; reps: number; weightKg: number }[] = [];
+  for (const set of sets) {
+    const last = groups.at(-1);
+    if (last !== undefined && last.reps === set.reps && last.weightKg === set.weightKg) {
+      last.count += 1;
+      continue;
+    }
+
+    groups.push({ count: 1, reps: set.reps, weightKg: set.weightKg });
+  }
+
+  return groups.map(group => `${group.count}×${group.reps}@${formatWeightKg(group.weightKg)}`).join(' · ');
+}
+
 export function formatSetsText(sets: readonly { readonly reps: number; readonly weightKg: number }[]): string {
   if (sets.length === 0) {
     return '—';

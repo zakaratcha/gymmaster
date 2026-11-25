@@ -2,6 +2,7 @@ import express, { type Router } from 'express';
 
 import { authRouter } from './auth/authRoutes.ts';
 import { clientsRouter } from './clients/clientsRoutes.ts';
+import { exerciseHistoryRouter } from './exerciseHistory/exerciseHistoryRoutes.ts';
 import { exercisesRouter } from './exercises/exercisesRoutes.ts';
 import { plansRouter } from './plans/plansRoutes.ts';
 import { activeWorkoutSessionsRouter } from './workoutSessions/activeWorkoutSessionsRoutes.ts';
@@ -13,5 +14,6 @@ apiRouter.use(authRouter);
 apiRouter.use('/workout-sessions', activeWorkoutSessionsRouter);
 apiRouter.use('/clients/:clientId/workout-sessions', workoutSessionsRouter);
 apiRouter.use('/clients/:clientId/plans', plansRouter);
+apiRouter.use('/clients/:clientId/exercise-history', exerciseHistoryRouter);
 apiRouter.use('/clients', clientsRouter);
 apiRouter.use('/exercises', exercisesRouter);

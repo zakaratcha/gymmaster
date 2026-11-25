@@ -14,11 +14,12 @@ import './WorkoutComparison.scss';
 const cnWorkoutComparison = cn('WorkoutComparison');
 
 type WorkoutComparisonProps = {
+  readonly clientId?: string;
   readonly plan: PlannedWorkout | null;
   readonly session: WorkoutSession;
 };
 
-export const WorkoutComparison: FC<WorkoutComparisonProps> = ({ plan, session }) => {
+export const WorkoutComparison: FC<WorkoutComparisonProps> = ({ clientId, plan, session }) => {
   if (plan === null) {
     return (
       <div className={cnWorkoutComparison()}>
@@ -34,7 +35,7 @@ export const WorkoutComparison: FC<WorkoutComparisonProps> = ({ plan, session })
     <div className={cnWorkoutComparison()}>
       <WorkoutComparisonTitle>План ↔ Факт</WorkoutComparisonTitle>
       <WorkoutComparisonSummary comparison={comparison} />
-      <WorkoutComparisonList rows={comparison.rows} />
+      <WorkoutComparisonList clientId={clientId} rows={comparison.rows} />
     </div>
   );
 };

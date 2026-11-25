@@ -23,6 +23,7 @@ type WorkoutSessionExerciseListProps = {
   readonly selectedExerciseId: string;
   onAddExercise(): void;
   onExerciseAction(action: ExerciseAction, exercisePosition: number): void;
+  onOpenHistory(exerciseId: string): void;
   onExerciseChange(event: ChangeEvent<HTMLSelectElement>): void;
   onSetAction(action: SetAction, exercisePosition: number, setPosition?: number): void;
   onSetChange(exercisePosition: number, setPosition: number, field: SetField, value: string): void;
@@ -37,6 +38,7 @@ export const WorkoutSessionExerciseList: FC<WorkoutSessionExerciseListProps> = (
   onAddExercise,
   onExerciseAction,
   onExerciseChange,
+  onOpenHistory,
   onSetAction,
   onSetChange
 }) => {
@@ -70,6 +72,7 @@ export const WorkoutSessionExerciseList: FC<WorkoutSessionExerciseListProps> = (
           key={`${draft.exerciseId}-${exercisePosition}`}
           mutationDisabled={mutationDisabled}
           onExerciseAction={onExerciseAction}
+          onOpenHistory={onOpenHistory}
           onSetAction={onSetAction}
           onSetChange={onSetChange}
         />

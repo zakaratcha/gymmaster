@@ -54,6 +54,12 @@ export class WorkoutComparisonBlock extends Block {
     await expect(lines.nth(1)).toContainText(factText);
   }
 
+  async openExerciseHistory(exerciseName: string): Promise<void> {
+    await this.rowByName(exerciseName)
+      .getByRole('link', { name: `История упражнения ${exerciseName}`, exact: true })
+      .click();
+  }
+
   async expectNoPlan(): Promise<void> {
     await expect(this.findBySelector('empty')).toBeVisible();
   }

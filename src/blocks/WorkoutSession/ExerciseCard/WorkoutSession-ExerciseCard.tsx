@@ -4,6 +4,7 @@ import { cn } from '@bem-react/classname';
 import { WorkoutSessionAddSet } from '../AddSet/WorkoutSession-AddSet';
 import { WorkoutSessionExerciseActions } from '../ExerciseActions/WorkoutSession-ExerciseActions';
 import { WorkoutSessionExerciseHeader } from '../ExerciseHeader/WorkoutSession-ExerciseHeader';
+import { WorkoutSessionExerciseHistory } from '../ExerciseHistory/WorkoutSession-ExerciseHistory';
 import { WorkoutSessionSetList } from '../SetList/WorkoutSession-SetList';
 import { WorkoutSessionSetRow } from '../SetRow/WorkoutSession-SetRow';
 import type { DraftExercise, ExerciseAction, SetAction, SetField } from '../types';
@@ -19,6 +20,7 @@ type WorkoutSessionExerciseCardProps = {
   readonly inProgress: boolean;
   readonly mutationDisabled: boolean;
   onExerciseAction(action: ExerciseAction, exercisePosition: number): void;
+  onOpenHistory(exerciseId: string): void;
   onSetAction(action: SetAction, exercisePosition: number, setPosition?: number): void;
   onSetChange(exercisePosition: number, setPosition: number, field: SetField, value: string): void;
 };
@@ -30,6 +32,7 @@ export const WorkoutSessionExerciseCard: FC<WorkoutSessionExerciseCardProps> = (
   inProgress,
   mutationDisabled,
   onExerciseAction,
+  onOpenHistory,
   onSetAction,
   onSetChange
 }) => {
@@ -37,12 +40,17 @@ export const WorkoutSessionExerciseCard: FC<WorkoutSessionExerciseCardProps> = (
     onSetAction('add', exercisePosition);
   }, [exercisePosition, onSetAction]);
 
+  const handleOpenHistory = useCallback(() => {
+    onOpenHistory(draft.exerciseId);
+  }, [draft.exerciseId, onOpenHistory]);
+
   return (
     <article className={cnWorkoutSessionExerciseCard()}>
       <WorkoutSessionExerciseHeader>
         <strong>
           {exercisePosition + 1}. {draft.exerciseName}
         </strong>
+        <WorkoutSessionExerciseHistory exerciseName={draft.exerciseName} onOpen={handleOpenHistory} />
         {inProgress && (
           <WorkoutSessionExerciseActions
             draftCount={draftCount}

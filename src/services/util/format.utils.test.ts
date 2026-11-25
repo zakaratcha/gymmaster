@@ -4,6 +4,7 @@ import {
   formatBodyWeightKg,
   formatPlannedDate,
   formatSessionDate,
+  formatSetGroupsText,
   formatSetsText,
   formatVolumeDeltaKg,
   formatVolumeKg,
@@ -50,6 +51,52 @@ describe('formatSetsText', () => {
 
   it('возвращает прочерк для пустого списка', () => {
     expect(formatSetsText([])).toBe('—');
+  });
+});
+
+describe('formatSetGroupsText', () => {
+  it('сворачивает подряд идущие одинаковые подходы', () => {
+    expect(
+      formatSetGroupsText([
+        { reps: 8, weightKg: 82.5 },
+        { reps: 8, weightKg: 82.5 },
+        { reps: 8, weightKg: 82.5 },
+        { reps: 8, weightKg: 82.5 }
+      ])
+    ).toBe('4×8@82.5');
+  });
+
+  it('группирует только соседние равные подходы', () => {
+    expect(
+      formatSetGroupsText([
+        { reps: 8, weightKg: 80 },
+        { reps: 8, weightKg: 80 },
+        { reps: 6, weightKg: 85 }
+      ])
+    ).toBe('2×8@80 · 1×6@85');
+  });
+
+  it('не объединяет одинаковые подходы не подряд', () => {
+    expect(
+      formatSetGroupsText([
+        { reps: 8, weightKg: 80 },
+        { reps: 6, weightKg: 85 },
+        { reps: 8, weightKg: 80 }
+      ])
+    ).toBe('1×8@80 · 1×6@85 · 1×8@80');
+  });
+
+  it('сохраняет порядок разных вхождений', () => {
+    expect(
+      formatSetGroupsText([
+        { reps: 8, weightKg: 80 },
+        { reps: 5, weightKg: 100 }
+      ])
+    ).toBe('1×8@80 · 1×5@100');
+  });
+
+  it('возвращает прочерк для пустого списка', () => {
+    expect(formatSetGroupsText([])).toBe('—');
   });
 });
 

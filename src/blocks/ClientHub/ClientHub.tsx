@@ -17,6 +17,7 @@ import {
 import { ClientCreateForm } from '../ClientCreateForm/ClientCreateForm';
 import { ClientHubContent } from './Content/ClientHub-Content';
 import { ClientHubDeleteDialog } from './DeleteDialog/ClientHub-DeleteDialog';
+import { ClientHubExerciseHistoryDialog } from './ExerciseHistoryDialog/ClientHub-ExerciseHistoryDialog';
 import { ClientHubHeader } from './Header/ClientHub-Header';
 import { ClientHubMain } from './Main/ClientHub-Main';
 import { ClientHubStartDialog } from './StartDialog/ClientHub-StartDialog';
@@ -38,6 +39,7 @@ type ClientHubState = {
   latestCompletedSession: WorkoutSession | null;
   sessionsLoading: boolean;
   sessionsError?: string;
+  historyDialogOpen: boolean;
   startDialogOpen: boolean;
   selectedPlanId: string;
   starting: boolean;
@@ -71,6 +73,8 @@ type ClientHubState = {
   setSessionsError(value: string | undefined): void;
   openStartDialog(): void;
   closeStartDialog(): void;
+  openHistoryDialog(): void;
+  closeHistoryDialog(): void;
   openDeleteDialog(): void;
   closeDeleteDialog(): void;
   setSelectedPlanId(value: string): void;
@@ -117,6 +121,7 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
     activeSession: null,
     latestCompletedSession: null,
     sessionsLoading: !staticMode,
+    historyDialogOpen: false,
     startDialogOpen: false,
     selectedPlanId: '',
     starting: false,
@@ -200,6 +205,12 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
       if (!this.starting) {
         this.startDialogOpen = false;
       }
+    },
+    openHistoryDialog() {
+      this.historyDialogOpen = true;
+    },
+    closeHistoryDialog() {
+      this.historyDialogOpen = false;
     },
     openDeleteDialog() {
       this.mutationError = undefined;
@@ -467,6 +478,26 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
     state.toggleNotesExpanded();
   }, [state]);
 
+  const handleHistoryOpen = useCallback(() => {
+    state.openHistoryDialog();
+  }, [state]);
+
+  const handleHistoryCancel = useCallback(() => {
+    state.closeHistoryDialog();
+  }, [state]);
+
+  const handleHistorySelect = useCallback(
+    (exerciseId: string) => {
+      state.closeHistoryDialog();
+      if (id === undefined || id.length === 0) {
+        return;
+      }
+
+      void navigate(`/clients/${encodeURIComponent(id)}/exercises/${encodeURIComponent(exerciseId)}/history`);
+    },
+    [id, navigate, state]
+  );
+
   return (
     <div className={cnClientHub()}>
       <ClientHubMain>
@@ -487,6 +518,7 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
           staticMode={staticMode}
           onAllPlans={handleAllPlans}
           onDelete={handleDeleteOpen}
+          onHistoryOpen={handleHistoryOpen}
           onPlansRetry={handlePlansRetry}
           onRetry={handleRetry}
           onSessionsRetry={handleSessionsRetry}
@@ -508,6 +540,9 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
           onSubmit={handleSave}
           submitting={state.submitting}
         />
+      )}
+      {state.historyDialogOpen && (
+        <ClientHubExerciseHistoryDialog onCancel={handleHistoryCancel} onSelect={handleHistorySelect} />
       )}
       {state.startDialogOpen && (
         <ClientHubStartDialog

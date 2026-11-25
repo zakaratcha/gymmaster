@@ -18,6 +18,8 @@ import {
   updateWorkoutSession
 } from '../../services/workoutSessions/workoutSessions.service';
 import { workoutTabsStore } from '../../stores/workoutTabs.store';
+import { Dialog } from '../Dialog/Dialog';
+import { ExerciseHistory } from '../ExerciseHistory/ExerciseHistory';
 import { WorkoutComparison } from '../WorkoutComparison/WorkoutComparison';
 import { WorkoutSessionActions } from './Actions/WorkoutSession-Actions';
 import { WorkoutSessionErrorBlock } from './ErrorBlock/WorkoutSession-ErrorBlock';
@@ -40,6 +42,7 @@ type WorkoutSessionState = {
   previousSession: WorkoutSessionModel | null;
   exercises: readonly Exercise[];
   drafts: DraftExercise[];
+  historyExerciseId?: string;
   selectedExerciseId: string;
   loading: boolean;
   error?: string;
@@ -51,6 +54,7 @@ type WorkoutSessionState = {
   setSession(value: WorkoutSessionModel): void;
   setPreviousSession(value: WorkoutSessionModel | null): void;
   setExercises(value: readonly Exercise[]): void;
+  setHistoryExerciseId(value: string | undefined): void;
   setSelectedExerciseId(value: string): void;
   setLoading(value: boolean): void;
   setError(value: string | undefined): void;
@@ -135,6 +139,9 @@ export const WorkoutSession: FC = observer(() => {
     },
     setExercises(value) {
       this.exercises = value;
+    },
+    setHistoryExerciseId(value) {
+      this.historyExerciseId = value;
     },
     setSelectedExerciseId(value) {
       this.selectedExerciseId = value;
@@ -317,6 +324,26 @@ export const WorkoutSession: FC = observer(() => {
     [state]
   );
 
+  const handleOpenHistory = useCallback(
+    (exerciseId: string) => {
+      if (clientId === undefined || clientId.length === 0) {
+        return;
+      }
+
+      if (state.session?.status === 'in_progress') {
+        state.setHistoryExerciseId(exerciseId);
+        return;
+      }
+
+      void navigate(`/clients/${encodeURIComponent(clientId)}/exercises/${encodeURIComponent(exerciseId)}/history`);
+    },
+    [clientId, navigate, state]
+  );
+
+  const handleCloseHistory = useCallback(() => {
+    state.setHistoryExerciseId(undefined);
+  }, [state]);
+
   const handleSetChange = useCallback(
     (exercisePosition: number, setPosition: number, field: SetField, value: string) => {
       state.setSetValue(exercisePosition, setPosition, field, value);
@@ -389,6 +416,7 @@ export const WorkoutSession: FC = observer(() => {
 
   const session = state.session;
   const client = state.client;
+  const historyExerciseId = state.historyExerciseId;
   const inProgress = session?.status === 'in_progress';
   const mutationDisabled = state.saving || state.completing;
   const factList = (
@@ -401,6 +429,7 @@ export const WorkoutSession: FC = observer(() => {
       onAddExercise={handleAddExercise}
       onExerciseAction={handleExerciseAction}
       onExerciseChange={handleExerciseChange}
+      onOpenHistory={handleOpenHistory}
       onSetAction={handleSetAction}
       onSetChange={handleSetChange}
     />
@@ -436,7 +465,7 @@ export const WorkoutSession: FC = observer(() => {
               </WorkoutSessionForm>
             ) : (
               <>
-                <WorkoutComparison plan={session.plan} session={session} />
+                <WorkoutComparison clientId={clientId} plan={session.plan} session={session} />
                 {session.plan === null && factList}
                 {state.previousSession !== null && clientId !== undefined && sessionId !== undefined && (
                   <WorkoutSessionPrevious clientId={clientId} previous={state.previousSession} sessionId={sessionId} />
@@ -446,6 +475,16 @@ export const WorkoutSession: FC = observer(() => {
           </>
         )}
       </WorkoutSessionMain>
+      {inProgress && historyExerciseId !== undefined && clientId !== undefined && clientId.length > 0 && (
+        <Dialog ariaLabel='История упражнения' onCancel={handleCloseHistory}>
+          <ExerciseHistory
+            clientId={clientId}
+            closeLabel='Закрыть'
+            exerciseId={historyExerciseId}
+            onClose={handleCloseHistory}
+          />
+        </Dialog>
+      )}
     </div>
   );
 });

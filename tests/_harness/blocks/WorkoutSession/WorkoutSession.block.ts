@@ -208,6 +208,21 @@ export class WorkoutSessionBlock extends Block {
     await expect(previous.getByRole('link', { name: 'Подробнее', exact: true })).toBeVisible();
   }
 
+  async openExerciseHistory(exerciseName: string): Promise<void> {
+    const card = this.findBySelector('exerciseCard').filter({ hasText: exerciseName });
+    await card.getByRole('button', { name: `История упражнения ${exerciseName}`, exact: true }).click();
+  }
+
+  async expectHistoryOverlay(): Promise<void> {
+    await expect(this.page.getByRole('dialog', { name: 'История упражнения' })).toBeVisible();
+    await expect(this.findBySelector('form')).toBeVisible();
+    await expect(this.page).toHaveURL(/\/workouts\/[^/]+\/[^/]+$/);
+  }
+
+  async expectSaveSuccessHidden(): Promise<void> {
+    await expect(this.findBySelector('success')).toHaveCount(0);
+  }
+
   async expectNoPreviousTransition(): Promise<void> {
     await expect(this.findBySelector('previous')).toHaveCount(0);
   }

@@ -9,14 +9,15 @@ import './WorkoutComparison-List.scss';
 const cnWorkoutComparisonList = cn('WorkoutComparison', 'List');
 
 type WorkoutComparisonListProps = {
+  readonly clientId?: string;
   readonly rows: readonly RowModel[];
 };
 
-export const WorkoutComparisonList: FC<WorkoutComparisonListProps> = ({ rows }) => {
+export const WorkoutComparisonList: FC<WorkoutComparisonListProps> = ({ clientId, rows }) => {
   return (
     <section className={cnWorkoutComparisonList()}>
       {rows.map((row, index) => (
-        <WorkoutComparisonRow key={`${row.exerciseId}-${index}`} row={row} />
+        <WorkoutComparisonRow clientId={clientId} key={`${row.exerciseId}-${index}`} row={row} />
       ))}
     </section>
   );
