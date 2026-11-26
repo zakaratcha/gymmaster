@@ -9,6 +9,7 @@ import { ClientHub } from '../blocks/ClientHub/ClientHub';
 import { Clients } from '../blocks/Clients/Clients';
 import { ExerciseHistoryScreen } from '../blocks/ExerciseHistoryScreen/ExerciseHistoryScreen';
 import { Exercises } from '../blocks/Exercises/Exercises';
+import { PasswordChange } from '../blocks/PasswordChange/PasswordChange';
 import { PlannedWorkoutEditor } from '../blocks/PlannedWorkoutEditor/PlannedWorkoutEditor';
 import { PlannedWorkoutList } from '../blocks/PlannedWorkoutList/PlannedWorkoutList';
 import { PreviousWorkoutComparison } from '../blocks/PreviousWorkoutComparison/PreviousWorkoutComparison';
@@ -34,6 +35,7 @@ export const AppRoutes: FC = () => {
           <Route path='/clients/:id/plans/:planId' element={<PlannedWorkoutEditor />} />
           <Route path='/exercises' element={<Exercises />} />
           <Route path='/account' element={<Profile />} />
+          <Route path='/account/password' element={<PasswordChange />} />
         </Route>
         <Route path='*' element={<Navigate replace to='/clients' />} />
       </Route>

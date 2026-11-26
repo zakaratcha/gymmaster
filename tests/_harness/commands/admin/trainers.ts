@@ -20,6 +20,7 @@ import {
   createScenarioTrainerEmail,
   rememberForeignClient,
   rememberScenarioTrainer,
+  rememberSecondScenarioTrainer,
   requireScenarioTrainer
 } from './scenarioTrainer';
 
@@ -76,6 +77,14 @@ export async function createScenarioTrainerAsAdmin(
   rememberScenarioTrainer({ email, password });
   const trainer = await createTrainerAsAdmin(email, password, extra);
   rememberScenarioTrainer({ id: trainer.id, email: trainer.email, password });
+  return trainer;
+}
+
+export async function createSecondScenarioTrainerAsAdmin(password: string): Promise<AdminTrainer> {
+  const email = createScenarioTrainerEmail();
+  rememberSecondScenarioTrainer({ email, password });
+  const trainer = await createTrainerAsAdmin(email, password);
+  rememberSecondScenarioTrainer({ id: trainer.id, email: trainer.email, password });
   return trainer;
 }
 

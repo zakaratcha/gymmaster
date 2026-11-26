@@ -60,6 +60,11 @@ export type ValidatedResetTrainerPasswordInput = {
   readonly password: string;
 };
 
+export type ValidatedChangeOwnPasswordInput = {
+  readonly currentPassword: string;
+  readonly newPassword: string;
+};
+
 type ValidationResult<T> = { readonly ok: true; readonly value: T } | { readonly ok: false; readonly error: string };
 
 function readRecordField(record: object, key: string): unknown {
@@ -137,4 +142,27 @@ export function validateResetTrainerPasswordInput(body: unknown): ValidationResu
   }
 
   return { ok: true, value: { password: passwordResult.value } };
+}
+
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === 'string' && value.length > 0;
+}
+
+export function validateChangeOwnPasswordInput(body: unknown): ValidationResult<ValidatedChangeOwnPasswordInput> {
+  if (typeof body !== 'object' || body === null) {
+    return { ok: false, error: INVALID_INPUT_ERROR };
+  }
+
+  const currentPassword = readRecordField(body, 'currentPassword');
+  const newPassword = readRecordField(body, 'newPassword');
+  if (!isNonEmptyString(currentPassword) || !isNonEmptyString(newPassword)) {
+    return { ok: false, error: INVALID_INPUT_ERROR };
+  }
+
+  const newPasswordResult = validatePassword(newPassword);
+  if (!newPasswordResult.ok) {
+    return newPasswordResult;
+  }
+
+  return { ok: true, value: { currentPassword, newPassword: newPasswordResult.value } };
 }

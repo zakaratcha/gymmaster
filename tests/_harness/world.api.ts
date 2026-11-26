@@ -14,6 +14,7 @@ export class ApiWorld extends World {
   adminTrainers?: readonly AdminTrainer[];
   authResult?: AuthResult;
   lastError?: ApiError;
+  passwordChangeError?: ApiError;
   activeWorkoutSessions?: readonly ActiveWorkoutSession[];
   activeWorkoutSession?: WorkoutSession | null;
   archivedExercise?: Exercise;

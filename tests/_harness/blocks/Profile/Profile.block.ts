@@ -10,7 +10,8 @@ export class ProfileBlock extends Block {
     title: '.Profile-Title',
     email: '.Profile-Email',
     logoutButton: '.Profile-Logout',
-    adminLink: '.Profile-Admin'
+    adminLink: '.Profile-Admin',
+    passwordChangeLink: '.Profile-PasswordChange'
   };
 
   constructor(page: PlaywrightPage) {
@@ -24,6 +25,10 @@ export class ProfileBlock extends Block {
 
   async openAdmin(): Promise<void> {
     await this.findBySelector('adminLink').click();
+  }
+
+  async openPasswordChange(): Promise<void> {
+    await this.findBySelector('passwordChangeLink').click();
   }
 
   async expectAdminVisible(): Promise<void> {

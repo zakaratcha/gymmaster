@@ -5,7 +5,9 @@ import cookieParser from 'cookie-parser';
 import express from 'express';
 import { createServer as createViteServer } from 'vite';
 
+import { CHANGE_PASSWORD_PATH } from './auth/authRoutes.ts';
 import { migrate } from './db/migrate.ts';
+import { acceptInvalidJsonBody } from './middleware/acceptInvalidJsonBody.ts';
 import { apiRouter } from './routes.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -16,6 +18,7 @@ async function main(): Promise<void> {
   const app = express();
   app.disable('x-powered-by');
   app.use(express.json({ type: ['application/json', 'application/merge-patch+json'] }));
+  app.use(`/api${CHANGE_PASSWORD_PATH}`, acceptInvalidJsonBody);
   app.use(cookieParser());
   app.use('/api', apiRouter);
 

@@ -65,3 +65,12 @@ export function collectCookiesFromResponse(response: Response, target: Map<strin
     target.set(name, value);
   }
 }
+
+export function readApiErrorMessage(body: unknown): string | undefined {
+  if (typeof body !== 'object' || body === null || !Object.hasOwn(body, 'error')) {
+    return undefined;
+  }
+
+  const message: unknown = Reflect.get(body, 'error');
+  return typeof message === 'string' && message.length > 0 ? message : undefined;
+}

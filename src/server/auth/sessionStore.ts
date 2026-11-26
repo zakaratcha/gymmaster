@@ -70,6 +70,46 @@ export function issueSession(trainerId: string, expectedPasswordHash: string): s
   })();
 }
 
+export type ReplacePasswordResult =
+  | { readonly ok: true; readonly token: string }
+  | { readonly ok: false; readonly reason: 'stale' | 'not-issued' };
+
+class SessionNotIssuedError extends Error {}
+
+export function replacePasswordAndIssueSession(
+  trainerId: string,
+  expectedHash: string,
+  newHash: string
+): ReplacePasswordResult {
+  const db = getDb();
+
+  try {
+    return getSqlite().transaction((): ReplacePasswordResult => {
+      const updated = db
+        .update(trainers)
+        .set({ password: newHash, updatedAt: nowIso() })
+        .where(and(eq(trainers.id, trainerId), eq(trainers.password, expectedHash)))
+        .run();
+      if (updated.changes === 0) {
+        return { ok: false, reason: 'stale' };
+      }
+
+      const token = issueSession(trainerId, newHash);
+      if (token === undefined) {
+        throw new SessionNotIssuedError();
+      }
+
+      return { ok: true, token };
+    })();
+  } catch (error) {
+    if (error instanceof SessionNotIssuedError) {
+      return { ok: false, reason: 'not-issued' };
+    }
+
+    throw error;
+  }
+}
+
 export async function createSession(trainerId: string, expectedPasswordHash: string, res: Response): Promise<boolean> {
   await cleanupExpiredSessions();
   const token = issueSession(trainerId, expectedPasswordHash);

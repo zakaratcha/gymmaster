@@ -2,9 +2,9 @@ import { boundClass } from 'autobind-decorator';
 
 import { api } from '../api/api.service';
 import { ApiClient } from '../api/ApiClient';
-import type { AuthResult, CurrentTrainerResponse, LoginRequest } from './auth.models';
+import type { AuthResult, ChangePasswordRequest, CurrentTrainerResponse, LoginRequest } from './auth.models';
 
-type LoginRequestConfig = {
+type CollectCookiesConfig = {
   collectCookies?: Map<string, string>;
 };
 
@@ -28,12 +28,20 @@ class AuthClient extends ApiClient {
     return `${this.getApiUrl()}/current-user`;
   }
 
-  async login(payload: LoginRequest, config: LoginRequestConfig = {}): Promise<AuthResult> {
+  async login(payload: LoginRequest, config: CollectCookiesConfig = {}): Promise<AuthResult> {
     return await api.post<AuthResult>(this.getLoginUrl(), payload, config);
   }
 
   async logout(): Promise<void> {
     await api.post<void>(this.getLogoutUrl());
+  }
+
+  private getCurrentUserPasswordUrl(): string {
+    return `${this.getCurrentUserUrl()}/password`;
+  }
+
+  async changePassword(payload: ChangePasswordRequest, config: CollectCookiesConfig = {}): Promise<void> {
+    await api.put<void>(this.getCurrentUserPasswordUrl(), payload, config);
   }
 
   async getCurrentUser(): Promise<CurrentTrainerResponse> {

@@ -12,11 +12,13 @@ type ForeignClient = {
 };
 
 let scenarioTrainer: ScenarioTrainer | undefined;
+let secondScenarioTrainer: ScenarioTrainer | undefined;
 let foreignClient: ForeignClient | undefined;
 let finishAdminWorkouts = false;
 
 export function resetScenarioTrainer(): void {
   scenarioTrainer = undefined;
+  secondScenarioTrainer = undefined;
   foreignClient = undefined;
   finishAdminWorkouts = false;
 }
@@ -35,6 +37,18 @@ export function requireScenarioTrainer(): ScenarioTrainer {
   }
 
   return scenarioTrainer;
+}
+
+export function rememberSecondScenarioTrainer(trainer: ScenarioTrainer): void {
+  secondScenarioTrainer = trainer;
+}
+
+export function requireSecondScenarioTrainer(): ScenarioTrainer {
+  if (secondScenarioTrainer === undefined) {
+    throw new Error('Нет второй учётки, созданной в сценарии');
+  }
+
+  return secondScenarioTrainer;
 }
 
 export function rememberForeignClient(client: ForeignClient): void {

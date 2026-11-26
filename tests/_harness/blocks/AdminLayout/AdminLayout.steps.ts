@@ -20,6 +20,7 @@ import { AdminTrainersStatusDialogBlock } from '../AdminTrainers/AdminTrainersSt
 import { AppBlock } from '../App/App.block';
 import { ExerciseListBlock } from '../ExerciseList/ExerciseList.block';
 import { LoginFormBlock } from '../LoginForm/LoginForm.block';
+import { PasswordChangeBlock } from '../PasswordChange/PasswordChange.block';
 import { ProfileBlock } from '../Profile/Profile.block';
 import { ShellBlock } from '../Shell/Shell.block';
 
@@ -100,12 +101,19 @@ When('я открываю Профиль', async function (this: CustomWorld) {
 });
 
 When('я выбираю пункт {string}', async function (this: CustomWorld, label: string) {
-  await new ProfileBlock(this.page).waitForVisible();
-  if (label !== 'Администрирование') {
-    throw new Error(`Неизвестный пункт "${label}"`);
+  const profile = new ProfileBlock(this.page);
+  await profile.waitForVisible();
+  if (label === 'Администрирование') {
+    await profile.openAdmin();
+    return;
   }
 
-  await new ProfileBlock(this.page).openAdmin();
+  if (label === 'Сменить пароль') {
+    await profile.openPasswordChange();
+    return;
+  }
+
+  throw new Error(`Неизвестный пункт "${label}"`);
 });
 
 When('я открываю раздел администрирования', async function (this: CustomWorld) {
@@ -117,11 +125,17 @@ When('я открываю адрес {string}', async function (this: CustomWorl
 });
 
 When('я выбираю {string}', async function (this: CustomWorld, label: string) {
-  if (label !== 'Назад') {
-    throw new Error(`Неизвестное действие "${label}"`);
+  if (label === 'Назад') {
+    await new AdminLayoutBlock(this.page).goBack();
+    return;
   }
 
-  await new AdminLayoutBlock(this.page).goBack();
+  if (label === '←') {
+    await new PasswordChangeBlock(this.page).goBack();
+    return;
+  }
+
+  throw new Error(`Неизвестное действие "${label}"`);
 });
 
 When('я создаю тренера сценария с паролем {string}', async function (this: CustomWorld, password: string) {

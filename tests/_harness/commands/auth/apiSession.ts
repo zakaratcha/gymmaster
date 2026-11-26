@@ -4,14 +4,33 @@ import { getTestUser, type TestUsername } from './testUsers';
 
 const cookiesByUser = new Map<TestUsername, ReadonlyMap<string, string>>();
 const cookiesByEmail = new Map<string, ReadonlyMap<string, string>>();
+const rememberedCookiesByEmail = new Map<string, ReadonlyMap<string, string>>();
 
 export function resetApiSession(): void {
   cookiesByUser.clear();
   cookiesByEmail.clear();
+  rememberedCookiesByEmail.clear();
 }
 
 export function getEmailCookies(email: string): ReadonlyMap<string, string> | undefined {
   return cookiesByEmail.get(email);
+}
+
+export function setEmailCookies(email: string, cookies: ReadonlyMap<string, string>): void {
+  cookiesByEmail.set(email, cookies);
+}
+
+export function rememberEmailSession(email: string): void {
+  const cookies = cookiesByEmail.get(email);
+  if (cookies === undefined) {
+    throw new Error(`Нет сохранённой сессии для ${email}`);
+  }
+
+  rememberedCookiesByEmail.set(email, cookies);
+}
+
+export function getRememberedEmailCookies(email: string): ReadonlyMap<string, string> | undefined {
+  return rememberedCookiesByEmail.get(email);
 }
 
 export async function loginWithCredentials(email: string, password: string): Promise<AuthResult> {

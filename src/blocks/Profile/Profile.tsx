@@ -43,6 +43,9 @@ export const Profile: FC = observer(() => {
         <p className={cnProfile('Email')}>{currentUserStore.email}</p>
         <div className={cnProfile('Actions')}>
           <Loading visible={state.submitting} />
+          <Button asChild className={cnProfile('PasswordChange')}>
+            <Link to='/account/password'>Сменить пароль</Link>
+          </Button>
           {isPlatformAdmin(currentUserStore.roles) && (
             <Button asChild className={cnProfile('Admin')}>
               <Link to='/admin'>Администрирование</Link>
