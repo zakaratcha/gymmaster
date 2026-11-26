@@ -1,0 +1,1 @@
+../../.agents/agents/claude/spec-reviewer.md

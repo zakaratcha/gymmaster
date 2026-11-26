@@ -1,0 +1,1 @@
+../../.agents/agents/opencode/spec-reviewer.md

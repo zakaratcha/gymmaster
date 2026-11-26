@@ -1,0 +1,1 @@
+../../.agents/agents/cursor/spec-reviewer.md
