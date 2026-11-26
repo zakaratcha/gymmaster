@@ -38,7 +38,7 @@ disable-model-invocation: true
 - инструмент `sys_session_create` недоступен → «Выход»:
   - «Статус» — `заблокировано`;
   - «Блокер» — сессия не запущена через Omnigent;
-  - «Следующий шаг» — из корня проекта выполни `omnigent cursor --model grok-4.7-medium` и вызови `/orchestrator-omnigent` там;
+  - «Следующий шаг» — из корня проекта выполни `omnigent cursor --model grok-4.7-medium --yolo` и вызови `/orchestrator-omnigent` там;
 - НЕ вызывать встроенный Task и субагентов текущего приложения;
 - НЕ запускать отдельного оркестратора;
 - НЕ запускать агентов параллельно;
