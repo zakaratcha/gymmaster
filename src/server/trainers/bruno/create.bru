@@ -1,0 +1,26 @@
+meta {
+  name: create
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/admin/trainers
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "email": "trainer@local",
+    "password": "secret-123"
+  }
+}
+
+docs {
+  Сначала login из auth-коллекции (cookie gm_session) под platform_admin. Ожидается 201 и trainer со статусом active. Поля roles и admin игнорируются.
+}

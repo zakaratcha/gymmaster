@@ -1,0 +1,25 @@
+meta {
+  name: set-status
+  type: http
+  seq: 3
+}
+
+patch {
+  url: {{baseUrl}}/api/admin/trainers/{{trainerId}}/status
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/merge-patch+json
+}
+
+body:json {
+  {
+    "status": "blocked"
+  }
+}
+
+docs {
+  Сначала login из auth-коллекции (cookie gm_session) под platform_admin. Подставьте trainerId чужой учётки. Ожидается 200. status: active или blocked.
+}

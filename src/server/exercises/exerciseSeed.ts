@@ -1,25 +1,31 @@
 import { randomUUID } from 'node:crypto';
 import { eq } from 'drizzle-orm';
 
+import { exerciseSeedNames } from '../../services/exercises/exerciseSeed.models.ts';
 import { getDb } from '../db/client.ts';
 import { exercises, trainers } from '../db/schema.ts';
 
-export const exerciseSeedNames = [
-  'Приседание со штангой',
-  'Жим лёжа',
-  'Становая тяга',
-  'Тяга верхнего блока',
-  'Тяга штанги в наклоне',
-  'Жим гантелей',
-  'Выпады',
-  'Румынская тяга',
-  'Подтягивания',
-  'Отжимания',
-  'Планка',
-  'Сгибание рук со штангой',
-  'Разгибание рук на блоке',
-  'Подъём на носки'
-] as const;
+export type ExerciseSeedRow = {
+  readonly id: string;
+  readonly trainerId: string;
+  readonly name: string;
+  readonly notes: null;
+  readonly archivedAt: null;
+  readonly createdAt: string;
+  readonly updatedAt: string;
+};
+
+export function buildExerciseSeedRows(trainerId: string, now: string): ExerciseSeedRow[] {
+  return exerciseSeedNames.map(name => ({
+    id: randomUUID(),
+    trainerId,
+    name,
+    notes: null,
+    archivedAt: null,
+    createdAt: now,
+    updatedAt: now
+  }));
+}
 
 export async function seedExercisesForTrainer(trainerId: string): Promise<void> {
   const db = getDb();
@@ -30,17 +36,7 @@ export async function seedExercisesForTrainer(trainerId: string): Promise<void> 
   }
 
   const now = new Date().toISOString();
-  const insertResult = await db.insert(exercises).values(
-    exerciseSeedNames.map(name => ({
-      id: randomUUID(),
-      trainerId,
-      name,
-      notes: null,
-      archivedAt: null,
-      createdAt: now,
-      updatedAt: now
-    }))
-  );
+  const insertResult = await db.insert(exercises).values(buildExerciseSeedRows(trainerId, now));
   if (insertResult.changes === 0) {
     throw new Error('Failed to seed exercises');
   }
@@ -54,3 +50,5 @@ export async function seedExercises(): Promise<void> {
     await seedExercisesForTrainer(trainer.id);
   }
 }
+
+export { exerciseSeedNames } from '../../services/exercises/exerciseSeed.models.ts';

@@ -9,7 +9,8 @@ export class ProfileBlock extends Block {
     root: '.Profile',
     title: '.Profile-Title',
     email: '.Profile-Email',
-    logoutButton: '.Profile-Logout'
+    logoutButton: '.Profile-Logout',
+    adminLink: '.Profile-Admin'
   };
 
   constructor(page: PlaywrightPage) {
@@ -19,6 +20,18 @@ export class ProfileBlock extends Block {
   async expectEmail(expected: string): Promise<void> {
     await this.waitForVisible();
     await expect(this.findBySelector('email')).toHaveText(expected);
+  }
+
+  async openAdmin(): Promise<void> {
+    await this.findBySelector('adminLink').click();
+  }
+
+  async expectAdminVisible(): Promise<void> {
+    await expect(this.findBySelector('adminLink')).toBeVisible();
+  }
+
+  async expectAdminHidden(): Promise<void> {
+    await expect(this.findBySelector('adminLink')).toHaveCount(0);
   }
 
   async logout(): Promise<void> {

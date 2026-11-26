@@ -5,6 +5,7 @@ import { clientsRouter } from './clients/clientsRoutes.ts';
 import { exerciseHistoryRouter } from './exerciseHistory/exerciseHistoryRoutes.ts';
 import { exercisesRouter } from './exercises/exercisesRoutes.ts';
 import { plansRouter } from './plans/plansRoutes.ts';
+import { trainersAdminRouter } from './trainers/trainersAdminRoutes.ts';
 import { activeWorkoutSessionsRouter } from './workoutSessions/activeWorkoutSessionsRoutes.ts';
 import { workoutSessionsRouter } from './workoutSessions/workoutSessionsRoutes.ts';
 
@@ -17,3 +18,4 @@ apiRouter.use('/clients/:clientId/plans', plansRouter);
 apiRouter.use('/clients/:clientId/exercise-history', exerciseHistoryRouter);
 apiRouter.use('/clients', clientsRouter);
 apiRouter.use('/exercises', exercisesRouter);
+apiRouter.use('/admin/trainers', trainersAdminRouter);

@@ -6,10 +6,12 @@ import type { Client } from '../../src/services/clients/clients.models';
 import type { ExerciseHistoryResponse } from '../../src/services/exerciseHistory/exerciseHistory.models';
 import type { Exercise } from '../../src/services/exercises/exercises.models';
 import type { PlannedWorkout } from '../../src/services/plans/plans.models';
-import type { Trainer } from '../../src/services/trainers/trainers.models';
+import type { AdminTrainer, Trainer } from '../../src/services/trainers/trainers.models';
 import type { ActiveWorkoutSession, WorkoutSession } from '../../src/services/workoutSessions/workoutSessions.models';
 
 export class ApiWorld extends World {
+  adminTrainer?: AdminTrainer;
+  adminTrainers?: readonly AdminTrainer[];
   authResult?: AuthResult;
   lastError?: ApiError;
   activeWorkoutSessions?: readonly ActiveWorkoutSession[];

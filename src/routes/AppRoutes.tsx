@@ -1,6 +1,9 @@
 import type { FC } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
+import { AdminLayout } from '../blocks/AdminLayout/AdminLayout';
+import { AdminTrainerCreateForm } from '../blocks/AdminTrainerCreateForm/AdminTrainerCreateForm';
+import { AdminTrainers } from '../blocks/AdminTrainers/AdminTrainers';
 import { AppLayout } from '../blocks/AppLayout/AppLayout';
 import { ClientHub } from '../blocks/ClientHub/ClientHub';
 import { Clients } from '../blocks/Clients/Clients';
@@ -33,6 +36,11 @@ export const AppRoutes: FC = () => {
           <Route path='/account' element={<Profile />} />
         </Route>
         <Route path='*' element={<Navigate replace to='/clients' />} />
+      </Route>
+      <Route element={<AdminLayout />} path='/admin'>
+        <Route index element={<AdminTrainers />} />
+        <Route path='trainers/new' element={<AdminTrainerCreateForm />} />
+        <Route path='*' element={<Navigate replace to='/admin' />} />
       </Route>
     </Routes>
   );

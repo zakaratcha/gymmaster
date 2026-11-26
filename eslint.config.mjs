@@ -88,6 +88,7 @@ export default defineConfig([globalIgnores([
         './tsconfig.storybook.json',
         './tsconfig.vite.json',
         './tsconfig.server.json',
+        './tsconfig.server.tests.json',
         './tests/tsconfig.json'
       ],
 

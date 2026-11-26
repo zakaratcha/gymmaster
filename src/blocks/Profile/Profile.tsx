@@ -1,9 +1,10 @@
-import { useCallback } from 'react';
+import { type FC, useCallback } from 'react';
 import { observer, useLocalObservable } from 'mobx-react-lite';
 import { cn } from '@bem-react/classname';
-import type { FC } from 'react';
+import { Link } from 'react-router-dom';
 
 import { logout } from '../../services/auth/auth.service';
+import { isPlatformAdmin } from '../../services/trainers/trainers.utils';
 import { currentUserStore } from '../../stores/currentUser.store';
 import { Button } from '../Button/Button';
 import { Loading } from '../Loading/Loading';
@@ -42,6 +43,11 @@ export const Profile: FC = observer(() => {
         <p className={cnProfile('Email')}>{currentUserStore.email}</p>
         <div className={cnProfile('Actions')}>
           <Loading visible={state.submitting} />
+          {isPlatformAdmin(currentUserStore.roles) && (
+            <Button asChild className={cnProfile('Admin')}>
+              <Link to='/admin'>Администрирование</Link>
+            </Button>
+          )}
           <Button className={cnProfile('Logout')} disabled={state.submitting} onClick={handleLogout}>
             Выйти
           </Button>

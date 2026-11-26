@@ -16,5 +16,6 @@
     "src/services/**/*.models.ts",
     "src/services/**/*.utils.ts",
     "src/services/**/*.typeguards.ts"
-  ]
+  ],
+  "exclude": ["src/**/*.test.ts"]
 }

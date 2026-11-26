@@ -1,6 +1,6 @@
 import { api } from '../../../src/services/api/api.service';
 import { installApiFetchLogging } from '../utils/apiFetchLogging';
-import { ensureUserCookies } from './auth/apiSession';
+import { ensureUserCookies, getEmailCookies } from './auth/apiSession';
 import type { TestUsername } from './auth/testUsers';
 import { withApiCookies } from './withApiCookies';
 
@@ -31,6 +31,19 @@ export async function requestAsTrainer<R, A extends unknown[]>(
   ...args: A
 ): Promise<R> {
   return await requestAs('Тренер', clientMethod, ...args);
+}
+
+export async function requestWithEmailSession<R, A extends unknown[]>(
+  email: string,
+  clientMethod: (...args: A) => Promise<R>,
+  ...args: A
+): Promise<R> {
+  const cookies = getEmailCookies(email);
+  if (cookies === undefined) {
+    throw new Error(`Нет сохранённой сессии для ${email}`);
+  }
+
+  return await withApiCookies(cookies, () => clientMethod(...args));
 }
 
 export async function requestAsAdmin<R, A extends unknown[]>(

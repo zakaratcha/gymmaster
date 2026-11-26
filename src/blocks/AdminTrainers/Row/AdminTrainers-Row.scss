@@ -1,0 +1,14 @@
+.AdminTrainers-Row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+
+  padding: var(--space-md) 0;
+
+  border-bottom: 1px solid var(--color-border);
+
+  &:first-child {
+    border-top: 1px solid var(--color-border);
+  }
+}

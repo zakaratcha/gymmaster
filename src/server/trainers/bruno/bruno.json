@@ -1,0 +1,6 @@
+{
+  "version": "1",
+  "name": "GymMaster Admin Trainers",
+  "type": "collection",
+  "ignore": ["node_modules", ".git"]
+}

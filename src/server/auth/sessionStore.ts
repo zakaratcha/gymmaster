@@ -2,7 +2,7 @@ import { randomBytes } from 'node:crypto';
 import { and, eq, gt, lt } from 'drizzle-orm';
 import type { Response } from 'express';
 
-import { getDb } from '../db/client.ts';
+import { getDb, getSqlite } from '../db/client.ts';
 import { sessions, type TrainerRow, trainers } from '../db/schema.ts';
 import { isProduction, SESSION_COOKIE, sessionMaxAgeMs } from './constants.ts';
 
@@ -47,24 +47,38 @@ export async function revokeSessionsForTrainer(trainerId: string): Promise<void>
   await db.delete(sessions).where(eq(sessions.trainerId, trainerId));
 }
 
-export async function createSession(trainerId: string, res: Response): Promise<string> {
+export function issueSession(trainerId: string, expectedPasswordHash: string): string | undefined {
   const db = getDb();
-  await revokeSessionsForTrainer(trainerId);
+
+  return getSqlite().transaction(() => {
+    const current = db.select().from(trainers).where(eq(trainers.id, trainerId)).get();
+    if (current === undefined || current.status !== 'active' || current.password !== expectedPasswordHash) {
+      return;
+    }
+
+    const token = newSessionToken();
+    db.delete(sessions).where(eq(sessions.trainerId, trainerId)).run();
+    db.insert(sessions)
+      .values({
+        id: token,
+        trainerId,
+        expiresAt: sessionExpiresAt(),
+        createdAt: nowIso()
+      })
+      .run();
+    return token;
+  })();
+}
+
+export async function createSession(trainerId: string, expectedPasswordHash: string, res: Response): Promise<boolean> {
   await cleanupExpiredSessions();
-
-  const token = newSessionToken();
-  const createdAt = nowIso();
-
-  // eslint-disable-next-line unicorn/no-unused-array-method-return -- Drizzle insert builder, not Map.values()
-  await db.insert(sessions).values({
-    id: token,
-    trainerId,
-    expiresAt: sessionExpiresAt(),
-    createdAt
-  });
+  const token = issueSession(trainerId, expectedPasswordHash);
+  if (token === undefined) {
+    return false;
+  }
 
   setSessionCookie(res, token);
-  return token;
+  return true;
 }
 
 export async function deleteSessionByToken(token: string): Promise<void> {

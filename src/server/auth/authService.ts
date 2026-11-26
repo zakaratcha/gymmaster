@@ -29,12 +29,17 @@ export async function login(emailRaw: string, password: string, res: Response): 
     return { ok: false, error: 'Неверный логин или пароль' };
   }
 
-  const passwordOk = await verifyPassword(password, row.password);
+  const passwordHash = row.password;
+  const passwordOk = await verifyPassword(password, passwordHash);
   if (!passwordOk) {
     return { ok: false, error: 'Неверный логин или пароль' };
   }
 
-  await createSession(row.id, res);
+  const issued = await createSession(row.id, passwordHash, res);
+  if (!issued) {
+    return { ok: false, error: 'Неверный логин или пароль' };
+  }
+
   return { ok: true, trainer: toPublicTrainer(row) };
 }
 

@@ -1,0 +1,13 @@
+.AdminLayout-Back {
+  display: inline-flex;
+  align-items: center;
+
+  min-height: var(--tap-target);
+  padding: 0 var(--space-sm);
+
+  text-decoration: none;
+
+  color: var(--color-text);
+
+  font-weight: 600;
+}
