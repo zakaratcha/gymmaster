@@ -6,6 +6,7 @@ import type { AuthContext } from '../auth/authContext.ts';
 import { getDb, getSqlite } from '../db/client.ts';
 import type { PlannedExerciseRow, PlannedSetRow, PlannedWorkoutRow } from '../db/schema.ts';
 import { clients, exercises, plannedExercises, plannedSets, plannedWorkouts } from '../db/schema.ts';
+import { ensureSplitTag } from '../splitTags/splitTagsService.ts';
 import {
   type ValidatedCreatePlanInput,
   type ValidatedPlannedExerciseInput,
@@ -185,13 +186,14 @@ export async function createPlan(
   const now = new Date().toISOString();
 
   getSqlite().transaction(() => {
+    const splitTag = ensureSplitTag(auth.trainerId, clientId, input.splitTag, now);
     db.insert(plannedWorkouts)
       .values({
         id,
         trainerId: auth.trainerId,
         clientId,
         plannedDate: input.plannedDate,
-        splitTag: input.splitTag,
+        splitTag,
         createdAt: now,
         updatedAt: now
       })
@@ -266,11 +268,11 @@ export async function updatePlan(
   if (input.plannedDate !== undefined) {
     patch.plannedDate = input.plannedDate;
   }
-  if (input.splitTag !== undefined) {
-    patch.splitTag = input.splitTag;
-  }
-
   getSqlite().transaction(() => {
+    if (input.splitTag !== undefined) {
+      patch.splitTag = ensureSplitTag(auth.trainerId, clientId, input.splitTag, patch.updatedAt);
+    }
+
     db.update(plannedWorkouts)
       .set(patch)
       .where(

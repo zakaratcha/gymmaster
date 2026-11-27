@@ -36,6 +36,7 @@ export class ApiWorld extends World {
   previousWorkoutSession?: WorkoutSession | null;
   secondaryClient?: Client;
   secondaryPlan?: PlannedWorkout;
+  splitTags?: readonly string[];
   trainer?: Trainer;
   trainerClient?: Client;
   trainerWorkoutSession?: WorkoutSession;

@@ -33,13 +33,19 @@ type ClientHubContentProps = {
   readonly plansLoading: boolean;
   readonly sessionsError: string | undefined;
   readonly sessionsLoading: boolean;
+  readonly splitTags: readonly string[];
+  readonly splitTagsError: string | undefined;
+  readonly splitTagsLoading: boolean;
   readonly staticMode: boolean;
   onAllPlans(): void;
   onDelete(): void;
+  onEmptyStartOpen(): void;
   onHistoryOpen(): void;
   onPlansRetry(): void;
   onRetry(): void;
   onSessionsRetry(): void;
+  onSplitTagAdd(): void;
+  onSplitTagsRetry(): void;
   onStartOpen(): void;
   onToggleNotes(): void;
 };
@@ -57,26 +63,26 @@ export const ClientHubContent: FC<ClientHubContentProps> = ({
   plansLoading,
   sessionsError,
   sessionsLoading,
+  splitTags,
+  splitTagsError,
+  splitTagsLoading,
   staticMode,
   onAllPlans,
   onDelete,
+  onEmptyStartOpen,
   onHistoryOpen,
   onPlansRetry,
   onRetry,
   onSessionsRetry,
+  onSplitTagAdd,
+  onSplitTagsRetry,
   onStartOpen,
   onToggleNotes
 }) => {
   const notes = client?.notes?.trim() ?? '';
-  const startDisabled =
-    id === undefined ||
-    staticMode ||
-    activeSession !== null ||
-    sessionsLoading ||
-    sessionsError !== undefined ||
-    plansLoading ||
-    plansError !== undefined ||
-    plans.length === 0;
+  const emptyStartDisabled =
+    id === undefined || staticMode || activeSession !== null || sessionsLoading || sessionsError !== undefined;
+  const startDisabled = emptyStartDisabled || plansLoading || plansError !== undefined || plans.length === 0;
 
   return (
     <div className={cnClientHubContent()}>
@@ -99,7 +105,13 @@ export const ClientHubContent: FC<ClientHubContentProps> = ({
             onAllPlans={onAllPlans}
             onRetry={onPlansRetry}
           />
-          <ClientHubActions active={activeSession !== null} disabled={startDisabled} onStart={onStartOpen} />
+          <ClientHubActions
+            active={activeSession !== null}
+            emptyStartDisabled={emptyStartDisabled}
+            startDisabled={startDisabled}
+            onEmptyStart={onEmptyStartOpen}
+            onStart={onStartOpen}
+          />
           <ClientHubLatestWorkout
             error={sessionsError}
             loading={sessionsLoading}
@@ -107,7 +119,14 @@ export const ClientHubContent: FC<ClientHubContentProps> = ({
             onRetry={onSessionsRetry}
           />
           <ClientHubHistory onOpen={onHistoryOpen} />
-          <ClientHubSplit />
+          <ClientHubSplit
+            addDisabled={id === undefined || staticMode || splitTagsLoading}
+            error={splitTagsError}
+            loading={splitTagsLoading}
+            tags={splitTags}
+            onAdd={onSplitTagAdd}
+            onRetry={onSplitTagsRetry}
+          />
         </>
       )}
       {!loading && client !== undefined && <ClientHubDelete onClick={onDelete} />}

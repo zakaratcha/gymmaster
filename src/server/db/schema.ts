@@ -207,6 +207,27 @@ export const sessionSets = sqliteTable(
   ]
 );
 
+export const clientSplitTags = sqliteTable(
+  'client_split_tags',
+  {
+    id: text('id').primaryKey(),
+    trainerId: text('trainer_id')
+      .notNull()
+      .references(() => trainers.id, { onDelete: 'cascade' }),
+    clientId: text('client_id')
+      .notNull()
+      .references(() => clients.id, { onDelete: 'cascade' }),
+    tag: text('tag').notNull(),
+    tagKey: text('tag_key').notNull(),
+    createdAt: text('created_at').notNull()
+  },
+  table => [
+    index('idx_client_split_tags_trainer_client').on(table.trainerId, table.clientId),
+    unique().on(table.clientId, table.tagKey),
+    check('chk_client_split_tags_tag', sql`length(trim(${table.tag})) > 0`)
+  ]
+);
+
 export type TrainerRow = typeof trainers.$inferSelect;
 export type SessionRow = typeof sessions.$inferSelect;
 export type ClientRow = typeof clients.$inferSelect;
@@ -217,3 +238,4 @@ export type PlannedSetRow = typeof plannedSets.$inferSelect;
 export type WorkoutSessionRow = typeof workoutSessions.$inferSelect;
 export type SessionExerciseRow = typeof sessionExercises.$inferSelect;
 export type SessionSetRow = typeof sessionSets.$inferSelect;
+export type ClientSplitTagRow = typeof clientSplitTags.$inferSelect;

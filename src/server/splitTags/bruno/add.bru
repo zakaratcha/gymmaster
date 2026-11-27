@@ -1,0 +1,25 @@
+meta {
+  name: add
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/clients/{{clientId}}/split-tags
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "tag": "ноги"
+  }
+}
+
+docs {
+  Сначала login из auth-коллекции (cookie gm_session). Подставьте clientId своего клиента (id из ответа create клиентской коллекции). Ожидается 200 и обновлённый пул splitTags; тег в другом регистре не дублируется, пустой тег — 400.
+}

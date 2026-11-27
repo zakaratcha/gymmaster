@@ -12,9 +12,11 @@ import type {
   PlannedWorkout
 } from '../../services/plans/plans.models';
 import { createPlan, getPlanById, updatePlan } from '../../services/plans/plans.service';
+import { listSplitTags } from '../../services/splitTags/splitTags.service';
 import { Button } from '../Button/Button';
 import { Input } from '../Input/Input';
 import { Loading } from '../Loading/Loading';
+import { SplitTagField } from '../SplitTagField/SplitTagField';
 
 import './PlannedWorkoutEditor.scss';
 
@@ -34,6 +36,7 @@ type DraftExercise = {
 type PlannedWorkoutEditorState = {
   plannedDate: string;
   splitTag: string;
+  splitTags: readonly string[];
   exercises: readonly Exercise[];
   drafts: DraftExercise[];
   selectedExerciseId: string;
@@ -44,6 +47,7 @@ type PlannedWorkoutEditorState = {
   submitting: boolean;
   setPlannedDate(value: string): void;
   setSplitTag(value: string): void;
+  setSplitTags(value: readonly string[]): void;
   setExercises(value: readonly Exercise[]): void;
   setDrafts(value: DraftExercise[]): void;
   setSelectedExerciseId(value: string): void;
@@ -116,6 +120,14 @@ function buildPayload(
   }
 
   return { payload: { plannedDate, splitTag: normalizedTag, exercises } };
+}
+
+async function listSplitTagsOrEmpty(clientId: string): Promise<readonly string[]> {
+  try {
+    return await listSplitTags(clientId);
+  } catch {
+    return [];
+  }
 }
 
 function toDraftExercises(plan: PlannedWorkout): DraftExercise[] {
@@ -235,6 +247,7 @@ export const PlannedWorkoutEditor: FC = observer(() => {
   const state = useLocalObservable<PlannedWorkoutEditorState>(() => ({
     plannedDate: formatDateInput(new Date()),
     splitTag: '',
+    splitTags: [],
     exercises: [],
     drafts: [],
     selectedExerciseId: '',
@@ -245,6 +258,9 @@ export const PlannedWorkoutEditor: FC = observer(() => {
     },
     setSplitTag(value) {
       this.splitTag = value;
+    },
+    setSplitTags(value) {
+      this.splitTags = value;
     },
     setExercises(value) {
       this.exercises = value;
@@ -358,6 +374,7 @@ export const PlannedWorkoutEditor: FC = observer(() => {
 
     state.setLoading(true);
     state.setError(undefined);
+    const splitTagsRequest = listSplitTagsOrEmpty(clientId);
     try {
       const exercises = await listExercises();
       state.setExercises(exercises);
@@ -373,6 +390,7 @@ export const PlannedWorkoutEditor: FC = observer(() => {
     } catch {
       state.setError('Не удалось загрузить план');
     } finally {
+      state.setSplitTags(await splitTagsRequest);
       state.setLoading(false);
     }
   }, [clientId, editing, planId, state]);
@@ -384,13 +402,6 @@ export const PlannedWorkoutEditor: FC = observer(() => {
   const handleDateChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       state.setPlannedDate(event.target.value);
-    },
-    [state]
-  );
-
-  const handleTagChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      state.setSplitTag(event.target.value);
     },
     [state]
   );
@@ -519,13 +530,14 @@ export const PlannedWorkoutEditor: FC = observer(() => {
               type='date'
               value={state.plannedDate}
             />
-            <Input
+            <SplitTagField
               className={cnPlannedWorkoutEditor('Field')}
               id='split-tag'
               label='Тег дня'
-              onChange={handleTagChange}
               placeholder='ноги'
+              tags={state.splitTags}
               value={state.splitTag}
+              onChange={state.setSplitTag}
             />
 
             <section className={cnPlannedWorkoutEditor('ExercisesSection')}>

@@ -8,14 +8,14 @@ import './ClientHub-SplitButton.scss';
 const cnClientHubSplitButton = cn('ClientHub', 'SplitButton');
 
 type ClientHubSplitButtonProps = {
-  readonly ariaLabel?: string;
   readonly children: ReactNode;
   readonly disabled: boolean;
+  onClick(): void;
 };
 
-export const ClientHubSplitButton: FC<ClientHubSplitButtonProps> = ({ ariaLabel, children, disabled }) => {
+export const ClientHubSplitButton: FC<ClientHubSplitButtonProps> = ({ children, disabled, onClick }) => {
   return (
-    <Button aria-label={ariaLabel} className={cnClientHubSplitButton()} disabled={disabled} type='button'>
+    <Button className={cnClientHubSplitButton()} disabled={disabled} onClick={onClick} type='button'>
       {children}
     </Button>
   );

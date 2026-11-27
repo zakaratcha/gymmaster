@@ -8,6 +8,7 @@ import type { Client } from '../../services/clients/clients.models';
 import { deleteClient, getClientById, updateClient } from '../../services/clients/clients.service';
 import type { PlannedWorkout } from '../../services/plans/plans.models';
 import { listPlans } from '../../services/plans/plans.service';
+import { addSplitTag, listSplitTags } from '../../services/splitTags/splitTags.service';
 import type { WorkoutSession } from '../../services/workoutSessions/workoutSessions.models';
 import {
   createWorkoutSession,
@@ -17,9 +18,11 @@ import {
 import { ClientCreateForm } from '../ClientCreateForm/ClientCreateForm';
 import { ClientHubContent } from './Content/ClientHub-Content';
 import { ClientHubDeleteDialog } from './DeleteDialog/ClientHub-DeleteDialog';
+import { ClientHubEmptyStartDialog } from './EmptyStartDialog/ClientHub-EmptyStartDialog';
 import { ClientHubExerciseHistoryDialog } from './ExerciseHistoryDialog/ClientHub-ExerciseHistoryDialog';
 import { ClientHubHeader } from './Header/ClientHub-Header';
 import { ClientHubMain } from './Main/ClientHub-Main';
+import { ClientHubSplitTagDialog } from './SplitTagDialog/ClientHub-SplitTagDialog';
 import { ClientHubStartDialog } from './StartDialog/ClientHub-StartDialog';
 
 import './ClientHub.scss';
@@ -39,6 +42,16 @@ type ClientHubState = {
   latestCompletedSession: WorkoutSession | null;
   sessionsLoading: boolean;
   sessionsError?: string;
+  splitTags: readonly string[];
+  splitTagsLoading: boolean;
+  splitTagsError?: string;
+  splitTagDialogOpen: boolean;
+  splitTagDraft: string;
+  splitTagError?: string;
+  addingSplitTag: boolean;
+  emptyStartDialogOpen: boolean;
+  emptyStartTag: string;
+  emptyStartError?: string;
   historyDialogOpen: boolean;
   startDialogOpen: boolean;
   selectedPlanId: string;
@@ -71,6 +84,19 @@ type ClientHubState = {
   setLatestCompletedSession(value: WorkoutSession | null): void;
   setSessionsLoading(value: boolean): void;
   setSessionsError(value: string | undefined): void;
+  setSplitTags(value: readonly string[]): void;
+  setSplitTagsLoading(value: boolean): void;
+  setSplitTagsError(value: string | undefined): void;
+  openSplitTagDialog(): void;
+  closeSplitTagDialog(): void;
+  setSplitTagDraft(value: string): void;
+  setSplitTagError(value: string | undefined): void;
+  setAddingSplitTag(value: boolean): void;
+  applyAddedSplitTags(value: readonly string[]): void;
+  openEmptyStartDialog(): void;
+  closeEmptyStartDialog(): void;
+  setEmptyStartTag(value: string): void;
+  setEmptyStartError(value: string | undefined): void;
   openStartDialog(): void;
   closeStartDialog(): void;
   openHistoryDialog(): void;
@@ -108,11 +134,22 @@ function getStartWorkoutErrorMessage(error: unknown): string {
   return `Не удалось начать тренировку (HTTP ${error.status})`;
 }
 
+function getEmptyStartWorkoutErrorMessage(error: unknown): string {
+  if (error instanceof ApiError && error.status === 404) {
+    return 'Клиент не найден';
+  }
+
+  return getStartWorkoutErrorMessage(error);
+}
+
 export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
   const staticMode = initialClient !== undefined;
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const loadGenerationRef = useRef(0);
+  const clientGenerationRef = useRef(0);
+  const plansGenerationRef = useRef(0);
+  const sessionsGenerationRef = useRef(0);
+  const splitTagsGenerationRef = useRef(0);
 
   const state = useLocalObservable<ClientHubState>(() => ({
     client: initialClient,
@@ -121,6 +158,13 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
     activeSession: null,
     latestCompletedSession: null,
     sessionsLoading: !staticMode,
+    splitTags: [],
+    splitTagsLoading: !staticMode,
+    splitTagDialogOpen: false,
+    splitTagDraft: '',
+    addingSplitTag: false,
+    emptyStartDialogOpen: false,
+    emptyStartTag: '',
     historyDialogOpen: false,
     startDialogOpen: false,
     selectedPlanId: '',
@@ -196,6 +240,55 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
     setSessionsError(value) {
       this.sessionsError = value;
     },
+    setSplitTags(value) {
+      this.splitTags = value;
+    },
+    setSplitTagsLoading(value) {
+      this.splitTagsLoading = value;
+    },
+    setSplitTagsError(value) {
+      this.splitTagsError = value;
+    },
+    openSplitTagDialog() {
+      this.splitTagDraft = '';
+      this.splitTagError = undefined;
+      this.splitTagDialogOpen = true;
+    },
+    closeSplitTagDialog() {
+      if (!this.addingSplitTag) {
+        this.splitTagDialogOpen = false;
+      }
+    },
+    setSplitTagDraft(value) {
+      this.splitTagDraft = value;
+    },
+    setSplitTagError(value) {
+      this.splitTagError = value;
+    },
+    setAddingSplitTag(value) {
+      this.addingSplitTag = value;
+    },
+    applyAddedSplitTags(value) {
+      this.splitTags = value;
+      this.splitTagsError = undefined;
+      this.splitTagDialogOpen = false;
+    },
+    openEmptyStartDialog() {
+      this.emptyStartTag = '';
+      this.emptyStartError = undefined;
+      this.emptyStartDialogOpen = true;
+    },
+    closeEmptyStartDialog() {
+      if (!this.starting) {
+        this.emptyStartDialogOpen = false;
+      }
+    },
+    setEmptyStartTag(value) {
+      this.emptyStartTag = value;
+    },
+    setEmptyStartError(value) {
+      this.emptyStartError = value;
+    },
     openStartDialog() {
       this.selectedPlanId = this.plans[0]?.id ?? '';
       this.startingError = undefined;
@@ -241,120 +334,223 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
     }
   }));
 
-  const loadClient = useCallback(
-    async (generation: number) => {
-      if (id === undefined || id.length === 0) {
-        state.setError('Клиент не найден');
-        state.setLoading(false);
-        return;
-      }
+  const loadClient = useCallback(async () => {
+    clientGenerationRef.current += 1;
+    const generation = clientGenerationRef.current;
+    if (id === undefined || id.length === 0) {
+      state.setError('Клиент не найден');
+      state.setLoading(false);
+      return;
+    }
 
-      state.setLoading(true);
-      state.setError(undefined);
+    state.setLoading(true);
+    state.setError(undefined);
 
-      try {
-        const loadedClient = await getClientById(id);
+    try {
+      const loadedClient = await getClientById(id);
+      if (clientGenerationRef.current === generation) {
         state.setClient(loadedClient);
-      } catch {
+      }
+    } catch {
+      if (clientGenerationRef.current === generation) {
         state.setError('Не удалось загрузить клиента');
         state.setClient(undefined);
-      } finally {
-        if (loadGenerationRef.current === generation) {
-          state.setLoading(false);
-        }
       }
-    },
-    [id, state]
-  );
+    } finally {
+      if (clientGenerationRef.current === generation) {
+        state.setLoading(false);
+      }
+    }
+  }, [id, state]);
 
-  const loadPlans = useCallback(
-    async (generation: number) => {
-      if (staticMode || id === undefined || id.length === 0) {
+  const loadPlans = useCallback(async () => {
+    plansGenerationRef.current += 1;
+    const generation = plansGenerationRef.current;
+    if (staticMode || id === undefined || id.length === 0) {
+      state.setPlansLoading(false);
+      return;
+    }
+
+    state.setPlansLoading(true);
+    state.setPlansError(undefined);
+    try {
+      const plans = await listPlans(id);
+      if (plansGenerationRef.current === generation) {
+        state.setPlans(plans);
+      }
+    } catch {
+      if (plansGenerationRef.current === generation) {
+        state.setPlansError('Не удалось загрузить планы');
+      }
+    } finally {
+      if (plansGenerationRef.current === generation) {
         state.setPlansLoading(false);
-        return;
       }
+    }
+  }, [id, state, staticMode]);
 
-      state.setPlansLoading(true);
-      state.setPlansError(undefined);
-      try {
-        const plans = await listPlans(id);
-        if (loadGenerationRef.current === generation) {
-          state.setPlans(plans);
-        }
-      } catch {
-        if (loadGenerationRef.current === generation) {
-          state.setPlansError('Не удалось загрузить планы');
-        }
-      } finally {
-        if (loadGenerationRef.current === generation) {
-          state.setPlansLoading(false);
-        }
+  const loadSessions = useCallback(async () => {
+    sessionsGenerationRef.current += 1;
+    const generation = sessionsGenerationRef.current;
+    if (staticMode || id === undefined || id.length === 0) {
+      state.setSessionsLoading(false);
+      return;
+    }
+
+    state.setSessionsLoading(true);
+    state.setSessionsError(undefined);
+    try {
+      const [activeSession, latestCompletedSession] = await Promise.all([
+        getActiveWorkoutSession(id),
+        getLatestCompletedWorkoutSession(id)
+      ]);
+      if (sessionsGenerationRef.current === generation) {
+        state.setActiveSession(activeSession);
+        state.setLatestCompletedSession(latestCompletedSession);
       }
-    },
-    [id, state, staticMode]
-  );
-
-  const loadSessions = useCallback(
-    async (generation: number) => {
-      if (staticMode || id === undefined || id.length === 0) {
+    } catch {
+      if (sessionsGenerationRef.current === generation) {
+        state.setSessionsError('Не удалось загрузить тренировки');
+      }
+    } finally {
+      if (sessionsGenerationRef.current === generation) {
         state.setSessionsLoading(false);
-        return;
       }
+    }
+  }, [id, state, staticMode]);
 
-      state.setSessionsLoading(true);
-      state.setSessionsError(undefined);
-      try {
-        const [activeSession, latestCompletedSession] = await Promise.all([
-          getActiveWorkoutSession(id),
-          getLatestCompletedWorkoutSession(id)
-        ]);
-        if (loadGenerationRef.current === generation) {
-          state.setActiveSession(activeSession);
-          state.setLatestCompletedSession(latestCompletedSession);
-        }
-      } catch {
-        if (loadGenerationRef.current === generation) {
-          state.setSessionsError('Не удалось загрузить тренировки');
-        }
-      } finally {
-        if (loadGenerationRef.current === generation) {
-          state.setSessionsLoading(false);
-        }
+  const loadSplitTags = useCallback(async () => {
+    splitTagsGenerationRef.current += 1;
+    const generation = splitTagsGenerationRef.current;
+    if (staticMode || id === undefined || id.length === 0) {
+      state.setSplitTagsLoading(false);
+      return;
+    }
+
+    state.setSplitTagsLoading(true);
+    state.setSplitTagsError(undefined);
+    try {
+      const splitTags = await listSplitTags(id);
+      if (splitTagsGenerationRef.current === generation) {
+        state.setSplitTags(splitTags);
       }
-    },
-    [id, state, staticMode]
-  );
+    } catch {
+      if (splitTagsGenerationRef.current === generation) {
+        state.setSplitTagsError('Не удалось загрузить теги');
+      }
+    } finally {
+      if (splitTagsGenerationRef.current === generation) {
+        state.setSplitTagsLoading(false);
+      }
+    }
+  }, [id, state, staticMode]);
 
   useEffect(() => {
     if (staticMode) {
       return;
     }
 
-    loadGenerationRef.current += 1;
-    const generation = loadGenerationRef.current;
-
-    void loadClient(generation);
-    void loadPlans(generation);
-    void loadSessions(generation);
-  }, [loadClient, loadPlans, loadSessions, staticMode]);
+    void loadClient();
+    void loadPlans();
+    void loadSessions();
+    void loadSplitTags();
+  }, [loadClient, loadPlans, loadSessions, loadSplitTags, staticMode]);
 
   const handleRetry = useCallback(() => {
-    loadGenerationRef.current += 1;
-    const generation = loadGenerationRef.current;
-    void loadClient(generation);
+    void loadClient();
   }, [loadClient]);
 
   const handlePlansRetry = useCallback(() => {
-    loadGenerationRef.current += 1;
-    const generation = loadGenerationRef.current;
-    void loadPlans(generation);
+    void loadPlans();
   }, [loadPlans]);
 
   const handleSessionsRetry = useCallback(() => {
-    loadGenerationRef.current += 1;
-    const generation = loadGenerationRef.current;
-    void loadSessions(generation);
+    void loadSessions();
   }, [loadSessions]);
+
+  const handleSplitTagsRetry = useCallback(() => {
+    void loadSplitTags();
+  }, [loadSplitTags]);
+
+  const handleSplitTagOpen = useCallback(() => {
+    state.openSplitTagDialog();
+  }, [state]);
+
+  const handleSplitTagCancel = useCallback(() => {
+    state.closeSplitTagDialog();
+  }, [state]);
+
+  const handleSplitTagSubmit = useCallback(
+    async (event: SyntheticEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      if (id === undefined || state.addingSplitTag) {
+        return;
+      }
+
+      const tag = state.splitTagDraft.trim();
+      if (tag.length === 0) {
+        state.setSplitTagError('Укажите тег');
+        return;
+      }
+
+      if (staticMode) {
+        state.setSplitTagError('Сохранение недоступно в демонстрационном режиме');
+        return;
+      }
+
+      state.setSplitTagError(undefined);
+      state.setAddingSplitTag(true);
+      try {
+        state.applyAddedSplitTags(await addSplitTag(id, tag));
+      } catch {
+        state.setSplitTagError('Не удалось добавить тег');
+      } finally {
+        state.setAddingSplitTag(false);
+      }
+    },
+    [id, state, staticMode]
+  );
+
+  const handleEmptyStartOpen = useCallback(() => {
+    state.openEmptyStartDialog();
+  }, [state]);
+
+  const handleEmptyStartCancel = useCallback(() => {
+    state.closeEmptyStartDialog();
+  }, [state]);
+
+  const handleEmptyStart = useCallback(
+    async (event: SyntheticEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      if (id === undefined || state.starting || state.activeSession !== null) {
+        return;
+      }
+
+      const splitTag = state.emptyStartTag.trim();
+      if (splitTag.length === 0) {
+        state.setEmptyStartError('Укажите тег дня');
+        return;
+      }
+
+      if (staticMode) {
+        state.setEmptyStartError('Запуск недоступен в демонстрационном режиме');
+        return;
+      }
+
+      state.setEmptyStartError(undefined);
+      state.setStarting(true);
+      try {
+        const session = await createWorkoutSession(id, { splitTag });
+        state.setActiveSession(session);
+        await navigate(`/workouts/${session.clientId}/${session.id}`);
+      } catch (error) {
+        state.setEmptyStartError(getEmptyStartWorkoutErrorMessage(error));
+      } finally {
+        state.setStarting(false);
+      }
+    },
+    [id, navigate, state, staticMode]
+  );
 
   const handleStartOpen = useCallback(() => {
     state.openStartDialog();
@@ -515,13 +711,19 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
           plansLoading={state.plansLoading}
           sessionsError={state.sessionsError}
           sessionsLoading={state.sessionsLoading}
+          splitTags={state.splitTags}
+          splitTagsError={state.splitTagsError}
+          splitTagsLoading={state.splitTagsLoading}
           staticMode={staticMode}
           onAllPlans={handleAllPlans}
           onDelete={handleDeleteOpen}
+          onEmptyStartOpen={handleEmptyStartOpen}
           onHistoryOpen={handleHistoryOpen}
           onPlansRetry={handlePlansRetry}
           onRetry={handleRetry}
           onSessionsRetry={handleSessionsRetry}
+          onSplitTagAdd={handleSplitTagOpen}
+          onSplitTagsRetry={handleSplitTagsRetry}
           onStartOpen={handleStartOpen}
           onToggleNotes={handleNotesToggle}
         />
@@ -553,6 +755,27 @@ export const ClientHub: FC<ClientHubProps> = observer(({ initialClient }) => {
           onCancel={handleStartCancel}
           onPlanChange={handlePlanChange}
           onStart={handleStart}
+        />
+      )}
+      {state.emptyStartDialogOpen && (
+        <ClientHubEmptyStartDialog
+          error={state.emptyStartError}
+          starting={state.starting}
+          tags={state.splitTags}
+          value={state.emptyStartTag}
+          onCancel={handleEmptyStartCancel}
+          onChange={state.setEmptyStartTag}
+          onSubmit={handleEmptyStart}
+        />
+      )}
+      {state.splitTagDialogOpen && (
+        <ClientHubSplitTagDialog
+          error={state.splitTagError}
+          submitting={state.addingSplitTag}
+          value={state.splitTagDraft}
+          onCancel={handleSplitTagCancel}
+          onChange={state.setSplitTagDraft}
+          onSubmit={handleSplitTagSubmit}
         />
       )}
       {state.deleteDialogOpen && (

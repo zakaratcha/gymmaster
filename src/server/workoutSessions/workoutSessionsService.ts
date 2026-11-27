@@ -17,6 +17,7 @@ import { getDb, getSqlite } from '../db/client.ts';
 import type { SessionExerciseRow, SessionSetRow, WorkoutSessionRow } from '../db/schema.ts';
 import { clients, exercises, sessionExercises, sessionSets, workoutSessions } from '../db/schema.ts';
 import { getPlanById } from '../plans/plansService.ts';
+import { ensureSplitTag } from '../splitTags/splitTagsService.ts';
 import {
   type ValidatedCreateWorkoutSessionInput,
   type ValidatedUpdateWorkoutSessionInput
@@ -345,8 +346,8 @@ export async function createWorkoutSession(
     return undefined;
   }
 
-  const splitTag = plan?.splitTag ?? input.splitTag;
-  if (splitTag === undefined) {
+  const inputSplitTag = plan?.splitTag ?? input.splitTag;
+  if (inputSplitTag === undefined) {
     throw new WorkoutSessionInputError('Укажите план тренировки или тег типа дня');
   }
 
@@ -361,6 +362,7 @@ export async function createWorkoutSession(
 
   try {
     getSqlite().transaction(() => {
+      const splitTag = ensureSplitTag(auth.trainerId, clientId, inputSplitTag, now);
       db.insert(workoutSessions)
         .values({
           id,

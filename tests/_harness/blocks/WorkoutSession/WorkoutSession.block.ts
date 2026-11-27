@@ -19,7 +19,8 @@ export class WorkoutSessionBlock extends Block {
     setValue: '.WorkoutSession-SetValue',
     save: '.WorkoutSession-Save',
     complete: '.WorkoutSession-Complete',
-    previous: '.WorkoutSession-Previous'
+    previous: '.WorkoutSession-Previous',
+    split: '.WorkoutSession-Split'
   } as const;
 
   constructor(page: PlaywrightPage) {
@@ -32,6 +33,10 @@ export class WorkoutSessionBlock extends Block {
       .locator('.WorkoutSession-Form, .WorkoutSession-ErrorBlock, .WorkoutComparison')
       .first()
       .waitFor({ state: 'visible' });
+  }
+
+  async expectSplitTag(splitTag: string): Promise<void> {
+    await expect(this.findBySelector('split')).toHaveText(splitTag);
   }
 
   async fillSet(exercisePosition: number, setPosition: number, reps: string, weightKg: string): Promise<void> {

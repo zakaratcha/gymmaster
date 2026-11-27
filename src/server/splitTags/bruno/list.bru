@@ -1,0 +1,15 @@
+meta {
+  name: list
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/clients/{{clientId}}/split-tags
+  body: none
+  auth: none
+}
+
+docs {
+  Сначала login из auth-коллекции (cookie gm_session). Подставьте clientId своего клиента (id из ответа create клиентской коллекции). Ожидается 200 и массив splitTags в порядке добавления; для чужого или несуществующего клиента — 404 not_found.
+}

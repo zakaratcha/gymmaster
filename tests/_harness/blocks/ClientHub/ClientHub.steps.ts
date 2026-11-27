@@ -2,11 +2,33 @@ import { Given, Then, When } from '@cucumber/cucumber';
 import { expect } from '@playwright/test';
 
 import { createClient } from '../../commands/clients/createClient';
+import { findClientByName } from '../../commands/clients/findClientByName';
+import { createWorkoutSession } from '../../commands/workoutSessions/workoutSessions';
 import { ClientsPage } from '../../pages/Clients/Clients.page';
 import type { CustomWorld } from '../../world';
 import { ClientCreateFormBlock } from '../ClientCreateForm/ClientCreateForm.block';
 import { ClientsBlock } from '../Clients/Clients.block';
-import { ClientHubBlock } from './ClientHub.block';
+import { SplitTagFieldBlock } from '../SplitTagField/SplitTagField.block';
+import { WorkoutSessionBlock } from '../WorkoutSession/WorkoutSession.block';
+import { ClientHubBlock, type ClientHubSection } from './ClientHub.block';
+
+function parseTags(value: string): readonly string[] {
+  return value.split(',').map(tag => tag.trim());
+}
+
+const SECTION_BY_NAME: Record<string, ClientHubSection> = {
+  планов: 'plans',
+  'пула тегов': 'splitTags'
+};
+
+function readSection(name: string): ClientHubSection {
+  const section = SECTION_BY_NAME[name];
+  if (section === undefined) {
+    throw new Error(`Неизвестная секция карточки "${name}"`);
+  }
+
+  return section;
+}
 
 Given(
   'существует клиент {string} с заметками {string} и весом {float}',
@@ -161,4 +183,143 @@ Given('следующее сохранение клиента на карточ�
 
 Given('следующее удаление клиента на карточке завершится ошибкой 500', async function (this: CustomWorld) {
   await new ClientHubBlock(this.page).failNextMutation('DELETE');
+});
+
+Given(
+  'для клиента {string} начата тренировка без плана с тегом {string}',
+  async function (clientName: string, splitTag: string) {
+    const client = await findClientByName(clientName);
+    await createWorkoutSession(client.id, { splitTag });
+  }
+);
+
+Given(
+  /^первая загрузка (планов|пула тегов) на карточке завершится ошибкой$/,
+  async function (this: CustomWorld, section: string) {
+    await new ClientHubBlock(this.page).failLoadsUntilRetry(readSection(section));
+  }
+);
+
+Given(/^загрузка (планов|пула тегов) завершается ошибкой$/, async function (this: CustomWorld, section: string) {
+  await new ClientHubBlock(this.page).failLoads(readSection(section));
+});
+
+Given(/^загрузка (планов|пула тегов) на карточке задерживается$/, async function (this: CustomWorld, section: string) {
+  await new ClientHubBlock(this.page).holdLoads(readSection(section));
+});
+
+When(/^загрузка (планов|пула тегов) на карточке завершается$/, async function (this: CustomWorld, section: string) {
+  await new ClientHubBlock(this.page).releaseHeldLoads(readSection(section));
+});
+
+When('я повторяю загрузку пула тегов на карточке', async function (this: CustomWorld) {
+  await new ClientHubBlock(this.page).retrySplitTags();
+});
+
+When('я повторяю загрузку планов на карточке', async function (this: CustomWorld) {
+  await new ClientHubBlock(this.page).retryPlans();
+});
+
+Then('блок «Сплит» показывает теги {string}', async function (this: CustomWorld, tags: string) {
+  await new ClientHubBlock(this.page).expectSplitTags(parseTags(tags));
+});
+
+Then('блок «Сплит» показывает тег {string}', async function (this: CustomWorld, tag: string) {
+  await new ClientHubBlock(this.page).expectSplitTag(tag);
+});
+
+Then('блок «Сплит» показывает только тег {string}', async function (this: CustomWorld, tag: string) {
+  await new ClientHubBlock(this.page).expectSplitTags([tag]);
+});
+
+Then('блок «Сплит» показывает «Тегов пока нет»', async function (this: CustomWorld) {
+  await new ClientHubBlock(this.page).expectSplitEmpty();
+});
+
+Then('блок «Сплит» не показывает метку «Скоро» и кнопку настроек сплита', async function (this: CustomWorld) {
+  await new ClientHubBlock(this.page).expectNoSplitStubs();
+});
+
+Then('на карточке клиента отображается ближайший план {string}', async function (this: CustomWorld, text: string) {
+  const block = new ClientHubBlock(this.page);
+  await block.waitForWorkoutDataReady();
+  await block.expectNearestPlan(text);
+});
+
+Then(/^действие «Старт с плана» (доступно|недоступно)$/, async function (this: CustomWorld, state: string) {
+  await new ClientHubBlock(this.page).expectStartEnabled(state === 'доступно');
+});
+
+Then(/^действие «Пустая сессия» (доступно|недоступно)$/, async function (this: CustomWorld, state: string) {
+  await new ClientHubBlock(this.page).expectEmptyStartEnabled(state === 'доступно');
+});
+
+When('я добавляю через «+ тег» тег {string}', async function (this: CustomWorld, tag: string) {
+  await new ClientHubBlock(this.page).addSplitTag(tag);
+});
+
+When('я открываю диалог «+ тег»', async function (this: CustomWorld) {
+  await new ClientHubBlock(this.page).openSplitTagDialog();
+});
+
+When('я ввожу в диалоге «+ тег» тег {string}', async function (this: CustomWorld, tag: string) {
+  await new ClientHubBlock(this.page).fillSplitTag(tag);
+});
+
+Given('сохранение тега на карточке завершится ошибкой', async function (this: CustomWorld) {
+  await new ClientHubBlock(this.page).failNextSplitTagAdd();
+});
+
+When('я подтверждаю диалог «+ тег» без отправки', async function (this: CustomWorld) {
+  await new ClientHubBlock(this.page).submitSplitTagWithoutRequest();
+});
+
+When('я подтверждаю диалог «+ тег», ожидая ошибку {int}', async function (this: CustomWorld, status: number) {
+  await new ClientHubBlock(this.page).submitSplitTag(status);
+});
+
+Then(
+  'диалог «+ тег» открыт с тегом {string} и показывает ошибку {string}',
+  async function (this: CustomWorld, tag: string, message: string) {
+    await new ClientHubBlock(this.page).expectSplitTagDialogError(tag, message);
+  }
+);
+
+When('я открываю «Пустая сессия»', async function (this: CustomWorld) {
+  await new ClientHubBlock(this.page).openEmptyStartDialog();
+});
+
+When('я начинаю пустую сессию', async function (this: CustomWorld) {
+  await new ClientHubBlock(this.page).startEmptySession();
+  await new WorkoutSessionBlock(this.page).waitForReady();
+});
+
+When('я начинаю «Пустая сессия» с тегом {string}', async function (this: CustomWorld, splitTag: string) {
+  const block = new ClientHubBlock(this.page);
+  await block.openEmptyStartDialog();
+  await new SplitTagFieldBlock(this.page).fill(splitTag);
+  await block.startEmptySession();
+  await new WorkoutSessionBlock(this.page).waitForReady();
+});
+
+When('я начинаю пустую сессию без отправки', async function (this: CustomWorld) {
+  await new ClientHubBlock(this.page).submitEmptyStartWithoutRequest();
+});
+
+When('я начинаю пустую сессию, ожидая ошибку {int}', async function (this: CustomWorld, status: number) {
+  await new ClientHubBlock(this.page).submitEmptyStart(status);
+});
+
+Then(
+  'диалог «Пустая сессия» открыт с тегом {string} и показывает ошибку {string}',
+  async function (this: CustomWorld, tag: string, message: string) {
+    await new ClientHubBlock(this.page).expectEmptyStartError(tag, message);
+  }
+);
+
+Then('открыт экран тренировки с тегом {string}', async function (this: CustomWorld, splitTag: string) {
+  await expect(this.page).toHaveURL(/\/workouts\/[^/]+\/[^/]+$/);
+  const block = new WorkoutSessionBlock(this.page);
+  await block.waitForReady();
+  await block.expectSplitTag(splitTag);
 });
