@@ -4,4 +4,15 @@
   gap: var(--space-sm);
 
   color: var(--color-text);
+
+  font-size: var(--font-size-md);
+
+  strong {
+    overflow: hidden;
+    flex: 1;
+
+    min-width: 0;
+
+    text-overflow: ellipsis;
+  }
 }

@@ -1,5 +1,6 @@
-import { type FC, useCallback } from 'react';
+import { type FC, type ReactNode, useCallback } from 'react';
 import { cn } from '@bem-react/classname';
+import { TrashIcon } from '@radix-ui/react-icons';
 
 import { Button } from '../../Button/Button';
 import type { ExerciseAction } from '../types';
@@ -32,21 +33,22 @@ export const WorkoutSessionExerciseAction: FC<WorkoutSessionExerciseActionProps>
   const ariaLabel = remove
     ? `Удалить упражнение ${exerciseName}`
     : `Переместить упражнение ${exerciseName} ${direction}`;
-  let content = '↓';
+  let content: ReactNode = '↓';
   if (action === 'up') {
     content = '↑';
   }
   if (remove) {
-    content = 'Удалить';
+    content = <TrashIcon aria-hidden='true' />;
   }
 
   return (
     <Button
       aria-label={ariaLabel}
-      className={cnWorkoutSessionExerciseAction()}
-      color={remove ? 'secondary' : 'default'}
+      className={cnWorkoutSessionExerciseAction({ action })}
+      color='ghost'
       disabled={disabled}
       onClick={handleClick}
+      size='s'
     >
       {content}
     </Button>

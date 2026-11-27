@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { observer, useLocalObservable } from 'mobx-react-lite';
 import { cn } from '@bem-react/classname';
+import { LightningBoltIcon } from '@radix-ui/react-icons';
 import type { ChangeEvent, FC, SyntheticEvent } from 'react';
 
 import { authenticate } from '../../services/auth/auth.service';
@@ -77,6 +78,9 @@ export const LoginForm: FC = observer(() => {
   return (
     <div className={cnLoginForm()}>
       <main className={cnLoginForm('Main')}>
+        <span aria-hidden='true' className={cnLoginForm('Logo')}>
+          <LightningBoltIcon />
+        </span>
         <h1 className={cnLoginForm('Title')}>GymMaster</h1>
         <p className={cnLoginForm('Subtitle')}>Кабинет тренера</p>
         <form className={cnLoginForm('Form')} onSubmit={handleSubmit}>

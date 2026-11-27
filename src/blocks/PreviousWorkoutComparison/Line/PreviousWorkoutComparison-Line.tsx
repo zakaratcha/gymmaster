@@ -11,13 +11,14 @@ const cnPreviousWorkoutComparisonLine = cn('PreviousWorkoutComparison', 'Line');
 type PreviousWorkoutComparisonLineProps = {
   readonly label: string;
   readonly value: string;
+  readonly tone?: 'positive' | 'negative';
 };
 
-export const PreviousWorkoutComparisonLine: FC<PreviousWorkoutComparisonLineProps> = ({ label, value }) => {
+export const PreviousWorkoutComparisonLine: FC<PreviousWorkoutComparisonLineProps> = ({ label, value, tone }) => {
   return (
     <div className={cnPreviousWorkoutComparisonLine()}>
       <PreviousWorkoutComparisonLineLabel>{label}</PreviousWorkoutComparisonLineLabel>
-      <PreviousWorkoutComparisonLineValue>{value}</PreviousWorkoutComparisonLineValue>
+      <PreviousWorkoutComparisonLineValue tone={tone}>{value}</PreviousWorkoutComparisonLineValue>
     </div>
   );
 };

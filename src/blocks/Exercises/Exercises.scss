@@ -13,8 +13,10 @@
     gap: var(--space-lg);
 
     width: 100%;
-    padding: var(--space-xl);
-    padding-bottom: calc(var(--tap-target) + var(--space-xl));
+    max-width: var(--content-width);
+    margin: 0 auto;
+    padding: var(--space-xl) var(--space-lg);
+    padding-bottom: calc(3.5rem + var(--space-2xl) * 2);
   }
 
   &-Header {
@@ -25,9 +27,11 @@
   &-Title {
     margin: 0;
 
+    letter-spacing: -0.02em;
+
     color: var(--color-text);
 
-    font-size: 1.75rem;
+    font-size: var(--font-size-2xl);
     font-weight: 700;
   }
 

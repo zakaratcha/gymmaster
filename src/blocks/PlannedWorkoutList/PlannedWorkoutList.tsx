@@ -1,6 +1,7 @@
 import { type FC, type SyntheticEvent, useCallback, useEffect } from 'react';
 import { observer, useLocalObservable } from 'mobx-react-lite';
 import { cn } from '@bem-react/classname';
+import { TrashIcon } from '@radix-ui/react-icons';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import type { Client } from '../../services/clients/clients.models';
@@ -60,10 +61,11 @@ const DeletePlanButton: FC<DeletePlanButtonProps> = ({ plan, onDelete }) => {
     <Button
       aria-label={`Удалить план ${plan.splitTag}`}
       className={cnPlannedWorkoutList('Delete')}
-      color='secondary'
+      color='ghost'
       onClick={handleDelete}
+      size='s'
     >
-      Удалить
+      <TrashIcon aria-hidden='true' />
     </Button>
   );
 };
@@ -188,7 +190,13 @@ export const PlannedWorkoutList: FC = observer(() => {
             ←
           </Link>
           <h1 className={cnPlannedWorkoutList('Title')}>Планы · {state.client?.name ?? 'клиент'}</h1>
-          <Button className={cnPlannedWorkoutList('Create')} disabled={clientId === undefined} onClick={handleCreate}>
+          <Button
+            className={cnPlannedWorkoutList('Create')}
+            color='primary'
+            disabled={clientId === undefined}
+            onClick={handleCreate}
+            size='s'
+          >
             + План
           </Button>
         </header>
@@ -253,7 +261,7 @@ export const PlannedWorkoutList: FC = observer(() => {
             <Button disabled={state.deleteSubmitting} onClick={state.closeDeleteDialog}>
               Отмена
             </Button>
-            <Button disabled={state.deleteSubmitting} onClick={handleDelete}>
+            <Button color='danger' disabled={state.deleteSubmitting} onClick={handleDelete}>
               {state.deleteSubmitting ? 'Удаление…' : 'Удалить'}
             </Button>
           </DialogActions>

@@ -14,7 +14,7 @@ type ClientHubStubActionProps = {
 
 export const ClientHubStubAction: FC<ClientHubStubActionProps> = ({ disabled, onClick }) => {
   return (
-    <Button className={cnClientHubStubAction()} disabled={disabled} onClick={onClick} type='button'>
+    <Button className={cnClientHubStubAction()} disabled={disabled} onClick={onClick} size='s' type='button'>
       Все планы
     </Button>
   );

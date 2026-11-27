@@ -14,7 +14,7 @@ type ClientHubEditProps = {
 
 export const ClientHubEdit: FC<ClientHubEditProps> = ({ disabled, onClick }) => {
   return (
-    <Button className={cnClientHubEdit()} disabled={disabled} onClick={onClick} type='button'>
+    <Button className={cnClientHubEdit()} color='ghost' disabled={disabled} onClick={onClick} size='s' type='button'>
       Править
     </Button>
   );

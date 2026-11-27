@@ -4,4 +4,16 @@
   font-size: var(--font-size-sm);
 
   overflow-wrap: anywhere;
+
+  &_tone_positive {
+    color: var(--color-positive);
+
+    font-weight: 600;
+  }
+
+  &_tone_negative {
+    color: var(--color-negative);
+
+    font-weight: 600;
+  }
 }

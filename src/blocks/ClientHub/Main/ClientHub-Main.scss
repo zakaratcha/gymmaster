@@ -5,6 +5,8 @@
   gap: var(--space-lg);
 
   width: 100%;
-  padding: var(--space-xl);
-  padding-bottom: calc(var(--tap-target) + var(--space-xl));
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: var(--space-lg);
+  padding-bottom: var(--space-2xl);
 }

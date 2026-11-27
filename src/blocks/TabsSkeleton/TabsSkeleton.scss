@@ -3,19 +3,19 @@
   flex-shrink: 0;
   gap: var(--space-sm);
 
-  padding: var(--space-sm) var(--space-md);
+  padding: var(--space-sm) var(--space-lg);
 
   border-bottom: 1px solid var(--color-border);
   background-color: var(--color-surface);
 
   span {
     width: 96px;
-    height: var(--tap-target);
+    height: 36px;
 
     animation: tabs-skeleton-pulse 1.2s ease-in-out infinite;
 
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-pill);
     background-color: var(--color-surface-elevated);
   }
 }

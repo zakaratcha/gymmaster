@@ -15,7 +15,14 @@ type ClientHubSplitButtonProps = {
 
 export const ClientHubSplitButton: FC<ClientHubSplitButtonProps> = ({ children, disabled, onClick }) => {
   return (
-    <Button className={cnClientHubSplitButton()} disabled={disabled} onClick={onClick} type='button'>
+    <Button
+      className={cnClientHubSplitButton()}
+      color='secondary'
+      disabled={disabled}
+      onClick={onClick}
+      size='s'
+      type='button'
+    >
       {children}
     </Button>
   );

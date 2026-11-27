@@ -29,8 +29,10 @@ export const WorkoutSessionRemoveSet: FC<WorkoutSessionRemoveSetProps> = ({
     <Button
       aria-label={`Удалить подход ${setPosition + 1} у упражнения ${exercisePosition + 1}`}
       className={cnWorkoutSessionRemoveSet()}
+      color='ghost'
       disabled={disabled}
       onClick={handleClick}
+      size='s'
     >
       ×
     </Button>

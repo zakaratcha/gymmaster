@@ -7,8 +7,9 @@ const cnPreviousWorkoutComparisonLineValue = cn('PreviousWorkoutComparison', 'Li
 
 type PreviousWorkoutComparisonLineValueProps = {
   readonly children: ReactNode;
+  readonly tone?: 'positive' | 'negative';
 };
 
-export const PreviousWorkoutComparisonLineValue: FC<PreviousWorkoutComparisonLineValueProps> = ({ children }) => {
-  return <span className={cnPreviousWorkoutComparisonLineValue()}>{children}</span>;
+export const PreviousWorkoutComparisonLineValue: FC<PreviousWorkoutComparisonLineValueProps> = ({ children, tone }) => {
+  return <span className={cnPreviousWorkoutComparisonLineValue({ tone })}>{children}</span>;
 };

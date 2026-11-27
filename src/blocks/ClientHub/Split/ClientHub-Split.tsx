@@ -30,7 +30,7 @@ export const ClientHubSplit: FC<ClientHubSplitProps> = ({ addDisabled, error, lo
       {error !== undefined && <ClientHubSplitError error={error} onRetry={onRetry} />}
       <ClientHubSplitRow>
         {ready && tags.length === 0 && <ClientHubSplitEmpty />}
-        {ready && tags.length > 0 && <ClientHubSplitTags>{tags.join(' · ')}</ClientHubSplitTags>}
+        {ready && tags.length > 0 && <ClientHubSplitTags tags={tags} />}
         <ClientHubSplitActions>
           <ClientHubSplitButton disabled={addDisabled} onClick={onAdd}>
             + тег

@@ -15,20 +15,47 @@
     width: 100%;
     max-width: 24rem;
     margin: 0 auto;
-    padding: var(--space-xl);
+    padding: var(--space-xl) var(--space-lg);
+  }
+
+  &-Submit {
+    min-height: 52px;
+    margin-top: var(--space-sm);
+  }
+
+  &-Logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 56px;
+    height: 56px;
+    margin-bottom: var(--space-lg);
+
+    color: var(--color-on-accent);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-accent);
+    box-shadow: 0 8px 32px rgb(197 240 74 / 25%);
+
+    svg {
+      width: 28px;
+      height: 28px;
+    }
   }
 
   &-Title {
     margin: 0 0 var(--space-xs);
 
+    letter-spacing: -0.02em;
+
     color: var(--color-text);
 
-    font-size: 1.75rem;
-    font-weight: 700;
+    font-size: 2rem;
+    font-weight: 800;
   }
 
   &-Subtitle {
-    margin: 0 0 var(--space-xl);
+    margin: 0 0 var(--space-2xl);
 
     color: var(--color-text-muted);
 

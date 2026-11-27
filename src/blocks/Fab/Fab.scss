@@ -1,15 +1,15 @@
 .Fab {
   position: fixed;
   z-index: 1;
-  right: var(--space-xl);
-  bottom: calc(var(--tap-target) + var(--space-lg));
+  right: max(var(--space-lg), (100vw - var(--content-width)) / 2 + var(--space-lg));
+  bottom: calc(56px + var(--space-lg) + env(safe-area-inset-bottom));
 
   width: 3.5rem;
   height: 3.5rem;
   padding: 0;
 
-  border-radius: 50%;
-  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
 
   .Button-Label {
     display: none;

@@ -1,5 +1,15 @@
 .WorkoutSession-SetLabel {
-  color: var(--color-text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
-  font-size: var(--font-size-sm);
+  width: 1.75rem;
+  height: 1.75rem;
+
+  color: var(--color-text-muted);
+  border-radius: 50%;
+  background-color: var(--color-surface-elevated);
+
+  font-size: var(--font-size-xs);
+  font-weight: 700;
 }

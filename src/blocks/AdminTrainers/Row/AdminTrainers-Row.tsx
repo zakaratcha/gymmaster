@@ -37,10 +37,15 @@ export const AdminTrainersRow: FC<AdminTrainersRowProps> = ({ trainer, onBlock, 
     <li className={cnAdminTrainersRow()} data-email={trainer.email} data-status={trainer.status}>
       <span>{trainer.email}</span>
       <span>{statusLabel(trainer.status)}</span>
-      <Button onClick={handleStatusClick} type='button'>
+      <Button
+        color={trainer.status === 'active' ? 'danger' : 'secondary'}
+        onClick={handleStatusClick}
+        size='s'
+        type='button'
+      >
         {trainer.status === 'active' ? 'Заблокировать' : 'Разблокировать'}
       </Button>
-      <Button onClick={handleResetPassword} type='button'>
+      <Button onClick={handleResetPassword} size='s' type='button'>
         Сбросить пароль
       </Button>
     </li>

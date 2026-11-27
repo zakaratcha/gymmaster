@@ -1,14 +1,22 @@
-import { type FC, type ReactNode } from 'react';
+import { type FC } from 'react';
 import { cn } from '@bem-react/classname';
+
+import { ClientHubSplitTag } from '../SplitTag/ClientHub-SplitTag';
 
 import './ClientHub-SplitTags.scss';
 
 const cnClientHubSplitTags = cn('ClientHub', 'SplitTags');
 
 type ClientHubSplitTagsProps = {
-  readonly children: ReactNode;
+  readonly tags: readonly string[];
 };
 
-export const ClientHubSplitTags: FC<ClientHubSplitTagsProps> = ({ children }) => {
-  return <span className={cnClientHubSplitTags()}>{children}</span>;
+export const ClientHubSplitTags: FC<ClientHubSplitTagsProps> = ({ tags }) => {
+  return (
+    <ul className={cnClientHubSplitTags()}>
+      {tags.map(tag => (
+        <ClientHubSplitTag key={tag}>{tag}</ClientHubSplitTag>
+      ))}
+    </ul>
+  );
 };

@@ -1,10 +1,19 @@
 .WorkoutSession-Status {
-  color: var(--color-accent);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
 
-  font-size: var(--font-size-md);
+  padding: 2px var(--space-sm);
+
+  color: var(--color-accent);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-accent-subtle);
+
+  font-size: var(--font-size-sm);
   font-weight: 600;
 
   &_completed {
     color: var(--color-text-muted);
+    background-color: var(--color-surface-elevated);
   }
 }

@@ -10,12 +10,24 @@ const cnClientHub = cn('ClientHub');
 type ClientHubActionButtonProps = {
   readonly children: ReactNode;
   readonly disabled: boolean;
+  readonly primary?: boolean;
   onClick(): void;
 };
 
-export const ClientHubActionButton: FC<ClientHubActionButtonProps> = ({ children, disabled, onClick }) => {
+export const ClientHubActionButton: FC<ClientHubActionButtonProps> = ({
+  children,
+  disabled,
+  primary = false,
+  onClick
+}) => {
   return (
-    <Button className={cnClientHub('ActionButton')} disabled={disabled} onClick={onClick} type='button'>
+    <Button
+      className={cnClientHub('ActionButton')}
+      color={primary ? 'primary' : 'default'}
+      disabled={disabled}
+      onClick={onClick}
+      type='button'
+    >
       {children}
     </Button>
   );

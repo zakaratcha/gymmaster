@@ -19,6 +19,15 @@ export function getFirstName(name: string): string {
   return firstName ?? name;
 }
 
+export function getInitials(name: string): string {
+  const letters = name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map(part => part.charAt(0).toUpperCase());
+  return letters.join('');
+}
+
 export function formatBodyWeightKg(bodyWeightKg?: number): string {
   if (bodyWeightKg === undefined) {
     return '—';
@@ -118,4 +127,12 @@ export function truncateNotes(notes: string, maxLength: number): string {
   }
 
   return `${notes.slice(0, maxLength).trimEnd()}…`;
+}
+
+export function toneOfDelta(value: number): 'positive' | 'negative' | undefined {
+  if (value > 0) {
+    return 'positive';
+  }
+
+  return value < 0 ? 'negative' : undefined;
 }

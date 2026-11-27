@@ -12,7 +12,7 @@ import {
   pushRecentClientId,
   resolveRecentClientIds
 } from '../../services/clients/clients.service';
-import { getFirstName } from '../../services/util/format.utils';
+import { getFirstName, getInitials } from '../../services/util/format.utils';
 import { Button } from '../Button/Button';
 import { ClientCreateForm } from '../ClientCreateForm/ClientCreateForm';
 import { Fab } from '../Fab/Fab';
@@ -324,6 +324,9 @@ export const Clients: FC<ClientsProps> = observer(({ initialClients, initialRece
                           onClick={handleClientClick}
                           type='button'
                         >
+                          <span aria-hidden='true' className={cnClients('RowAvatar')}>
+                            {getInitials(client.name)}
+                          </span>
                           <span className={cnClients('RowName')}>{client.name}</span>
                           <span aria-hidden='true' className={cnClients('RowChevron')}>
                             ›

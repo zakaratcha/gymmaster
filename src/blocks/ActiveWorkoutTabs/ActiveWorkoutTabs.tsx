@@ -47,6 +47,7 @@ export const ActiveWorkoutTabs: FC<ActiveWorkoutTabsProps> = ({
         <ActiveWorkoutTabsTab
           key={session.id}
           label={getFirstName(session.clientName)}
+          live
           to={`/workouts/${encodeURIComponent(session.clientId)}/${encodeURIComponent(session.id)}`}
         />
       ))}

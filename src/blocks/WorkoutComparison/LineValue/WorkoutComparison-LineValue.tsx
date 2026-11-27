@@ -5,10 +5,13 @@ import './WorkoutComparison-LineValue.scss';
 
 const cnWorkoutComparisonLineValue = cn('WorkoutComparison', 'LineValue');
 
+export type WorkoutComparisonTone = 'positive' | 'negative';
+
 type WorkoutComparisonLineValueProps = {
   readonly children: ReactNode;
+  readonly tone?: WorkoutComparisonTone;
 };
 
-export const WorkoutComparisonLineValue: FC<WorkoutComparisonLineValueProps> = ({ children }) => {
-  return <span className={cnWorkoutComparisonLineValue()}>{children}</span>;
+export const WorkoutComparisonLineValue: FC<WorkoutComparisonLineValueProps> = ({ children, tone }) => {
+  return <span className={cnWorkoutComparisonLineValue({ tone })}>{children}</span>;
 };

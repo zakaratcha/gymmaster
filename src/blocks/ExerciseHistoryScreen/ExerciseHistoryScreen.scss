@@ -1,5 +1,8 @@
 .ExerciseHistoryScreen {
+  width: 100%;
+  max-width: var(--content-width);
   min-height: 100%;
+  margin: 0 auto;
 
   background-color: var(--color-bg);
 }

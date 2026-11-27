@@ -1,7 +1,12 @@
 import { type FC } from 'react';
 import { cn } from '@bem-react/classname';
 
-import { formatVolumeDeltaKg, formatVolumeKg, formatWorkoutCount } from '../../../services/util/format.utils';
+import {
+  formatVolumeDeltaKg,
+  formatVolumeKg,
+  formatWorkoutCount,
+  toneOfDelta
+} from '../../../services/util/format.utils';
 import type {
   WorkoutComparison,
   WorkoutComparisonTotals
@@ -31,7 +36,7 @@ export const WorkoutComparisonSummary: FC<WorkoutComparisonSummaryProps> = ({ co
     <section className={cnWorkoutComparisonSummary()}>
       <WorkoutComparisonLine label='план' value={formatTotals(planTotals)} />
       <WorkoutComparisonLine label='факт' value={formatTotals(factTotals)} />
-      <WorkoutComparisonLine label='Δ объём' value={formatVolumeDeltaKg(deltaKg)} />
+      <WorkoutComparisonLine label='Δ объём' tone={toneOfDelta(deltaKg)} value={formatVolumeDeltaKg(deltaKg)} />
     </section>
   );
 };

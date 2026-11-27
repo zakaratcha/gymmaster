@@ -51,7 +51,7 @@ export const Profile: FC = observer(() => {
               <Link to='/admin'>Администрирование</Link>
             </Button>
           )}
-          <Button className={cnProfile('Logout')} disabled={state.submitting} onClick={handleLogout}>
+          <Button className={cnProfile('Logout')} color='danger' disabled={state.submitting} onClick={handleLogout}>
             Выйти
           </Button>
         </div>

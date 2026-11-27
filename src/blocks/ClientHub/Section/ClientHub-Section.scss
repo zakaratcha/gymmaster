@@ -5,13 +5,26 @@
   flex-direction: column;
   gap: var(--space-sm);
 
-  padding-bottom: var(--space-lg);
+  padding: var(--space-lg);
 
-  border-bottom: 1px solid var(--color-border);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
 
-  &:last-child {
-    padding-bottom: 0;
+  &_type_actions {
+    padding: 0;
 
-    border-bottom: none;
+    border: none;
+    background: none;
+  }
+
+  &_type_activeWorkout {
+    border-color: rgb(197 240 74 / 35%);
+    background-color: var(--color-accent-subtle);
+  }
+
+  &_type_notes,
+  &_type_bodyWeight {
+    padding: var(--space-md) var(--space-lg);
   }
 }

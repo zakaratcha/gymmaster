@@ -1,11 +1,12 @@
 .ClientHub-SplitTags {
+  display: flex;
   flex: 1;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
 
   min-width: 0;
+  margin: 0;
+  padding: 0;
 
-  color: var(--color-text-muted);
-
-  font-size: var(--font-size-md);
-
-  overflow-wrap: anywhere;
+  list-style: none;
 }

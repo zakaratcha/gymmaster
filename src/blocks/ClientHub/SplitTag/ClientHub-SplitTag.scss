@@ -1,0 +1,15 @@
+.ClientHub-SplitTag {
+  display: inline-flex;
+  align-items: center;
+
+  min-height: 32px;
+  padding: var(--space-xs) var(--space-md);
+
+  color: var(--color-text);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-surface-elevated);
+
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+}

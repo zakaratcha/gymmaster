@@ -3,5 +3,8 @@
   align-items: center;
   gap: var(--space-sm);
 
-  padding: var(--space-md) var(--space-lg);
+  width: 100%;
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: var(--space-lg) var(--space-lg) 0;
 }

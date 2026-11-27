@@ -18,8 +18,10 @@ export const WorkoutSessionAddSet: FC<WorkoutSessionAddSetProps> = ({ disabled, 
     <Button
       aria-label={`Добавить подход в упражнение ${exercisePosition + 1}`}
       className={cnWorkoutSessionAddSet()}
+      color='secondary'
       disabled={disabled}
       onClick={onAdd}
+      size='s'
       type='button'
     >
       + Подход

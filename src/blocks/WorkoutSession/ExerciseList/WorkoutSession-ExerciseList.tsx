@@ -54,7 +54,12 @@ export const WorkoutSessionExerciseList: FC<WorkoutSessionExerciseListProps> = (
               selectedExerciseId={selectedExerciseId}
               onChange={onExerciseChange}
             />
-            <Button disabled={exercises.length === 0 || mutationDisabled} onClick={onAddExercise} type='button'>
+            <Button
+              color='secondary'
+              disabled={exercises.length === 0 || mutationDisabled}
+              onClick={onAddExercise}
+              type='button'
+            >
               + Упражнение
             </Button>
           </WorkoutSessionAddExercise>

@@ -18,6 +18,9 @@
     display: flex;
     flex-shrink: 0;
 
+    padding: 0 max(0px, (100% - var(--content-width)) / 2);
+    padding-bottom: env(safe-area-inset-bottom);
+
     border-top: 1px solid var(--color-border);
     background-color: var(--color-surface);
   }
@@ -26,9 +29,11 @@
     display: flex;
     align-items: center;
     flex: 1;
+    flex-direction: column;
     justify-content: center;
+    gap: 2px;
 
-    min-height: var(--tap-target);
+    min-height: 56px;
     padding: var(--space-sm) var(--space-md);
 
     transition:
@@ -38,17 +43,20 @@
 
     color: var(--color-text-muted);
 
-    font-size: var(--font-size-sm);
-    font-weight: 500;
+    font-size: var(--font-size-xs);
+    font-weight: 600;
 
     &_active {
       color: var(--color-accent);
-      background-color: var(--color-accent-subtle);
     }
 
     &:hover:not(&_active) {
       color: var(--color-text);
-      background-color: var(--color-surface-elevated);
     }
+  }
+
+  &-NavIcon {
+    width: 20px;
+    height: 20px;
   }
 }

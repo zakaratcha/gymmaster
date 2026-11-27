@@ -1,3 +1,9 @@
 .WorkoutSession-ExerciseAction {
-  padding: var(--space-sm);
+  width: 32px;
+  min-width: 32px;
+  padding: 0;
+
+  &_action_remove:hover:not(:disabled) {
+    color: var(--color-danger);
+  }
 }

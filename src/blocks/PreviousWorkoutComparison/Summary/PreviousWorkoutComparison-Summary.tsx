@@ -1,7 +1,7 @@
 import { type FC } from 'react';
 import { cn } from '@bem-react/classname';
 
-import { formatVolumeDeltaKg, formatVolumeKg } from '../../../services/util/format.utils';
+import { formatVolumeDeltaKg, formatVolumeKg, toneOfDelta } from '../../../services/util/format.utils';
 import type { PreviousWorkoutComparison } from '../../../services/workoutSessions/previousWorkoutComparison.models';
 import { PreviousWorkoutComparisonLine } from '../Line/PreviousWorkoutComparison-Line';
 
@@ -20,7 +20,7 @@ export const PreviousWorkoutComparisonSummary: FC<PreviousWorkoutComparisonSumma
     <section className={cnPreviousWorkoutComparisonSummary()}>
       <PreviousWorkoutComparisonLine label='прошлая' value={`${formatVolumeKg(comparison.previousVolumeKg)} кг`} />
       <PreviousWorkoutComparisonLine label='текущая' value={`${formatVolumeKg(comparison.currentVolumeKg)} кг`} />
-      <PreviousWorkoutComparisonLine label='Δ объём' value={formatVolumeDeltaKg(deltaKg)} />
+      <PreviousWorkoutComparisonLine label='Δ объём' tone={toneOfDelta(deltaKg)} value={formatVolumeDeltaKg(deltaKg)} />
     </section>
   );
 };

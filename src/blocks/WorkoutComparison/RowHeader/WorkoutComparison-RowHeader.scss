@@ -1,6 +1,6 @@
 .WorkoutComparison-RowHeader {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-sm);
 
@@ -9,10 +9,15 @@
   font-size: var(--font-size-md);
 
   a {
-    text-decoration: underline;
+    transition: color var(--transition-fast);
+    text-decoration: none;
 
-    color: inherit;
+    color: var(--color-text);
 
     font-weight: 700;
+
+    &:hover {
+      color: var(--color-accent);
+    }
   }
 }

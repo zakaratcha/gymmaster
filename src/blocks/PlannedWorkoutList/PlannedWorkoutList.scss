@@ -13,7 +13,9 @@
     gap: var(--space-lg);
 
     width: 100%;
-    padding: var(--space-xl);
+    max-width: var(--content-width);
+    margin: 0 auto;
+    padding: var(--space-lg);
   }
 
   &-Header {
@@ -28,19 +30,26 @@
     flex-shrink: 0;
     justify-content: center;
 
-    min-width: var(--tap-target);
-    min-height: var(--tap-target);
+    width: 40px;
+    height: 40px;
+    margin-left: calc(-1 * var(--space-sm));
     padding: 0;
 
     cursor: pointer;
+    transition: background-color var(--transition-fast);
     text-decoration: none;
 
     color: var(--color-text);
     border: none;
+    border-radius: 50%;
     background: none;
 
     font-family: inherit;
-    font-size: 1.5rem;
+    font-size: 1.375rem;
+
+    &:hover {
+      background-color: var(--color-surface-elevated);
+    }
   }
 
   &-Title {
@@ -51,11 +60,12 @@
     margin: 0;
 
     white-space: nowrap;
+    letter-spacing: -0.01em;
     text-overflow: ellipsis;
 
     color: var(--color-text);
 
-    font-size: 1.25rem;
+    font-size: var(--font-size-xl);
     font-weight: 700;
   }
 
@@ -108,13 +118,17 @@
 
   &-List {
     display: flex;
+    overflow: hidden;
     flex-direction: column;
-    gap: var(--space-sm);
 
     margin: 0;
     padding: 0;
 
     list-style: none;
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-surface);
   }
 
   &-Item {
@@ -123,8 +137,17 @@
     gap: var(--space-xs);
 
     min-width: 0;
+    padding-right: var(--space-sm);
 
-    border-bottom: 1px solid var(--color-border);
+    transition: background-color var(--transition-fast);
+
+    &:hover {
+      background-color: var(--color-surface-elevated);
+    }
+
+    & + & {
+      border-top: 1px solid var(--color-border);
+    }
   }
 
   &-Row {
@@ -134,8 +157,8 @@
     gap: var(--space-lg);
 
     min-width: 0;
-    min-height: var(--tap-target);
-    padding: var(--space-md) 0;
+    min-height: 64px;
+    padding: var(--space-md) var(--space-lg);
 
     cursor: pointer;
     text-align: left;
@@ -150,9 +173,12 @@
   &-Date {
     flex-shrink: 0;
 
+    min-width: 6.5em;
+
     color: var(--color-text-muted);
 
     font-size: var(--font-size-sm);
+    font-weight: 500;
   }
 
   &-Details {
@@ -176,6 +202,7 @@
       color: var(--color-text);
 
       font-size: var(--font-size-md);
+      font-weight: 700;
     }
   }
 
@@ -183,7 +210,13 @@
     align-self: center;
     flex-shrink: 0;
 
+    width: 36px;
     min-width: auto;
-    padding: var(--space-sm) var(--space-md);
+    height: 36px;
+    padding: 0;
+
+    &:hover:not(:disabled) {
+      color: var(--color-danger);
+    }
   }
 }

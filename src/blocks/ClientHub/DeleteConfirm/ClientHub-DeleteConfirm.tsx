@@ -15,7 +15,7 @@ type ClientHubDeleteConfirmProps = {
 
 export const ClientHubDeleteConfirm: FC<ClientHubDeleteConfirmProps> = ({ disabled, submitting, onClick }) => {
   return (
-    <Button className={cnClientHubDeleteConfirm()} disabled={disabled} onClick={onClick} type='button'>
+    <Button className={cnClientHubDeleteConfirm()} color='danger' disabled={disabled} onClick={onClick} type='button'>
       {submitting ? 'Удаление…' : 'Удалить'}
     </Button>
   );

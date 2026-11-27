@@ -3,9 +3,10 @@
   align-items: center;
   flex-shrink: 0;
   justify-content: center;
+  gap: var(--space-sm);
 
-  min-height: var(--tap-target);
-  padding: var(--space-sm) var(--space-md);
+  min-height: 36px;
+  padding: var(--space-xs) var(--space-lg);
 
   transition:
     color var(--transition-fast),
@@ -16,19 +17,46 @@
 
   color: var(--color-text-muted);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-pill);
 
   font-size: var(--font-size-sm);
-  font-weight: 500;
+  font-weight: 600;
+
+  &_live::before {
+    width: 8px;
+    height: 8px;
+
+    content: "";
+    animation: active-workout-tab-pulse 1.6s ease-in-out infinite;
+
+    border-radius: 50%;
+    background-color: var(--color-accent);
+  }
 
   &_active {
-    color: var(--color-accent);
+    color: var(--color-on-accent);
     border-color: var(--color-accent);
-    background-color: var(--color-accent-subtle);
+    background-color: var(--color-accent);
+  }
+
+  &_active.ActiveWorkoutTabs-Tab_live::before {
+    background-color: var(--color-on-accent);
   }
 
   &:hover:not(&_active) {
     color: var(--color-text);
-    background-color: var(--color-surface-elevated);
+    border-color: var(--color-border-strong);
+  }
+}
+
+@keyframes active-workout-tab-pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ActiveWorkoutTabs-Tab_live::before {
+    animation: none;
   }
 }

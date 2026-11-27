@@ -13,8 +13,10 @@
     gap: var(--space-lg);
 
     width: 100%;
-    padding: var(--space-xl);
-    padding-bottom: calc(var(--tap-target) + var(--space-xl));
+    max-width: var(--content-width);
+    margin: 0 auto;
+    padding: var(--space-xl) var(--space-lg);
+    padding-bottom: calc(3.5rem + var(--space-2xl) * 2);
   }
 
   &-Header {
@@ -25,9 +27,11 @@
   &-Title {
     margin: 0;
 
+    letter-spacing: -0.02em;
+
     color: var(--color-text);
 
-    font-size: 1.75rem;
+    font-size: var(--font-size-2xl);
     font-weight: 700;
   }
 
@@ -83,12 +87,12 @@
   &-SectionTitle {
     margin: 0;
 
-    letter-spacing: 0.02em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
 
     color: var(--color-text-muted);
 
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-xs);
     font-weight: 600;
   }
 
@@ -97,8 +101,8 @@
     overflow-x: auto;
     gap: var(--space-sm);
 
-    margin: 0 calc(-1 * var(--space-xl));
-    padding: 0 var(--space-xl);
+    margin: 0 calc(-1 * var(--space-lg));
+    padding: 0 var(--space-lg);
 
     scrollbar-width: thin;
   }
@@ -117,7 +121,7 @@
 
     color: var(--color-text);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-pill);
     background-color: var(--color-surface);
 
     font-family: inherit;
@@ -125,7 +129,7 @@
     font-weight: 500;
 
     &:hover {
-      border-color: var(--color-text-muted);
+      border-color: var(--color-border-strong);
       background-color: var(--color-surface-elevated);
     }
 
@@ -135,14 +139,24 @@
   }
 
   &-List {
+    overflow: hidden;
+
     margin: 0;
     padding: 0;
 
     list-style: none;
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-surface);
   }
 
   &-ListItem {
     margin: 0;
+
+    & + & {
+      border-top: 1px solid var(--color-border);
+    }
   }
 
   &-Row {
@@ -152,24 +166,45 @@
     gap: var(--space-md);
 
     width: 100%;
-    min-height: var(--tap-target);
-    padding: var(--space-md) 0;
+    min-height: 60px;
+    padding: var(--space-md) var(--space-lg);
 
     cursor: pointer;
-    transition: color var(--transition-fast);
+    transition: background-color var(--transition-fast);
     text-align: left;
 
     color: var(--color-text);
     border: none;
-    border-bottom: 1px solid var(--color-border);
     background: none;
 
     font-family: inherit;
     font-size: var(--font-size-md);
+    font-weight: 500;
 
     &:hover {
-      color: var(--color-accent);
+      background-color: var(--color-surface-elevated);
     }
+
+    &:active {
+      background-color: var(--color-surface-pressed);
+    }
+  }
+
+  &-RowAvatar {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    justify-content: center;
+
+    width: 36px;
+    height: 36px;
+
+    color: var(--color-accent);
+    border-radius: 50%;
+    background-color: var(--color-accent-subtle);
+
+    font-size: var(--font-size-sm);
+    font-weight: 700;
   }
 
   &-RowName {

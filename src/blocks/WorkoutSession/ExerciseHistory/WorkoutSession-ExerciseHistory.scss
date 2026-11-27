@@ -4,22 +4,27 @@
   flex-shrink: 0;
   justify-content: center;
 
-  width: var(--tap-target);
-  min-width: var(--tap-target);
-  height: var(--tap-target);
-  min-height: var(--tap-target);
-  margin-left: auto;
+  width: 36px;
+  height: 36px;
   padding: 0;
 
   cursor: pointer;
+  transition:
+    color var(--transition-fast),
+    background-color var(--transition-fast);
 
-  color: var(--color-text);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background-color: var(--color-surface);
+  color: var(--color-text-muted);
+  border: none;
+  border-radius: var(--radius-sm);
+  background-color: transparent;
+
+  &:hover {
+    color: var(--color-accent);
+    background-color: var(--color-accent-subtle);
+  }
 
   svg {
-    width: 1.25rem;
-    height: 1.25rem;
+    width: 1.125rem;
+    height: 1.125rem;
   }
 }

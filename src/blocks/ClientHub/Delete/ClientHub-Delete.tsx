@@ -13,7 +13,7 @@ type ClientHubDeleteProps = {
 
 export const ClientHubDelete: FC<ClientHubDeleteProps> = ({ onClick }) => {
   return (
-    <Button className={cnClientHub('Delete')} onClick={onClick} type='button'>
+    <Button className={cnClientHub('Delete')} color='danger' onClick={onClick} type='button'>
       Удалить клиента
     </Button>
   );

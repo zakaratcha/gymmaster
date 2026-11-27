@@ -59,6 +59,7 @@ export class ClientHubBlock extends Block {
     emptyStartDialog: 'dialog.ClientHub-EmptyStartDialog',
     split: '.ClientHub-Section_type_split',
     splitTags: '.ClientHub-Section_type_split .ClientHub-SplitTags',
+    splitTag: '.ClientHub-Section_type_split .ClientHub-SplitTag',
     splitEmpty: '.ClientHub-Section_type_split .ClientHub-SplitEmpty',
     splitError: '.ClientHub-Section_type_split .ClientHub-SplitError',
     splitLoading: '.ClientHub-Section_type_split .ClientHub-SplitLoading',
@@ -394,18 +395,13 @@ export class ClientHubBlock extends Block {
 
   async expectSplitTags(tags: readonly string[]): Promise<void> {
     await this.waitForSplitReady();
-    await expect(this.findBySelector('splitTags')).toHaveText(tags.join(' · '));
+    await expect(this.findBySelector('splitTag')).toHaveText([...tags]);
   }
 
   async expectSplitTag(tag: string): Promise<void> {
     await this.waitForSplitReady();
-    const tags = this.findBySelector('splitTags');
-    await expect
-      .poll(async () => {
-        const text = await tags.textContent();
-        return text?.split(' · ') ?? [];
-      })
-      .toContain(tag);
+    const tags = this.findBySelector('splitTag');
+    await expect.poll(async () => tags.allTextContents()).toContain(tag);
   }
 
   async expectSplitEmpty(): Promise<void> {

@@ -6,11 +6,14 @@ import './Button.scss';
 
 const cnButton = cn('Button');
 
-type ButtonColor = 'primary' | 'secondary' | 'default';
+type ButtonColor = 'primary' | 'secondary' | 'danger' | 'ghost' | 'default';
+
+type ButtonSize = 'm' | 's';
 
 type ButtonProps = {
   readonly className?: string;
   readonly color?: ButtonColor;
+  readonly size?: ButtonSize;
   readonly asChild?: boolean;
   readonly startIcon?: ReactNode;
   readonly endIcon?: ReactNode;
@@ -20,6 +23,7 @@ type ButtonProps = {
 export const Button: FC<ButtonProps> = ({
   className,
   color = 'default',
+  size = 'm',
   asChild = false,
   startIcon,
   endIcon,
@@ -30,7 +34,10 @@ export const Button: FC<ButtonProps> = ({
   'aria-label': ariaLabel,
   form
 }) => {
-  const buttonClassName = color === 'default' ? cnButton(null, [className]) : cnButton({ color }, [className]);
+  const buttonClassName = cnButton(
+    { color: color === 'default' ? undefined : color, size: size === 'm' ? undefined : size },
+    [className]
+  );
 
   if (asChild) {
     return (

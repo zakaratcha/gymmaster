@@ -1,5 +1,6 @@
 import { type FC, type SyntheticEvent, useCallback } from 'react';
 import { cn } from '@bem-react/classname';
+import { ArchiveIcon } from '@radix-ui/react-icons';
 
 import type { Exercise } from '../../services/exercises/exercises.models';
 import { Button } from '../Button/Button';
@@ -55,17 +56,16 @@ export const ExerciseList: FC<ExerciseListProps> = ({ exercises, searchActive, o
                 type='button'
               >
                 <span className={cnExerciseList('RowName')}>{exercise.name}</span>
-                <span aria-hidden='true' className={cnExerciseList('RowChevron')}>
-                  ›
-                </span>
               </button>
               <Button
                 aria-label={`Архивировать ${exercise.name}`}
                 className={cnExerciseList('ArchiveButton')}
+                color='ghost'
                 onClick={handleArchiveClick}
+                size='s'
                 type='button'
               >
-                Архив
+                <ArchiveIcon aria-hidden='true' />
               </Button>
             </li>
           ))}

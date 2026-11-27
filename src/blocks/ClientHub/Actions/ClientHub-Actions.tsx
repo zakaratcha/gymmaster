@@ -27,7 +27,7 @@ export const ClientHubActions: FC<ClientHubActionsProps> = ({
     <ClientHubSection className={cnClientHub('Actions')} title='Действия' type='actions'>
       {active && <ClientHubActionHint>У клиента уже есть тренировка в процессе</ClientHubActionHint>}
       <ClientHubActionRow>
-        <ClientHubActionButton disabled={startDisabled} onClick={onStart}>
+        <ClientHubActionButton disabled={startDisabled} primary onClick={onStart}>
           Старт с плана ▼
         </ClientHubActionButton>
         <ClientHubActionButton disabled={emptyStartDisabled} onClick={onEmptyStart}>

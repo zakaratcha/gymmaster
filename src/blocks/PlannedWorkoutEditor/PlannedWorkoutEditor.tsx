@@ -1,6 +1,7 @@
-import { type ChangeEvent, type FC, type SyntheticEvent, useCallback, useEffect } from 'react';
+import { type ChangeEvent, type FC, type ReactNode, type SyntheticEvent, useCallback, useEffect } from 'react';
 import { observer, useLocalObservable } from 'mobx-react-lite';
 import { cn } from '@bem-react/classname';
+import { TrashIcon } from '@radix-ui/react-icons';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import type { Exercise } from '../../services/exercises/exercises.models';
@@ -164,16 +165,16 @@ const PlannedExerciseAction: FC<PlannedExerciseActionProps> = ({
   const ariaLabel = removing
     ? `Удалить упражнение ${exerciseName}`
     : `Переместить упражнение ${exerciseName} ${direction}`;
-  let content = '↓';
+  let content: ReactNode = '↓';
   if (action === 'up') {
     content = '↑';
   }
   if (removing) {
-    content = 'Удалить';
+    content = <TrashIcon aria-hidden='true' />;
   }
 
   return (
-    <Button aria-label={ariaLabel} color={removing ? 'secondary' : 'default'} disabled={disabled} onClick={handleClick}>
+    <Button aria-label={ariaLabel} color='ghost' disabled={disabled} onClick={handleClick} size='s'>
       {content}
     </Button>
   );
@@ -206,7 +207,13 @@ const PlannedSetAction: FC<PlannedSetActionProps> = ({
       : `Удалить подход ${(setPosition ?? 0) + 1} у упражнения ${exercisePosition + 1}`;
 
   return (
-    <Button aria-label={ariaLabel} className={className} onClick={handleClick}>
+    <Button
+      aria-label={ariaLabel}
+      className={className}
+      color={action === 'add' ? 'secondary' : 'ghost'}
+      onClick={handleClick}
+      size='s'
+    >
       {action === 'add' ? '+ Подход' : '×'}
     </Button>
   );
@@ -501,8 +508,10 @@ export const PlannedWorkoutEditor: FC = observer(() => {
           <h1 className={cnPlannedWorkoutEditor('Title')}>{editing ? 'План тренировки' : 'Новый план'}</h1>
           <Button
             className={cnPlannedWorkoutEditor('Save')}
+            color='primary'
             disabled={state.loading}
             form='plan-editor-form'
+            size='s'
             type='submit'
           >
             {state.submitting ? 'Сохранение…' : 'Сохранить'}
@@ -557,7 +566,7 @@ export const PlannedWorkoutEditor: FC = observer(() => {
                       </option>
                     ))}
                   </select>
-                  <Button disabled={state.exercises.length === 0} onClick={handleAddExercise}>
+                  <Button color='secondary' disabled={state.exercises.length === 0} onClick={handleAddExercise}>
                     + Упражнение
                   </Button>
                 </div>

@@ -2,12 +2,21 @@
   display: inline-flex;
   align-items: center;
 
-  min-height: var(--tap-target);
-  padding: 0 var(--space-sm);
+  min-height: 36px;
+  margin-left: calc(-1 * var(--space-sm));
+  padding: 0 var(--space-md);
 
+  transition: background-color var(--transition-fast);
   text-decoration: none;
 
-  color: var(--color-text);
+  color: var(--color-text-muted);
+  border-radius: var(--radius-pill);
 
+  font-size: var(--font-size-sm);
   font-weight: 600;
+
+  &:hover {
+    color: var(--color-text);
+    background-color: var(--color-surface-elevated);
+  }
 }
